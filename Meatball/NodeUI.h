@@ -6,9 +6,9 @@ namespace Meatball {
         NodeUI();
         NodeUI(bool visible);
 
+        virtual void handleInput();
         virtual void update();
         virtual void draw();
-        virtual void handleInput();
 
         // events
         virtual void onFocusGain();

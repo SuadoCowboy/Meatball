@@ -10,9 +10,9 @@ namespace Meatball {
         static void init();
         static void run(const std::string& input);
         static void print(const std::string& message);
+        static std::stringstream output;
 
     private:
-        static std::stringstream output;
         static std::unordered_map<std::string, std::string> variables; // HayBCMD aliases are stored here
     };
 }

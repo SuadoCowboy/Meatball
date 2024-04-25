@@ -135,6 +135,7 @@
     <ClCompile Include="ConsoleUI.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="NodeUI.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SpaceInvadersTest.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -142,6 +143,7 @@
     <ClInclude Include="ConsoleUI.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="NodeUI.h" />
+    <ClInclude Include="Scene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
