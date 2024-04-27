@@ -131,17 +131,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="ConsoleUI.cpp" />
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Input.h" />
+    <ClCompile Include="Node.cpp" />
     <ClCompile Include="NodeUI.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SpaceInvadersTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="ConsoleUI.h" />
     <ClInclude Include="Engine.h" />
+    <ClInclude Include="Node.h" />
     <ClInclude Include="NodeUI.h" />
     <ClInclude Include="Scene.h" />
   </ItemGroup>

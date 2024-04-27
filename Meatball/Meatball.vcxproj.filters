@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\User-Interface">
+      <UniqueIdentifier>{4662917d-b23e-4c7f-91f7-de719c42119d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\User-Interface">
+      <UniqueIdentifier>{a5b71f51-31d7-43a7-83db-c1d9d61c3f89}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
@@ -27,11 +33,20 @@
     <ClCompile Include="ConsoleUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NodeUI.cpp">
+    <ClCompile Include="Node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeUI.cpp">
+      <Filter>Source Files\User-Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Source Files\User-Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.h">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,7 +56,7 @@
     <ClInclude Include="Console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NodeUI.h">
+    <ClInclude Include="Node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ConsoleUI.h">
@@ -49,6 +64,12 @@
     </ClInclude>
     <ClInclude Include="Scene.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeUI.h">
+      <Filter>Header Files\User-Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Header Files\User-Interface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
