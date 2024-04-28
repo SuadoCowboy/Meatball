@@ -16,7 +16,7 @@ int main(int, char**)
     // 3rd task: implement multiplayer and ticks per second system
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "My Title UwU");
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Console Build In Progress");
     SetWindowState(FLAG_VSYNC_HINT);
 
     Color backgroundColor = GetColor(0x181818FF);
@@ -26,34 +26,29 @@ int main(int, char**)
     Meatball::Scene* mainScene = new Meatball::Scene{ 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
     
     Color buttonColor = { 42, 107, 73, 255 };
-    Meatball::Interface::Button* myButton = new Meatball::Interface::Button(WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 50, 400, 100, buttonColor);
+    Meatball::Interface::Button* myButton = new Meatball::Interface::Button(WINDOW_WIDTH / 2 - 150, WINDOW_HEIGHT / 2 - 37, 300, 75, buttonColor);
 
     Font mytypeFont = LoadFont("fonts\\mytype.ttf");
-    Meatball::Interface::Label* myLabel = new Meatball::Interface::Label(myButton->height, mytypeFont, WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 50);
+    Meatball::Interface::Label* myLabel = new Meatball::Interface::Label((float)myButton->height, mytypeFont, myButton->x, myButton->y);
     myLabel->backgroundColor = { 0, 0, 0, 127 };
-
-    myLabel->setAnchor(myButton);
+    
     myLabel->setText("Say gex.");
+    myLabel->x = myButton->x + myButton->width / 2 - myLabel->width / 2;
+    myLabel->setAnchor(myButton);
 
-    myButton->connectOnMouseButtonPressed([&](Meatball::Interface::Button& buttonClass, Input::InpMouseButton buttons) {
+    SetExitKey(KEY_NULL); // disable exit key
+
+    myButton->connectOnMouseButtonPressed([&](Meatball::Scene& scene, Meatball::Interface::Button& button, Input::InpMouseButton buttons) {
         if (buttons & Input::InpMouseButton::MOUSE1)
-            myButton->x -= 30;
+            button.x -= 30;
         if (buttons & Input::InpMouseButton::MOUSE2)
-            myButton->x += 30;
-        
-        if (buttons & Input::InpMouseButton::MOUSE4) {
-            myLabel->x -= 30;
-            myLabel->setAnchor(myButton);
-        }
-        if (buttons & Input::InpMouseButton::MOUSE5) {
-            myLabel->x += 30;
-            myLabel->setAnchor(myButton);
-        }
-
+            button.x += 30;
     });
 
     mainScene->addNode(myButton);
     mainScene->addNode(myLabel);
+
+    mainScene->sortUINodesVector();
 
     Meatball::Engine engine{mainScene};
 

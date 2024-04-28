@@ -143,6 +143,7 @@
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="NodeUI.cpp" />
+    <ClCompile Include="Panel.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SpaceInvadersTest.cpp" />
   </ItemGroup>
@@ -154,6 +155,7 @@
     <ClInclude Include="Label.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="NodeUI.h" />
+    <ClInclude Include="Panel.h" />
     <ClInclude Include="Scene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

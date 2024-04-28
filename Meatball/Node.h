@@ -5,20 +5,23 @@
 namespace Meatball {
     enum NodeType {
         NODE = 1,
+
         NODEUI = 2,
-        SCENE = 4,
+        NODEUI_SCENE = 4,
         NODEUI_BUTTON = 8,
         NODEUI_LABEL = 16,
-        //NODEUI_BUTTON_TOGGLE = 32,
-        //NODEUI_PANEL = 64 // just a colored rectangle or something
+        NODEUI_PANEL = 32 // just a colored rectangle or something
+        //NODEUI_BUTTON_TOGGLE = 64,
         //NODEUI_TEXT_INPUT = 128,
-        //NODEUI_TEXT_BOX = 256 // or just use text_input and use a variable something related to disable input? or the other way around
-        //NODEUI_TEXURE = 512
+        //NODEUI_TEXT_BOX = 256, // or just use text_input and use a variable something related to disable input? or the other way around
+        
+        //SPRITE = 512, // could be used in UI/2D/3D
+        //TEXTURE = 1024
     };
 
     class Node {
     public:
-        Node(int x = 0, int y = 0, int width = 1, int height = 1, bool visible = true);
+        Node(int x, int y, int z, int width, int height, bool visible = true);
 
         virtual void update();
         virtual void draw();
@@ -26,7 +29,7 @@ namespace Meatball {
         virtual int getTypes();
 
         bool visible;
-        int x, y, width, height;
+        int x, y, z, width, height;
 
         virtual bool checkCollision(Rectangle& rectangle);
     };

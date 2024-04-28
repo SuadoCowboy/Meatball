@@ -5,11 +5,11 @@ void Meatball::Engine::init() {
 }
 
 Meatball::Engine::Engine(Scene* currentScene): currentScene(currentScene) {
-    float screenWidth = (float)GetScreenWidth();
-    float screenHeight = (float)GetScreenHeight();
+    int screenWidth = GetScreenWidth();
+    int screenHeight = GetScreenHeight();
     
-    float consoleUIWidth = screenWidth - screenWidth / 4;
-    float consoleUIHeight = screenHeight - screenHeight / 4;
+    int consoleUIWidth = screenWidth - screenWidth / 4;
+    int consoleUIHeight = screenHeight - screenHeight / 4;
 
     consoleUI = createConsoleUI(
         screenWidth / 2 - consoleUIWidth / 2,
@@ -38,18 +38,27 @@ void Meatball::Engine::addScene(Scene* scene) {
 }
 
 void Meatball::Engine::handleInput() {
-    /*
-    // pseudo code for onFocusGain and onFocusLoss FOR CONSOLE UI:
-    if (consoleUI.visible && mousebuttonpressed()) {
-        if (&mousebuttonpress.object == consoleUI) {
-            if (!consoleUI.focused) consoleUI->onFocusGain();
-            return;
-        } else
-            consoleUI->onFocusLoss();
-    }
-    currentScene->handleInput(); // WHEN ADDING THIS PART OF THE CODE REMEMBER TO REMOVE THE LINE BELOW
-    */
+    Rectangle mouseRect = {(float)GetMouseX(), (float)GetMouseY(), 1, 1};
+    
+    if (IsKeyReleased(KEY_GRAVE))
+        consoleUI->visible = !consoleUI->visible;
 
+    if (consoleUI->visible) {
+        if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT)) {
+            if (!consoleUI->checkCollision(mouseRect))
+                consoleUI->onFocusLoss(*consoleUI);
+
+            else if (!consoleUIFocused) {
+                consoleUIFocused = true;
+                consoleUI->onFocusGain(*consoleUI);
+            }
+        }
+
+        if (consoleUI->checkCollision(mouseRect)) {
+            consoleUI->handleInput();
+            return;
+        }
+    }
     /*
     // also handle input outside scene class, create Input class or something
     Input::update();
@@ -61,11 +70,12 @@ void Meatball::Engine::handleInput() {
     */
 
     // TODO: code to change focused scenes, when
-    currentScene->handleInput();
+    if (currentScene->checkCollision(mouseRect))
+        currentScene->handleInput();
 }
 
 void Meatball::Engine::update() {
-    if (consoleUI->visible) // && consoleUI->focused)
+    if (consoleUI->visible)
         consoleUI->update();
 
     currentScene->update();

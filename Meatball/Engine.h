@@ -35,7 +35,8 @@ namespace Meatball {
     
     private:
         Scene* consoleUI; // console is not inside any scene
-        
+        bool consoleUIFocused;
+
         Scene* currentScene;
         std::vector<Scene*> scenes;
     };

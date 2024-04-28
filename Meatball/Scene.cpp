@@ -1,82 +1,114 @@
 #include "Scene.h"
 
-#include "NodeUI.h"
 #include "Button.h"
 #include "Input.h"
 
+#include <algorithm>
+
 #include <raylib.h>
 
-Meatball::Scene::Scene(int x, int y, int width, int height, bool visible) : Node(x, y, width, height, visible), currentFocusedNode(nullptr) {}
+Meatball::Scene::Scene(int x, int y, int width, int height, bool visible) : NodeUI(x, y, width, height, visible), currentFocusedUINode(nullptr) {}
 
 Meatball::Scene::~Scene() {
-    for (auto& node : nodes)
+    for (auto& node : uiNodes)
         delete node;
 
-    nodes.clear();
+    uiNodes.clear();
+
+    /*
+    for (auto& node : 2dNodes)
+        delete node;
+    
+    2dNodes.clear();
+
+    for (auto& node : 3dNodes)
+        delete node;
+
+    3dNodes.clear();
+    */
 }
 
 int Meatball::Scene::getTypes() {
-    return Node::getTypes() | NodeType::SCENE;
+    return Node::getTypes() | NodeType::NODEUI_SCENE;
 }
 
-void Meatball::Scene::addNode(Node* node) {
-    nodes.push_back(node);
+void Meatball::Scene::addNode(Interface::NodeUI* node) {
+    uiNodes.push_back(node);
+}
+
+bool sortByZOrder(Meatball::Node* a, Meatball::Node* b) {
+    return a->z > b->z; // Sort in descending order of zOrder/layers
+}
+
+void Meatball::Scene::sortUINodesVector() {
+    std::sort(uiNodes.begin(), uiNodes.end(), sortByZOrder);
 }
 
 void Meatball::Scene::handleInput() {
     // TODO: add mousewheel event
 
     unsigned char mouseButtons = Input::anyMouseButtonPressed();
-    if (mouseButtons != 0) {
-        int mouseX = GetMouseX();
-        int mouseY = GetMouseY();
+    if (mouseButtons == 0)
+        return;
         
-        bool hitNode = false;
-        Rectangle mouseRect{(float)mouseX, (float)mouseY, 1.0f, 1.0f};
-        for (auto& node : nodes) {
-            if (!node->visible || !node->checkCollision(mouseRect))
-                continue;
+    bool hitNode = false;
+    Rectangle mouseRect{(float)GetMouseX()-x, (float)GetMouseY()-y, 1.0f, 1.0f};
 
-            if (currentFocusedNode != nullptr && currentFocusedNode->getTypes() & NodeType::NODEUI)
-                dynamic_cast<Interface::NodeUI*>(currentFocusedNode)->onFocusLoss();
+    for (auto it = uiNodes.rbegin(); it != uiNodes.rend(); ++it) {
+        auto node = *it;
+        if (node->inputPassThrough || !node->visible || !node->checkCollision(mouseRect))
+            continue;
+        
+        if (currentFocusedUINode != nullptr)
+            currentFocusedUINode->onFocusLoss(*this);
                 
-            currentFocusedNode = node;
-            dynamic_cast<Interface::NodeUI*>(currentFocusedNode)->onFocusGain();
+        currentFocusedUINode = node;
+        currentFocusedUINode->onFocusGain(*this);
 
-            hitNode = true;
-            break;
+        hitNode = true;
+        break;
             
-        }
+    }
 
+    if (currentFocusedUINode != nullptr) {
         // if the hit was in an empty space
-        if (currentFocusedNode != nullptr && !hitNode) {
-            dynamic_cast<Interface::NodeUI*>(currentFocusedNode)->onFocusLoss();
-            currentFocusedNode = nullptr;
+        if (!hitNode) {
+            currentFocusedUINode->onFocusLoss(*this);
+            currentFocusedUINode = nullptr;
         }
-
-        // TODO: find a way to check whether we are in game or using a user interface.
-        // FOR NOW we are only using NodeUI so it's okay to stay like that.
-        
-        // Scene class will check which node object was pressed by a mouse button and call a event
-        if (currentFocusedNode != nullptr && currentFocusedNode->getTypes() & NodeType::NODEUI_BUTTON)
-            dynamic_cast<Interface::Button*>(currentFocusedNode)->onMouseButtonPressed(
-                (Input::InpMouseButton)mouseButtons);
-            // maybe button press function should use events like press and release? Idk. See that in the future future
+        else if (currentFocusedUINode->getTypes() & NodeType::NODEUI_BUTTON)
+            ((Interface::Button*)currentFocusedUINode)->onMouseButtonPressed(
+                *this,
+                (Input::InpMouseButton)mouseButtons
+            );
+        // maybe button press function should use events like press and release? Idk. See that in the future future
         //else if (currentFocusedNode->getTypes() & NodeType::NODEUI_TEXT_INPUT)
             // handle text input
         
         //else if (currentFocusedNode->getTypes() & NodeType::NODEUI_BUTTON_TOGGLE)
             //dynamic_cast<Interface::ToggleButton*>(currentFocusedNode)->toggle();
     }
+
+    // TODO: find a way to check whether we are in game or using a user interface.
+    // FOR NOW we are only using NodeUI so it's okay to stay like that.
 }
 
 void Meatball::Scene::update() {
-    for (auto& node : nodes)
+    for (auto& node : uiNodes)
         node->update(); // should it be like that or just the focused one should be updated?? or maybe the visible ones???
 }
 
 void Meatball::Scene::draw() {
-    for (auto& node : nodes)
-        if (node->visible)
+    for (auto& node : uiNodes)
+        if (node->visible) {
+            int originalX = node->x, originalY = node->y;
+
+            node->x += x;
+            node->y += y;
+            
             node->draw();
+
+            node->x = originalX;
+            node->y = originalY;
+        }
 }
