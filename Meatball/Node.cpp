@@ -1,7 +1,7 @@
 #include "Node.h"
 
-Meatball::Node::Node(int x, int y, int width, int height, bool visible)
-	: x(x), y(y), width(width), height(height), visible(visible) {}
+Meatball::Node::Node(int x, int y, int z, int width, int height, bool visible)
+	: x(x), y(y), z(z), width(width), height(height), visible(visible) {}
 
 void Meatball::Node::update() {}
 void Meatball::Node::draw() {}
