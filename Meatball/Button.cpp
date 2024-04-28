@@ -54,7 +54,6 @@ bool Meatball::Interface::ButtonStyleX::checkCollision(const Button& button, Rec
 	return CheckCollisionRecs(buttonRect, rectangle);
 }
 
-
 Meatball::Interface::Button::Button(int x, int y, int width, int height, Color color, bool visible) :
 	NodeUI(x, y, width, height, visible), color(color), styleMethods(nullptr) {
 	setStyle(ButtonStyle::RECTANGLE);
@@ -96,12 +95,12 @@ bool Meatball::Interface::Button::checkCollision(Rectangle& rectangle) {
 	return styleMethods->checkCollision(*this, rectangle);
 }
 
-void Meatball::Interface::Button::setOnMouseButtonPressed(const std::function<void(Button&, MouseButton)>& lambda) {
-	onMouseButtonPressedFunction = lambda;
+void Meatball::Interface::Button::connectOnMouseButtonPressed(const std::function<void(Button&, Input::InpMouseButton)>& lambda) {
+	onMouseButtonPressedConnector = lambda;
 }
 
-void Meatball::Interface::Button::onMouseButtonPressed(MouseButton button) {
-	onMouseButtonPressedFunction(*this, button);
+void Meatball::Interface::Button::onMouseButtonPressed(Input::InpMouseButton buttons) {
+	if (onMouseButtonPressedConnector) onMouseButtonPressedConnector(*this, buttons);
 }
 
 int Meatball::Interface::Button::getTypes() {

@@ -2,10 +2,15 @@
 
 #include "Console.h"
 #include "ConsoleUI.h"
+
 #include "Node.h"
+
 #include "NodeUI.h"
 #include "Button.h"
+#include "Label.h"
+
 #include "Scene.h"
+
 #include "Input.h"
 
 #include <HayBCMD.h>

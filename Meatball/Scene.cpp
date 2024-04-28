@@ -2,6 +2,7 @@
 
 #include "NodeUI.h"
 #include "Button.h"
+#include "Input.h"
 
 #include <raylib.h>
 
@@ -23,12 +24,13 @@ void Meatball::Scene::addNode(Node* node) {
 }
 
 void Meatball::Scene::handleInput() {
-    
-    //pseudo code for onFocusGain and onFocusLoss:
-    if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT)) {// && mousebuttonpress.object != currentFocusedNode) {
+    // TODO: add mousewheel event
+
+    unsigned char mouseButtons = Input::anyMouseButtonPressed();
+    if (mouseButtons != 0) {
         int mouseX = GetMouseX();
         int mouseY = GetMouseY();
-
+        
         bool hitNode = false;
         Rectangle mouseRect{(float)mouseX, (float)mouseY, 1.0f, 1.0f};
         for (auto& node : nodes) {
@@ -46,6 +48,7 @@ void Meatball::Scene::handleInput() {
             
         }
 
+        // if the hit was in an empty space
         if (currentFocusedNode != nullptr && !hitNode) {
             dynamic_cast<Interface::NodeUI*>(currentFocusedNode)->onFocusLoss();
             currentFocusedNode = nullptr;
@@ -56,7 +59,8 @@ void Meatball::Scene::handleInput() {
         
         // Scene class will check which node object was pressed by a mouse button and call a event
         if (currentFocusedNode != nullptr && currentFocusedNode->getTypes() & NodeType::NODEUI_BUTTON)
-            dynamic_cast<Interface::Button*>(currentFocusedNode)->onMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT);
+            dynamic_cast<Interface::Button*>(currentFocusedNode)->onMouseButtonPressed(
+                (Input::InpMouseButton)mouseButtons);
             // maybe button press function should use events like press and release? Idk. See that in the future future
         //else if (currentFocusedNode->getTypes() & NodeType::NODEUI_TEXT_INPUT)
             // handle text input

@@ -138,7 +138,9 @@
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="ConsoleUI.cpp" />
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="Input.h" />
+    <ClCompile Include="Label.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="NodeUI.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -149,6 +151,7 @@
     <ClInclude Include="Console.h" />
     <ClInclude Include="ConsoleUI.h" />
     <ClInclude Include="Engine.h" />
+    <ClInclude Include="Label.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="NodeUI.h" />
     <ClInclude Include="Scene.h" />

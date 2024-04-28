@@ -3,19 +3,33 @@
 Meatball::Interface::NodeUI::NodeUI(int x, int y, int width, int height, bool visible)
 	: Node(x, y, width, height, visible), nodeAnchoredTo(nullptr), relativeX(0), relativeY(0) {}
 
-void Meatball::Interface::NodeUI::onFocusGain() {}
-void Meatball::Interface::NodeUI::onFocusLoss() {}
-
-int Meatball::Interface::NodeUI::getTypes() {
-	return Node::getTypes() | NodeType::NODEUI;
+void Meatball::Interface::NodeUI::onFocusGain() {
+	if (onFocusGainConnector) onFocusGainConnector(*this);
 }
 
-void Meatball::Interface::NodeUI::updatePosition() {
+void Meatball::Interface::NodeUI::onFocusLoss() {
+	if (onFocusLossConnector) onFocusLossConnector(*this);
+}
+
+void Meatball::Interface::NodeUI::update() {
+	// updates position relative to anchor
 	if (nodeAnchoredTo == nullptr)
 		return;
 
 	x = nodeAnchoredTo->x + relativeX;
 	y = nodeAnchoredTo->y + relativeY;
+}
+
+void Meatball::Interface::NodeUI::connectOnFocusGain(const std::function<void(NodeUI&)>& lambda) {
+	onFocusGainConnector = lambda;
+}
+
+void Meatball::Interface::NodeUI::connectOnFocusLoss(const std::function<void(NodeUI&)>& lambda) {
+	onFocusLossConnector = lambda;
+}
+
+int Meatball::Interface::NodeUI::getTypes() {
+	return Node::getTypes() | NodeType::NODEUI;
 }
 
 void Meatball::Interface::NodeUI::setAnchor(NodeUI* node) {

@@ -47,7 +47,7 @@ void Meatball::Engine::handleInput() {
         } else
             consoleUI->onFocusLoss();
     }
-    currentScene.handleInput(); // WHEN ADDING THIS PART OF THE CODE REMEMBER TO REMOVE THE LINE BELOW
+    currentScene->handleInput(); // WHEN ADDING THIS PART OF THE CODE REMEMBER TO REMOVE THE LINE BELOW
     */
 
     /*

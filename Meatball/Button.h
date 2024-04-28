@@ -1,6 +1,7 @@
 #pragma once
 
 #include "NodeUI.h"
+#include "Input.h"
 
 #include <raylib.h>
 
@@ -21,8 +22,11 @@ namespace Meatball {
 			Button(int x, int y, int width, int height, Color color, bool visible = true);
 			~Button();
 			
-			void setOnMouseButtonPressed(const std::function<void(Button&, MouseButton)>& lambda);
-			void onMouseButtonPressed(MouseButton button);
+			// TODO: if more nodeui inheritances requires those events, create another class to inherit
+			// specific events from. Ex: MousePressedEvent; MouseHoverEvent; MouseUnhoverEvent; etc 
+			void connectOnMouseButtonPressed(const std::function<void(Button&, Input::InpMouseButton)>& lambda);
+			void onMouseButtonPressed(Input::InpMouseButton buttons);
+			
 			void draw();
 			
 			bool checkCollision(Rectangle& rectangle);
@@ -34,7 +38,7 @@ namespace Meatball {
 			Color color;
 		
 		private:
-			std::function<void(Button&, MouseButton)> onMouseButtonPressedFunction;
+			std::function<void(Button&, Input::InpMouseButton)> onMouseButtonPressedConnector;
 			ButtonStyleClass* styleMethods; // methods for a specific style
 		};
 

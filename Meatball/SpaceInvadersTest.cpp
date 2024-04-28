@@ -7,10 +7,12 @@
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 700
 
+namespace Input = Meatball::Input;
+
 int main(int, char**)
 {
     // 1st task: create a simple space invaders(2d game) copy using Meatball
-    // 2nd task: create a 3d fps/tps shooter?
+    // 2nd task: create a 3d fps  shooter?
     // 3rd task: implement multiplayer and ticks per second system
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -26,31 +28,33 @@ int main(int, char**)
     Color buttonColor = { 42, 107, 73, 255 };
     Meatball::Interface::Button* myButton = new Meatball::Interface::Button(WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 50, 400, 100, buttonColor);
 
-    unsigned char currentStyle = 0;
+    Font mytypeFont = LoadFont("C:\\Users\\home\\Desktop\\Lucca\\Projeto\\cpp\\Meatball\\x64\\Debug\\fonts\\mytype.ttf");
+    Meatball::Interface::Label* myLabel = new Meatball::Interface::Label(myButton->height, mytypeFont, WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 50);
+    myLabel->backgroundColor = { 0, 0, 0, 127 };
 
-    myButton->setOnMouseButtonPressed([&](Meatball::Interface::Button& buttonClass, MouseButton button) {
-        if (button != MouseButton::MOUSE_BUTTON_LEFT)
-            return;
+    myLabel->setAnchor(myButton);
+    myLabel->setText("OHAIOOO!");
 
-        currentStyle++;
-        if (currentStyle == 3) currentStyle = 0;
+    myButton->connectOnMouseButtonPressed([&](Meatball::Interface::Button& buttonClass, Input::InpMouseButton buttons) {
+        if (buttons & Input::InpMouseButton::MOUSE1)
+            myButton->x -= 30;
+        if (buttons & Input::InpMouseButton::MOUSE2)
+            myButton->x += 30;
         
-        buttonClass.setStyle((Meatball::Interface::ButtonStyle)currentStyle);
+        if (buttons & Input::InpMouseButton::MOUSE4) {
+            myLabel->x -= 30;
+            myLabel->setAnchor(myButton);
+        }
+        if (buttons & Input::InpMouseButton::MOUSE5) {
+            myLabel->x += 30;
+            myLabel->setAnchor(myButton);
+        }
 
-        if (currentStyle == 1) {
-            myButton->width = 4000;
-            myButton->x = WINDOW_WIDTH / 2;
-            myButton->y = WINDOW_HEIGHT / 2;
-        }
-        else {
-            myButton->width = 400;
-            myButton->x = WINDOW_WIDTH / 2 - 200;
-            myButton->y = WINDOW_HEIGHT / 2 - 50;
-        }
-        });
+    });
 
     mainScene->addNode(myButton);
-    
+    mainScene->addNode(myLabel);
+
     Meatball::Engine engine{mainScene};
 
     while (!WindowShouldClose()) {
@@ -64,6 +68,8 @@ int main(int, char**)
 
         EndDrawing();
     }
+
+    UnloadFont(mytypeFont);
 
     return 0;
 }

@@ -48,6 +48,12 @@
     <ClCompile Include="Input.h">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="Label.cpp">
+      <Filter>Source Files\User-Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -69,6 +75,9 @@
       <Filter>Header Files\User-Interface</Filter>
     </ClInclude>
     <ClInclude Include="Button.h">
+      <Filter>Header Files\User-Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Label.h">
       <Filter>Header Files\User-Interface</Filter>
     </ClInclude>
   </ItemGroup>
