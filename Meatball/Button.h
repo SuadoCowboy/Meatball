@@ -8,6 +8,8 @@
 #include <functional>
 
 namespace Meatball {
+	class Scene;
+
 	namespace Interface {
 		enum ButtonStyle {
 			RECTANGLE,
@@ -24,8 +26,8 @@ namespace Meatball {
 			
 			// TODO: if more nodeui inheritances requires those events, create another class to inherit
 			// specific events from. Ex: MousePressedEvent; MouseHoverEvent; MouseUnhoverEvent; etc 
-			void connectOnMouseButtonPressed(const std::function<void(Button&, Input::InpMouseButton)>& lambda);
-			void onMouseButtonPressed(Input::InpMouseButton buttons);
+			void connectOnMouseButtonPressed(const std::function<void(Scene& scene, Button& button, Input::InpMouseButton)>& lambda);
+			void onMouseButtonPressed(Scene& scene, Input::InpMouseButton buttons);
 			
 			void draw();
 			
@@ -38,7 +40,7 @@ namespace Meatball {
 			Color color;
 		
 		private:
-			std::function<void(Button&, Input::InpMouseButton)> onMouseButtonPressedConnector;
+			std::function<void(Scene& scene, Button& button, Input::InpMouseButton)> onMouseButtonPressedConnector;
 			ButtonStyleClass* styleMethods; // methods for a specific style
 		};
 

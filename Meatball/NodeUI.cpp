@@ -1,14 +1,18 @@
 #include "NodeUI.h"
 
-Meatball::Interface::NodeUI::NodeUI(int x, int y, int width, int height, bool visible)
-	: Node(x, y, width, height, visible), nodeAnchoredTo(nullptr), relativeX(0), relativeY(0) {}
+#include "Console.h"
 
-void Meatball::Interface::NodeUI::onFocusGain() {
-	if (onFocusGainConnector) onFocusGainConnector(*this);
+Meatball::Interface::NodeUI::NodeUI(int x, int y, int width, int height, bool visible)
+	: Node(x, y, 0, width, height, visible), nodeAnchoredTo(nullptr),
+	relativeX(0), relativeY(0), inputPassThrough(false) {}
+
+void Meatball::Interface::NodeUI::onFocusGain(Scene& scene) {
+	if (onFocusGainConnector) onFocusGainConnector(scene, *this);
 }
 
-void Meatball::Interface::NodeUI::onFocusLoss() {
-	if (onFocusLossConnector) onFocusLossConnector(*this);
+void Meatball::Interface::NodeUI::onFocusLoss(Scene& scene) {
+	if (onFocusLossConnector)
+		onFocusLossConnector(scene, *this);
 }
 
 void Meatball::Interface::NodeUI::update() {
@@ -20,11 +24,11 @@ void Meatball::Interface::NodeUI::update() {
 	y = nodeAnchoredTo->y + relativeY;
 }
 
-void Meatball::Interface::NodeUI::connectOnFocusGain(const std::function<void(NodeUI&)>& lambda) {
+void Meatball::Interface::NodeUI::connectOnFocusGain(const std::function<void(Scene&, NodeUI&)>& lambda) {
 	onFocusGainConnector = lambda;
 }
 
-void Meatball::Interface::NodeUI::connectOnFocusLoss(const std::function<void(NodeUI&)>& lambda) {
+void Meatball::Interface::NodeUI::connectOnFocusLoss(const std::function<void(Scene&, NodeUI&)>& lambda) {
 	onFocusLossConnector = lambda;
 }
 

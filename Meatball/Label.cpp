@@ -2,7 +2,9 @@
 
 Meatball::Interface::Label::Label(float fontSize, const Font& font, int x, int y, bool visible, float spacing)
 	: NodeUI(x, y, width, height, visible), fontSize(fontSize), font(font), spacing(spacing),
-	backgroundColor({ 0, 0, 0, 255 }), foregroundColor({ 255, 255, 255, 255 }) {}
+	backgroundColor({ 0, 0, 0, 255 }), foregroundColor({ 255, 255, 255, 255 }) {
+	inputPassThrough = true;
+}
 
 int Meatball::Interface::Label::getTypes() {
 	return NodeUI::getTypes() | NodeType::NODEUI_LABEL;

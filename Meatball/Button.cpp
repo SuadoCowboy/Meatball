@@ -95,12 +95,12 @@ bool Meatball::Interface::Button::checkCollision(Rectangle& rectangle) {
 	return styleMethods->checkCollision(*this, rectangle);
 }
 
-void Meatball::Interface::Button::connectOnMouseButtonPressed(const std::function<void(Button&, Input::InpMouseButton)>& lambda) {
+void Meatball::Interface::Button::connectOnMouseButtonPressed(const std::function<void(Scene& scene, Button& button, Input::InpMouseButton)>& lambda) {
 	onMouseButtonPressedConnector = lambda;
 }
 
-void Meatball::Interface::Button::onMouseButtonPressed(Input::InpMouseButton buttons) {
-	if (onMouseButtonPressedConnector) onMouseButtonPressedConnector(*this, buttons);
+void Meatball::Interface::Button::onMouseButtonPressed(Scene& scene, Input::InpMouseButton buttons) {
+	if (onMouseButtonPressedConnector) onMouseButtonPressedConnector(scene, *this, buttons);
 }
 
 int Meatball::Interface::Button::getTypes() {
