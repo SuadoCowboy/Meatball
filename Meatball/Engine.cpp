@@ -11,18 +11,30 @@ Meatball::Engine::Engine(Scene* currentScene): currentScene(currentScene) {
     float consoleUIWidth = screenWidth - screenWidth / 4;
     float consoleUIHeight = screenHeight - screenHeight / 4;
 
-    consoleUI = ConsoleUI(
+    consoleUI = createConsoleUI(
         screenWidth / 2 - consoleUIWidth / 2,
         screenHeight / 2 - consoleUIHeight / 2,
         consoleUIWidth,
         consoleUIHeight
     ); // centers the console to the middle of the screen
+    
+    addScene(currentScene);
 }
 
 Meatball::Engine::~Engine() {
     for (auto& scene : scenes)
         delete scene;
+
     scenes.clear();
+
+    if (consoleUI != nullptr) {
+        delete consoleUI;
+        consoleUI = nullptr;
+    }
+}
+
+void Meatball::Engine::addScene(Scene* scene) {
+    scenes.push_back(scene);
 }
 
 void Meatball::Engine::handleInput() {
@@ -53,8 +65,9 @@ void Meatball::Engine::handleInput() {
 }
 
 void Meatball::Engine::update() {
-    if (consoleUI.visible) // && consoleUI.focused)
-        consoleUI.update();
+    if (consoleUI->visible) // && consoleUI->focused)
+        consoleUI->update();
+
     currentScene->update();
 }
 
@@ -66,6 +79,6 @@ void Meatball::Engine::draw() {
         if (scene->visible)
             scene->draw();
 
-    if (consoleUI.visible)
-        consoleUI.draw();
+    if (consoleUI->visible)
+        consoleUI->draw();
 }

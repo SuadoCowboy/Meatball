@@ -1,13 +1,13 @@
 #include "NodeUI.h"
 
 Meatball::Interface::NodeUI::NodeUI(int x, int y, int width, int height, bool visible)
-	: Node(visible), x(x), y(y), width(width), height(height), nodeAnchoredTo(nullptr), relativeX(0), relativeY(0) {}
+	: Node(x, y, width, height, visible), nodeAnchoredTo(nullptr), relativeX(0), relativeY(0) {}
 
 void Meatball::Interface::NodeUI::onFocusGain() {}
 void Meatball::Interface::NodeUI::onFocusLoss() {}
 
-Meatball::NodeType Meatball::Interface::NodeUI::getType() {
-	return NodeType::NODEUI;
+int Meatball::Interface::NodeUI::getTypes() {
+	return Node::getTypes() | NodeType::NODEUI;
 }
 
 void Meatball::Interface::NodeUI::updatePosition() {

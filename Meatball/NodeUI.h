@@ -17,9 +17,7 @@ namespace Meatball {
             // position relative to anchor
             void updatePosition();
 
-            virtual NodeType getType();
-
-            int x, y, width, height;
+            virtual int getTypes();
 
         private:
             int relativeX, relativeY; // for anchor mode

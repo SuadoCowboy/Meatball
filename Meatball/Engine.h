@@ -3,7 +3,10 @@
 #include "Console.h"
 #include "ConsoleUI.h"
 #include "Node.h"
+#include "NodeUI.h"
+#include "Button.h"
 #include "Scene.h"
+#include "Input.h"
 
 #include <HayBCMD.h>
 
@@ -26,7 +29,7 @@ namespace Meatball {
         void draw(); // draw current scene + consoleUI
     
     private:
-        ConsoleUI consoleUI; // console is not inside any scene
+        Scene* consoleUI; // console is not inside any scene
         
         Scene* currentScene;
         std::vector<Scene*> scenes;

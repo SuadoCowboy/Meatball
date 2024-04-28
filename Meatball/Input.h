@@ -16,15 +16,6 @@ namespace Meatball {
 		MOUSE6 = MouseButton::MOUSE_BUTTON_SIDE
 	};
 	*/
-	class Input {
-	public:
-		static bool pressed();
-		static bool pressedOnce();
-
-		static bool released();
-		static bool releasedOnce();
-
-	private:
-		std::unordered_map<std::string, short> keys; // (keyname, keycode)
-	}
+	
+	// I don't know what to do with input.h... Maybe handle binds?
 }

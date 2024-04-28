@@ -1,6 +1,11 @@
 #include "Scene.h"
 
-Meatball::Scene::Scene(bool visible) : currentFocusedNode(nullptr), visible(visible) {}
+#include "NodeUI.h"
+#include "Button.h"
+
+#include <raylib.h>
+
+Meatball::Scene::Scene(int x, int y, int width, int height, bool visible) : Node(x, y, width, height, visible), currentFocusedNode(nullptr) {}
 
 Meatball::Scene::~Scene() {
     for (auto& node : nodes)
@@ -9,41 +14,55 @@ Meatball::Scene::~Scene() {
     nodes.clear();
 }
 
+int Meatball::Scene::getTypes() {
+    return Node::getTypes() | NodeType::SCENE;
+}
+
 void Meatball::Scene::addNode(Node* node) {
     nodes.push_back(node);
 }
 
 void Meatball::Scene::handleInput() {
-    if (currentFocusedNode == nullptr || !currentFocusedNode->visible)
-        return;
-
-    /*
-    //pseudo code for onFocusGain and onFocusLoss:
-    if (mousebuttonpressed() && mousebuttonpress.object != currentFocusedNode) {
-        currentFocusedNode->onFocusLoss();
-        currentFocusedNode = mousebuttonpress.object;
-        currentFocusedNode->onFocusGain();
-    }
-    */
     
-    // Scene class will check which node object was pressed by a mouse button and call a event
-    switch (currentFocusedNode->type) {
-    case TEXT_INPUT_BOX:    
-        // place a function call or slice of code here to handle text input
-        break;
-    case TOGGLE_BUTTON: // a toggle button
-        if (UI::ToggleButton* toggleButton = dynamic_cast<UI::ToggleButton*>(currentFocusedNode)) {
-            toggleButton->toggle(); // Now it's possible to use variables of button class
+    //pseudo code for onFocusGain and onFocusLoss:
+    if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT)) {// && mousebuttonpress.object != currentFocusedNode) {
+        int mouseX = GetMouseX();
+        int mouseY = GetMouseY();
+
+        bool hitNode = false;
+        Rectangle mouseRect{(float)mouseX, (float)mouseY, 1.0f, 1.0f};
+        for (auto& node : nodes) {
+            if (!node->visible || !node->checkCollision(mouseRect))
+                continue;
+
+            if (currentFocusedNode != nullptr && currentFocusedNode->getTypes() & NodeType::NODEUI)
+                dynamic_cast<Interface::NodeUI*>(currentFocusedNode)->onFocusLoss();
+                
+            currentFocusedNode = node;
+            dynamic_cast<Interface::NodeUI*>(currentFocusedNode)->onFocusGain();
+
+            hitNode = true;
+            break;
+            
         }
-        break;
-    case BUTTON: // just a simple press button
-        if (UI::Button* button = dynamic_cast<UI::Button*>(currentFocusedNode)) {
-            button->press(); // Now it's possible to use variables of button class
+
+        if (currentFocusedNode != nullptr && !hitNode) {
+            dynamic_cast<Interface::NodeUI*>(currentFocusedNode)->onFocusLoss();
+            currentFocusedNode = nullptr;
+        }
+
+        // TODO: find a way to check whether we are in game or using a user interface.
+        // FOR NOW we are only using NodeUI so it's okay to stay like that.
+        
+        // Scene class will check which node object was pressed by a mouse button and call a event
+        if (currentFocusedNode != nullptr && currentFocusedNode->getTypes() & NodeType::NODEUI_BUTTON)
+            dynamic_cast<Interface::Button*>(currentFocusedNode)->onMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT);
             // maybe button press function should use events like press and release? Idk. See that in the future future
-        }
-        break;
-    case default: // any other thing that does not require input handling
-        break;
+        //else if (currentFocusedNode->getTypes() & NodeType::NODEUI_TEXT_INPUT)
+            // handle text input
+        
+        //else if (currentFocusedNode->getTypes() & NodeType::NODEUI_BUTTON_TOGGLE)
+            //dynamic_cast<Interface::ToggleButton*>(currentFocusedNode)->toggle();
     }
 }
 

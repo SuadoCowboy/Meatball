@@ -5,14 +5,10 @@
 #include "Console.h"
 
 Meatball::Scene* Meatball::createConsoleUI(float x, float y, float width, float height, Color mainPanelColor, bool isVisible) {
-	Rectangle mainPanel; // might need to be created a node to store the mainPanel also...
-
-	//Scene* scene = new Scene(isVisible);
-	/*
-	delete scene;
-	scene = nullptr; // doing that in case this part is ran WHILE IT'S NOT EVEN FINISHED
-	*/
+	Scene* scene = new Scene(isVisible);
 	
+	//Panel mainPanel{0,0};
+
 	//closeButton.setAnchor(mainPanel);
 	//inputBox.setAnchor(mainPanel);
 	//outputBox.setAnchor(mainPanel);
@@ -27,5 +23,5 @@ Meatball::Scene* Meatball::createConsoleUI(float x, float y, float width, float 
 	//scene->addNode(outputBox); // the box that shows all the console data
 	//scene->addNode(buildVersion) // this one is at the top right
 	
-	//return scene;
+	return scene;
 }
