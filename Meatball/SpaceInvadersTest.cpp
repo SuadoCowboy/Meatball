@@ -28,12 +28,12 @@ int main(int, char**)
     Color buttonColor = { 42, 107, 73, 255 };
     Meatball::Interface::Button* myButton = new Meatball::Interface::Button(WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 50, 400, 100, buttonColor);
 
-    Font mytypeFont = LoadFont("C:\\Users\\home\\Desktop\\Lucca\\Projeto\\cpp\\Meatball\\x64\\Debug\\fonts\\mytype.ttf");
+    Font mytypeFont = LoadFont("fonts\\mytype.ttf");
     Meatball::Interface::Label* myLabel = new Meatball::Interface::Label(myButton->height, mytypeFont, WINDOW_WIDTH / 2 - 200, WINDOW_HEIGHT / 2 - 50);
     myLabel->backgroundColor = { 0, 0, 0, 127 };
 
     myLabel->setAnchor(myButton);
-    myLabel->setText("OHAIOOO!");
+    myLabel->setText("Say gex.");
 
     myButton->connectOnMouseButtonPressed([&](Meatball::Interface::Button& buttonClass, Input::InpMouseButton buttons) {
         if (buttons & Input::InpMouseButton::MOUSE1)
