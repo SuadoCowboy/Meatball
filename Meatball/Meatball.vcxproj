@@ -144,6 +144,8 @@
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="NodeUI.cpp" />
     <ClCompile Include="Panel.cpp" />
+    <ClCompile Include="RESIZE_EXAMPLE2D.cpp" />
+    <ClCompile Include="RESIZE_EXAMPLE3D.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SpaceInvadersTest.cpp" />
   </ItemGroup>
