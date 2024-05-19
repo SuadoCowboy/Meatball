@@ -2,9 +2,9 @@
 
 #include "Console.h"
 
-Meatball::Interface::NodeUI::NodeUI(int x, int y, int width, int height, bool visible)
+Meatball::Interface::NodeUI::NodeUI(float x, float y, float width, float height, bool visible)
 	: Node(x, y, 0, width, height, visible), nodeAnchoredTo(nullptr),
-	relativeX(0), relativeY(0), inputPassThrough(false) {}
+	anchorRelative({ 0, 0 }), inputPassThrough(false) {}
 
 void Meatball::Interface::NodeUI::onFocusGain(Scene& scene) {
 	if (onFocusGainConnector) onFocusGainConnector(scene, *this);
@@ -20,8 +20,12 @@ void Meatball::Interface::NodeUI::update() {
 	if (nodeAnchoredTo == nullptr)
 		return;
 
-	x = nodeAnchoredTo->x + relativeX;
-	y = nodeAnchoredTo->y + relativeY;
+	x = nodeAnchoredTo->x + anchorRelative.x;
+	y = nodeAnchoredTo->y + anchorRelative.y;
+}
+
+Meatball::Interface::NodeUI* Meatball::Interface::NodeUI::getAnchor() {
+	return nodeAnchoredTo;
 }
 
 void Meatball::Interface::NodeUI::connectOnFocusGain(const std::function<void(Scene&, NodeUI&)>& lambda) {
@@ -42,11 +46,11 @@ void Meatball::Interface::NodeUI::setAnchor(NodeUI* node) {
 
 	nodeAnchoredTo = node;
 	if (nodeAnchoredTo == nullptr) {
-		relativeX = 0;
-		relativeY = 0;
+		anchorRelative.x = 0;
+		anchorRelative.y = 0;
 		return;
 	}
 
-	relativeX = x - nodeAnchoredTo->x;
-	relativeY = y - nodeAnchoredTo->y;
+	anchorRelative.x = x - nodeAnchoredTo->x;
+	anchorRelative.y = y - nodeAnchoredTo->y;
 }

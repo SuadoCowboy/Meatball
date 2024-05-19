@@ -8,7 +8,7 @@ namespace Meatball {
 	namespace Interface {
 		class Label : public NodeUI {
 		public:
-			Label(float fontSize, const Font& font, int x, int y, bool visible = true, float spacing = 1.0f);
+			Label(float fontSize, const Font& font, float x, float y, bool visible = true, float spacing = 1.0f);
 
 			void draw();
 

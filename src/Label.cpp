@@ -1,7 +1,7 @@
 #include "Label.h"
 
-Meatball::Interface::Label::Label(float fontSize, const Font& font, int x, int y, bool visible, float spacing)
-	: NodeUI(x, y, width, height, visible), fontSize(fontSize), font(font), spacing(spacing),
+Meatball::Interface::Label::Label(float fontSize, const Font& font, float x, float y, bool visible, float spacing)
+	: NodeUI(x, y, 1.f, 1.f, visible), fontSize(fontSize), font(font), spacing(spacing),
 	backgroundColor({ 0, 0, 0, 255 }), foregroundColor({ 255, 255, 255, 255 }) {
 	inputPassThrough = true;
 }
@@ -13,8 +13,8 @@ int Meatball::Interface::Label::getTypes() {
 void Meatball::Interface::Label::updateSize() {
 	Vector2 size = MeasureTextEx(font, text.c_str(), fontSize, spacing);
 
-	width = (int)size.x;
-	height = (int)size.y;
+	width = size.x;
+	height = size.y;
 }
 
 void Meatball::Interface::Label::setText(const std::string& newText) {
@@ -29,6 +29,6 @@ const std::string& Meatball::Interface::Label::getText() {
 void Meatball::Interface::Label::draw() {
 	DrawRectangle(x, y, width, height, backgroundColor);
 
-	Vector2 pos{ (float)x, (float)y };
+	Vector2 pos{ x, y };
 	DrawTextEx(font, text.c_str(), pos, fontSize, spacing, foregroundColor);
 }

@@ -54,7 +54,7 @@ bool Meatball::Interface::ButtonStyleX::checkCollision(const Button& button, Rec
 	return CheckCollisionRecs(buttonRect, rectangle);
 }
 
-Meatball::Interface::Button::Button(int x, int y, int width, int height, Color color, bool visible) :
+Meatball::Interface::Button::Button(float x, float y, float width, float height, Color color, bool visible) :
 	NodeUI(x, y, width, height, visible), color(color), styleMethods(nullptr) {
 	setStyle(ButtonStyle::RECTANGLE);
 }

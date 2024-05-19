@@ -7,24 +7,18 @@
 
 using namespace Meatball::Interface;
 
-Meatball::Scene* Meatball::createConsoleUI(int x, int y, int width, int height, Color mainPanelColor, bool visible) {
-	Scene* scene = new Scene(x, y, width, height, visible);
+Meatball::Scene* Meatball::createConsoleUI(float x, float y, float width, float height, Color mainPanelColor, bool visible) {
+	Scene* scene = new Scene(visible);
 	
-	Panel* mainPanel = new Panel{ 0, 0, width, height, mainPanelColor };
+	Panel* mainPanel = new Panel{ x, y, width, height, mainPanelColor };
 	mainPanel->z = 1;
-
-	Button* closeButton = new Button{ width - 10, 5, 5, 5, {255, 255, 255, 255} };
+	
+	Button* closeButton = new Button{ x + width - 10.f, y + 5.f, 5.f, 5.f, {255, 255, 255, 255} };
 	closeButton->setStyle(ButtonStyle::X);
 	closeButton->setAnchor(mainPanel);
 	closeButton->z = 0;
 
-	closeButton->connectOnFocusGain([&](Scene& scene, NodeUI uiNode) {
-		Console::print("FOCUS GAINED BY BUTTON!\n");
-	});
-
-	closeButton->connectOnFocusLoss([&](Scene& scene, NodeUI uiNode) {
-		Console::print("FOCUS LOST BY BUTTON!\n");
-	});
+	Console::print("(" + std::to_string(closeButton->x) + ", " + std::to_string(closeButton->y) + ")\n");
 
 	closeButton->connectOnMouseButtonPressed([&](Scene& scene, Button& button, Input::InpMouseButton mouseButton)  {
 		// TODO: FUTURE: slow fade when closing(configurable via cmd so settings.cfg could be created :D)

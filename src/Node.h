@@ -21,7 +21,7 @@ namespace Meatball {
 
     class Node {
     public:
-        Node(int x, int y, int z, int width, int height, bool visible = true);
+        Node(float x, float y, float z, float width, float height, bool visible = true);
 
         virtual void update();
         virtual void draw();
@@ -29,7 +29,7 @@ namespace Meatball {
         virtual int getTypes();
 
         bool visible;
-        int x, y, z, width, height;
+        float x, y, z, width, height;
 
         virtual bool checkCollision(Rectangle& rectangle);
     };

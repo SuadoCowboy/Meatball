@@ -21,7 +21,7 @@ namespace Meatball {
 
 		class Button : public NodeUI {
 		public:
-			Button(int x, int y, int width, int height, Color color, bool visible = true);
+			Button(float x, float y, float width, float height, Color color, bool visible = true);
 			~Button();
 			
 			// TODO: if more nodeui inheritances requires those events, create another class to inherit

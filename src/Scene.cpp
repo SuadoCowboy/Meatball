@@ -2,12 +2,11 @@
 
 #include "Button.h"
 #include "Input.h"
+#include "Label.h"
 
 #include <algorithm>
 
-#include <raylib.h>
-
-Meatball::Scene::Scene(int x, int y, int width, int height, bool visible) : NodeUI(x, y, width, height, visible), currentFocusedUINode(nullptr) {}
+Meatball::Scene::Scene(bool visible) : visible(visible), currentFocusedUINode(nullptr) {}
 
 Meatball::Scene::~Scene() {
     for (auto& node : uiNodes)
@@ -28,10 +27,6 @@ Meatball::Scene::~Scene() {
     */
 }
 
-int Meatball::Scene::getTypes() {
-    return Node::getTypes() | NodeType::NODEUI_SCENE;
-}
-
 void Meatball::Scene::addNode(Interface::NodeUI* node) {
     uiNodes.push_back(node);
 }
@@ -45,14 +40,13 @@ void Meatball::Scene::sortUINodesVector() {
 }
 
 void Meatball::Scene::handleInput() {
-    // TODO: add mousewheel event
-
+    // TODO: add mousewheel 
     unsigned char mouseButtons = Input::anyMouseButtonPressed();
     if (mouseButtons == 0)
         return;
         
     bool hitNode = false;
-    Rectangle mouseRect{(float)GetMouseX()-x, (float)GetMouseY()-y, 1.0f, 1.0f};
+    Rectangle mouseRect{(float)GetMouseX(), (float)GetMouseY(), 1.0f, 1.0f};
 
     for (auto it = uiNodes.rbegin(); it != uiNodes.rend(); ++it) {
         auto node = *it;
@@ -101,14 +95,47 @@ void Meatball::Scene::update() {
 void Meatball::Scene::draw() {
     for (auto& node : uiNodes)
         if (node->visible) {
-            int originalX = node->x, originalY = node->y;
+            //float originalX = node->x, originalY = node->y;
 
-            node->x += x;
-            node->y += y;
+            /*node->x *= screenUnitSystem.x;
+            node->y *= screenUnitSystem.y;
+            node->width *= screenUnitSystem.x;
+            node->height *= screenUnitSystem.y;
+
+            float originalFontSize = 0.0f;
+            if (node->getTypes() & NodeType::NODEUI_LABEL) {
+                auto label = (Interface::Label*)node;
+                originalFontSize = label->fontSize;
+                label->fontSize *= screenUnitSystem.y;
+            }*/
             
             node->draw();
 
-            node->x = originalX;
+            /*node->x = originalX;
             node->y = originalY;
+            node->width = originalWidth;
+            node->height = originalHeight;
+
+            if (node->getTypes() & NodeType::NODEUI_LABEL) {
+                ((Interface::Label*)node)->fontSize = originalFontSize;
+            }*/
         }
 }
+
+const std::vector<Meatball::Interface::NodeUI*>& Meatball::Scene::getUINodes() {
+    return uiNodes;
+}
+
+Meatball::Interface::NodeUI* Meatball::Scene::getCurrentFocusedUINode() {
+    return currentFocusedUINode;
+}
+
+/*
+const std::vector<Meatball::Interface::Node2D*>& Meatball::Scene::get2DNodes() {
+    return 2dNodes;
+}
+
+const std::vector<Meatball::Interface::Node3D*>& Meatball::Scene::get3DNodes() {
+    return 3dNodes;
+}
+*/
