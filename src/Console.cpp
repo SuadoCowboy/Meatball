@@ -1,7 +1,5 @@
 #include "Console.h"
 
-#include <HayBCMD.h>
-
 #include <iostream>
 
 #ifndef MEATBALL_CONSOLE_LOG
@@ -32,4 +30,8 @@ void Meatball::Console::run(const std::string& input) {
 void Meatball::Console::print(const std::string& message) {
     output << message;
     std::cout << message;
+}
+
+void Meatball::Console::printf(const std::string& format, const std::vector<HayBCMD::Data>& args) {
+    print(HayBCMD::formatString(format, args));
 }
