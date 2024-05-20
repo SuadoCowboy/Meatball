@@ -4,7 +4,14 @@
 
 #include "Shared.h"
 
-#define PANEL_FOCUS_LEVEL (unsigned char)1
+/*
+0 = scene
+1 = panels
+2 = buttons?
+3 = input_box??
+4 = ??????
+*/
+#define PANEL_Z_LEVEL (unsigned char)1
 
 namespace Meatball {
     struct Panel {
