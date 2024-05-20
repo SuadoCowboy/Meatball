@@ -1,0 +1,17 @@
+Things made with events (on_pressed, on_released, etc);
+
+implement all kind of possible data types to Meatball::Config?
+
+HayBCMD Console class;
+Input handling with binds by HayBCMD;
+
+Multiplayer Stuff;
+
+Make 3D easier in raylib;
+3D map maker and loader;
+
+take source engine movement(Bhop, ABH, Strafe, etc);
+
+Good Collision Detection(AABB? Search more about It);
+
+A* path finding for AI;
