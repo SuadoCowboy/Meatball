@@ -7,7 +7,7 @@
 
 namespace Meatball {
 	namespace Input {
-		// WARNING: do not use this enum for raylib functions. ONLY USE ON INPUT NAMESPACE FUNCTIONS
+		// WARNING: do not use this enum for raylib functions. ONLY USE ON FUNCTIONS OF THIS NAMESPACE
 		// why this enum exists? simple: I want to anyMouseButtonPressed
 		// to return correctly when more than 1 button is pressed.
 		enum InpMouseButton {

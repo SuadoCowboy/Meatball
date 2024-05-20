@@ -1,9 +1,17 @@
 #pragma once
 
 #include "Scene.h"
-
-#include <raylib.h>
+#include "Interface/Panel.h"
 
 namespace Meatball {
-    Scene* createConsoleUI(float x, float y, float width, float height, Color mainPanelColor = { 22, 22, 22, 200 }, bool visible = true);
+    class ConsoleUIScene : public Scene {
+    public:
+        ConsoleUIScene(bool visible = true);
+
+        // Only console can appear in every scene so only it needs visible boolean.
+        // The rest of the scenes will be handled by a class or something that says which one should be used.
+        bool visible;
+
+        Panel mainPanel;
+    };
 }
