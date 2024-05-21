@@ -1,22 +1,28 @@
 #include "Config.h"
 
-#include <filesystem>
 #include <fstream>
 
 #include <HayBCMD.h>
 
-using Type = Meatball::ConfigData::Type;
+Meatball::ConfigData::ConfigData(int i) : intV(i) {}
+Meatball::ConfigData::ConfigData(double d): doubleV(d) {}
+Meatball::ConfigData::ConfigData(float f): floatV(f) {}
+Meatball::ConfigData::ConfigData(bool b) : boolV(b) {}
+Meatball::ConfigData::ConfigData(unsigned char uc) : unsignedCharV(uc) {}
+Meatball::ConfigData::ConfigData(std::string s): stringV(s) {}
+Meatball::ConfigData::ConfigData(Color color): colorV(color) {}
+Meatball::ConfigData::ConfigData() {}
 
-Meatball::ConfigData::ConfigData(int i) : type(Type::INT), i(i) {}
-Meatball::ConfigData::ConfigData(double d): type(Type::DOUBLE), d(d) {}
-Meatball::ConfigData::ConfigData(float f): type(Type::FLOAT), f(f) {}
-Meatball::ConfigData::ConfigData(bool b) : type(Type::BOOL), b(b) {}
-Meatball::ConfigData::ConfigData(unsigned char uc) : type(Type::UNSIGNED_CHAR), uc(uc) {}
-Meatball::ConfigData::ConfigData(std::string s): type(Type::STRING), s(s) {}
-Meatball::ConfigData::ConfigData(Sound sound): type(Type::SOUND), sound(sound) {}
-Meatball::ConfigData::ConfigData(Color color): type(Type::COLOR), color(color) {}
+static bool handleSpaceError(size_t spaceIdx, size_t spaceIdxBefore, size_t lineIdx) {
+    if (spaceIdx == std::string::npos || spaceIdx == 0 || spaceIdx == spaceIdxBefore+1) {
+            HayBCMD::Output::printf("ERROR: Could not load data: space error in line {}\n", lineIdx);
+            return true;
+    }
 
-std::unordered_map<const char*, Meatball::ConfigData> Meatball::loadData(std::filesystem::path path) {
+    return false;
+}
+
+std::unordered_map<std::string, Meatball::ConfigData> Meatball::loadData(std::filesystem::path path) {
     if (!std::filesystem::exists(path) || std::filesystem::is_directory(path) || path.extension() != ".meatdata") {
         HayBCMD::Output::printf("ERROR: Could not load data: \"{}\" is not compatible or does not exist\n", path.c_str());
         return {};
@@ -24,17 +30,62 @@ std::unordered_map<const char*, Meatball::ConfigData> Meatball::loadData(std::fi
 
     std::ifstream file(path);
 
-    int lineIdx = 0;
-    std::string line;
+    std::unordered_map<std::string, Meatball::ConfigData> data = {};
 
-    // line example: "mainPanelColor COLOR 22, 22, 22, 200"
-    while (std::getline(file, line)) {
+    // line example: "mainPanelColor COLOR 22,22,22,200"
+    size_t lineIdx = 1;
+    for (std::string line; std::getline(file, line);) {
+        if (line.size() <= 1) continue;
+        
+        // "name "
         size_t spaceIdx = line.find(" ");
+        if (handleSpaceError(spaceIdx, 0, lineIdx)) return {};
+        
+        std::string name = line.substr(0, spaceIdx);
 
-        if (spaceIdx == std::string::npos) {
-            HayBCMD::Output::printf("ERROR: Could not load data: space missing in line \"{}\"\n", lineIdx);
+        // " type "
+        size_t secondSpaceIdx = line.find(" ", spaceIdx+1);
+        if (handleSpaceError(secondSpaceIdx, spaceIdx, lineIdx)) return {};
+
+        std::string type = line.substr(spaceIdx+1, secondSpaceIdx-spaceIdx-1);
+        std::string value = line.substr(secondSpaceIdx+1);
+
+        if (type == "STRING")
+            data[name.c_str()] = ConfigData(value);
+        else if (type == "INT")
+            data[name.c_str()] = ConfigData(std::stoi(value));
+        else if (type == "FLOAT")
+            data[name.c_str()] = ConfigData(std::stof(value));
+        else if (type == "DOUBLE")
+            data[name.c_str()] = ConfigData(std::stod(value));
+        else if (type == "BOOL")
+            data[name.c_str()] = ConfigData((bool)std::stoi(value));
+        else if (type == "UNSIGNED_CHAR")
+            data[name.c_str()] = ConfigData((unsigned char)std::stoi(value));
+        
+        else if (type == "COLOR") {
+            size_t firstCommaIdx = value.find(",");
+            size_t secondCommaIdx = value.find(",", firstCommaIdx+1);
+            size_t thirdCommaIdx = value.find(",", secondCommaIdx+1);
+
+            Color color = BLACK;
+            
+            color.r = std::stoi(value.substr(0, firstCommaIdx));
+            color.g = std::stoi(value.substr(firstCommaIdx+1, secondCommaIdx-firstCommaIdx-1));
+            color.b = std::stoi(value.substr(secondCommaIdx+1, thirdCommaIdx-secondCommaIdx-1));
+            if (thirdCommaIdx != std::string::npos)
+                color.a = std::stoi(value.substr(thirdCommaIdx+1));
+
+            data[name.c_str()] = ConfigData(color);
         }
 
+        else {
+            HayBCMD::Output::printf("ERROR: Could not load data: missing TYPE in line {}\n", lineIdx);
+            return {};
+        }
+        
         lineIdx++;
     }
+
+    return data;
 }

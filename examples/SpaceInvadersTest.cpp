@@ -1,13 +1,17 @@
-#include <raylib.h>
-
 #include <iostream>
 #include <vector>
 #include <utility>
 
+#include <raylib.h>
+
+#include <Console.h>
+#include <ConsoleUI.h>
+#include <Config.h>
+
+#include <HayBCMD.h>
+
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 700
-
-namespace Input = Meatball::Input;
 
 int main(int, char**)
 {
@@ -23,65 +27,35 @@ int main(int, char**)
 
     Color backgroundColor = GetColor(0x181818FF);
 
-    Meatball::Engine::init();
+    Meatball::Console::init();
 
-    Meatball::Scene* mainScene = new Meatball::Scene{};
-    
-    Color buttonColor = { 43, 43, 43, 255 };
-    Meatball::Interface::Button* myButton = new Meatball::Interface::Button(WINDOW_WIDTH / 2 - 150, WINDOW_HEIGHT / 2 - 37, 300, 75, buttonColor);
+    auto consoleUIData = Meatball::loadData("data/consoleUI.meatdata");
+    auto consoleUI = Meatball::ConsoleUIScene(WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2); 
 
-    Font mytypeFont = LoadFont("data/fonts/mytype.ttf");
-    Meatball::Interface::Label* myLabel = new Meatball::Interface::Label((float)myButton->height, mytypeFont, myButton->x, myButton->y);
-    myLabel->backgroundColor = { 0, 0, 0, 127 };
-    
-    myLabel->setText("Say gex.");
-    myLabel->x = myButton->x + myButton->width / 2 - myLabel->width / 2;
-    myLabel->setAnchor(myButton);
+    if (consoleUIData.size() < 4) {
+        consoleUI.mainPanel.color = BLACK;
+        consoleUI.sendButton.setText("WRONG");
+        consoleUI.sendButton.color = WHITE;
+        consoleUI.closeButton.color = BLACK;
 
-    myButton->connectOnMouseButtonPressed([&](Meatball::Scene& scene, Meatball::Interface::Button& button, Input::InpMouseButton buttons) {
-        if (buttons & Input::InpMouseButton::MOUSE1)
-            button.x -= 30;
-        if (buttons & Input::InpMouseButton::MOUSE2)
-            button.x += 30;
-    });
+    } else {
+        consoleUI.mainPanel.color = consoleUIData["mainPanelColor"].colorV;
 
-    mainScene->addNode(myButton);
-    mainScene->addNode(myLabel);
+        consoleUI.sendButton.setText(consoleUIData["sendButtonText"].stringV);
+        consoleUI.sendButton.color = consoleUIData["sendButtonColor"].colorV;
 
-    mainScene->sortUINodesVector();
-
-    Meatball::Engine engine{ mainScene, WINDOW_WIDTH, WINDOW_HEIGHT };
-
-    std::vector<std::pair<unsigned short, unsigned short>> screenRatioSizes;
-    for (unsigned char i = 1; i < 5; i++) {
-        screenRatioSizes.emplace_back(std::pair<unsigned short, unsigned short>( WINDOW_WIDTH*i, WINDOW_HEIGHT*i ));
+        consoleUI.closeButton.color = consoleUIData["closeButtonColor"].colorV;
     }
-
-    unsigned char currentScreenSizeIndex = 0;
 
     while (!WindowShouldClose()) {
-        engine.handleInput();
-        engine.update();
-
-        if (IsKeyPressed('Z')) {
-            SetWindowSize(screenRatioSizes[currentScreenSizeIndex].first, screenRatioSizes[currentScreenSizeIndex].second);
-            currentScreenSizeIndex++;
-            if (currentScreenSizeIndex > screenRatioSizes.size()-1) currentScreenSizeIndex = 0;
-            
-            engine.updateNodesSizes();
-        }
+        ClearBackground(RAYWHITE);
+        
+        consoleUI.update();
 
         BeginDrawing();
-
-        ClearBackground(backgroundColor);
-        engine.draw();
-
-        DrawText("Press Z to swap", 0, 0, (int)(engine.screenUnitSystem.y * 24.0f), WHITE);
-        DrawText(TextFormat("Current size: %dx%d", GetScreenWidth(), GetScreenHeight()), 0, (int)(engine.screenUnitSystem.y * 24.0f), (int)(engine.screenUnitSystem.y * 24.0f), WHITE);
+        consoleUI.draw();
         EndDrawing();
     }
-
-    UnloadFont(mytypeFont);
 
     return 0;
 }

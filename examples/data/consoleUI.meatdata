@@ -1,0 +1,4 @@
+mainPanelColor COLOR 22,22,22,200
+sendButtonText STRING Send
+sendButtonColor COLOR 10,10,10
+closeButtonColor COLOR 255,255,255

@@ -2,7 +2,9 @@
 
 #include "Console.h"
 
-Meatball::ConsoleUIScene::ConsoleUIScene(bool visible) : Scene() {
+Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float height, bool visible)
+	: Scene(), visible(visible), mainPanel(x, y, width, height), sendButton(x+width-28, y+height-18, 26, 16), closeButton(x-7, 2, 5, 5) {
+	sendButton.setText("", sendButton.rect.height-4);
 	/*Panel* mainPanel = new Panel{ x, y, width, height, mainPanelColor };
 	mainPanel->z = 1;
 	
@@ -38,4 +40,19 @@ Meatball::ConsoleUIScene::ConsoleUIScene(bool visible) : Scene() {
 	//scene->addNode(outputBox); // the box that shows all the console data
 	//scene->addNode(buildVersion) // this one is at the top right of the window itself
 	*/
+}
+
+void Meatball::ConsoleUIScene::draw() {
+	if (!visible) return;
+	mainPanel.draw();
+	
+	sendButton.drawRect();
+	sendButton.drawTextCentered(true, true);
+	
+	closeButton.drawX();
+}
+
+void Meatball::ConsoleUIScene::update() {
+	sendButton.update();
+	closeButton.update();
 }
