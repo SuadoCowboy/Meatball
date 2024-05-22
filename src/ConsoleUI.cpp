@@ -23,7 +23,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 		//print(inputTextbox.getText());
 		//Console::run(inputTextbox.getText());
 		//inputTextbox.setText("");
-	}
+	};
 
 	/*Panel* mainPanel = new Panel{ x, y, width, height, mainPanelColor };
 	mainPanel->z = 1;
