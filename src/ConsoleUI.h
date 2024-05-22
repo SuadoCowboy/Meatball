@@ -14,6 +14,9 @@ namespace Meatball {
         /// @param visible if scene is visible or not(only this class uses this)
         ConsoleUIScene(float x, float y, float width, float height, bool visible = true);
 
+        /// @brief appends text to outputTextbox
+        void print(const std::string& message);
+
         void draw();
         void update();
 

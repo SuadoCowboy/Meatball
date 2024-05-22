@@ -1,5 +1,7 @@
 #include "ConsoleUI.h"
 
+#include <HayBCMD.h>
+
 #include "Console.h"
 
 unsigned char Meatball::ConsoleUIScene::margin = 4;
@@ -11,6 +13,18 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	closeButton = {x+width-5-margin, y+margin, 5, 5};
 
 	sendButton.setText("", sendButton.rect.height-4);
+
+	closeButton.onRelease = [&]() {
+		visible = false;
+		// TODO: fading effect (maybe add a task system? Meatball::Task() or Meatball::newTask() or something)
+	};
+
+	sendButton.onRelease = [&]() {
+		//print(inputTextbox.getText());
+		//Console::run(inputTextbox.getText());
+		//inputTextbox.setText("");
+	}
+
 	/*Panel* mainPanel = new Panel{ x, y, width, height, mainPanelColor };
 	mainPanel->z = 1;
 	
@@ -48,6 +62,10 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	*/
 }
 
+void Meatball::ConsoleUIScene::print(const std::string& message) {
+	//outputTextbox.appendText(message);
+}
+
 void Meatball::ConsoleUIScene::draw() {
 	if (!visible) return;
 	mainPanel.draw();
@@ -59,6 +77,8 @@ void Meatball::ConsoleUIScene::draw() {
 }
 
 void Meatball::ConsoleUIScene::update() {
+	if (!visible) return;
+
 	sendButton.update();
 	closeButton.update();
 }
