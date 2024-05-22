@@ -5,3 +5,4 @@ sendButtonColor COLOR 20,20,20,200
 sendButtonHoveredColor COLOR 50,50,50,200
 
 closeButtonColor COLOR 255,255,200
+closeButtonHoveredColor COLOR 0,0,0,255
