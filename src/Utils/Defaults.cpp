@@ -2,7 +2,11 @@
 
 #include "Config.h"
 
-Meatball::ConsoleUIScene Meatball::initConsoleUI(Rectangle rect, const std::string& meatdataPath) {
+#include <Console.h>
+
+#include <functional>
+
+Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::string& meatdataPath) {
     auto consoleUIData = Config::loadData("data/consoleUI.meatdata");
     
     auto marginData = Config::ifContainsGet(consoleUIData, "margin");
@@ -28,6 +32,10 @@ Meatball::ConsoleUIScene Meatball::initConsoleUI(Rectangle rect, const std::stri
 
     Config::ConfigData* closeButtonHoveredColorData = Config::ifContainsGet(consoleUIData, "closeButtonHoveredColor");
     if (closeButtonHoveredColorData) consoleUI.closeButton.hoveredColor = closeButtonHoveredColorData->colorV;
+
+    Console::init([&](const std::string& message) {
+        consoleUI.print(message);
+    });
 
     return consoleUI;
 }
