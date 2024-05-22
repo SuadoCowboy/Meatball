@@ -6,7 +6,7 @@
 
 #include <Console.h>
 #include <ConsoleUI.h>
-#include <Config.h>
+#include <Utils/Defaults.h>
 
 #include <HayBCMD.h>
 
@@ -29,28 +29,8 @@ int main(int, char**)
 
     Meatball::Console::init();
 
-    auto consoleUIData = Meatball::loadData("data/consoleUI.meatdata");
-    if (consoleUIData.count("margin"))
-        Meatball::ConsoleUIScene::margin = consoleUIData["margin"].unsignedCharV;
-
-    auto consoleUI = Meatball::ConsoleUIScene(WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
-
-    if (consoleUIData.size() < 5) {
-        consoleUI.mainPanel.color = BLACK;
-        consoleUI.sendButton.setText("WRONG");
-        consoleUI.sendButton.color = WHITE;
-        consoleUI.closeButton.color = BLACK;
-
-    } else {
-        consoleUI.mainPanel.color = consoleUIData["mainPanelColor"].colorV;
-
-        consoleUI.sendButton.setText(consoleUIData["sendButtonText"].stringV);
-        consoleUI.sendButton.color = consoleUIData["sendButtonColor"].colorV;
-        consoleUI.sendButton.hoveredColor = consoleUIData["sendButtonHoveredColor"].colorV;
-
-        consoleUI.closeButton.color = consoleUIData["closeButtonColor"].colorV;
-
-    }
+    // Utils/Defaults.h
+    auto consoleUI = Meatball::initConsoleUI((Rectangle){WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, "data/consoleUI.meatdata");
 
     while (!WindowShouldClose()) {
         ClearBackground(RAYWHITE);
