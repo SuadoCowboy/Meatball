@@ -1,8 +1,8 @@
 #pragma once
 
-#include <raylib.h>
+//#include <functional>
 
-#include "Shared.h"
+#include <raylib.h>
 
 namespace Meatball {
     struct Panel {
@@ -13,7 +13,7 @@ namespace Meatball {
         void draw();
 
         // events
-        //VoidFunc onClick; // could be used to drag panel? or create another panel class that handles it
+        //std::function<void()> onClick, onRelease; // could be used to drag panel? or create another panel class that handles it
 
         Color color;
         Rectangle rect;
