@@ -1,4 +1,4 @@
-Things made with events (on_pressed, on_released, etc);
+Things made with events (onClick, onRelease, onHover, etc);
 
 implement all kind of possible data types to Meatball::Config?
 
