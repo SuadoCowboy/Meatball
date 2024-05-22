@@ -7,28 +7,36 @@
 #include <raylib.h>
 
 namespace Meatball {
-    struct ConfigData {
-        int intV;
-        double doubleV;
-        float floatV;
-        bool boolV;
-        unsigned char unsignedCharV;
-        std::string stringV;
-        
-        Color colorV;
+    namespace Config {
+        struct ConfigData {
+            int intV;
+            double doubleV;
+            float floatV;
+            bool boolV;
+            unsigned char unsignedCharV;
+            std::string stringV;
+            
+            Color colorV;
 
-        ConfigData(int i);
-        ConfigData(double d);
-        ConfigData(float f);
-        ConfigData(bool b);
-        ConfigData(unsigned char uc);
-        ConfigData(std::string s);
-        ConfigData(Color color);
-        ConfigData();
-    };
+            ConfigData(int i);
+            ConfigData(double d);
+            ConfigData(float f);
+            ConfigData(bool b);
+            ConfigData(unsigned char uc);
+            ConfigData(std::string s);
+            ConfigData(Color color);
+            ConfigData();
+        };
 
-    /// @brief A function that can be used to load data, not to be confused with loadCfg
-    /// @param path path to a file that contains data (should end with .meatdata)
-    /// @return empty unordered_map if something went wrong
-    std::unordered_map<std::string, ConfigData> loadData(std::filesystem::path path);
+        /// @brief if data contains 
+        /// @param data loaded data (see loadData function)
+        /// @param what what to check if is contained in data
+        /// @return pointer to data if contains else nullptr
+        ConfigData* ifContainsGet(std::unordered_map<std::string, ConfigData>& data, const std::string& what);
+
+        /// @brief A function that can be used to load data, not to be confused with loadCfg
+        /// @param path path to a file that contains data (should end with .meatdata)
+        /// @return empty unordered_map if something went wrong
+        std::unordered_map<std::string, ConfigData> loadData(std::filesystem::path path);
+    }
 }
