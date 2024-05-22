@@ -24,5 +24,8 @@ namespace Meatball {
         Panel mainPanel;
         Button closeButton;
         Button sendButton;
+
+        // margin - the space between mainPanel border and objects close to it
+        static unsigned char margin;
     };
 }

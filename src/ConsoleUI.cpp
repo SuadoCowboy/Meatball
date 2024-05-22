@@ -2,8 +2,14 @@
 
 #include "Console.h"
 
+unsigned char Meatball::ConsoleUIScene::margin = 4;
+
 Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float height, bool visible)
-	: Scene(), visible(visible), mainPanel(x, y, width, height), sendButton(x+width-28, y+height-18, 26, 16), closeButton(x-7, 2, 5, 5) {
+	: Scene(), visible(visible) {
+	sendButton = {x+width-76-margin, y+height-21-margin, 76, 21};
+	mainPanel = {x, y, width, height};
+	closeButton = {x+width-9-margin, y+margin, 5, 5};
+
 	sendButton.setText("", sendButton.rect.height-4);
 	/*Panel* mainPanel = new Panel{ x, y, width, height, mainPanelColor };
 	mainPanel->z = 1;

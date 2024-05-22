@@ -1,4 +1,7 @@
 mainPanelColor COLOR 22,22,22,200
+
 sendButtonText STRING Send
-sendButtonColor COLOR 10,10,10
-closeButtonColor COLOR 255,255,255
+sendButtonColor COLOR 20,20,20,200
+sendButtonHoveredColor COLOR 50,50,50,200
+
+closeButtonColor COLOR 255,255,200

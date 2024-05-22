@@ -10,6 +10,7 @@ namespace Meatball {
     class Button
     {
     public:
+        Button();
         Button(float x, float y, float width, float height);
         Button(Rectangle rect);
         
@@ -33,7 +34,7 @@ namespace Meatball {
 
         bool isHovered();
 
-        VoidFunc onClick, onHover;
+        VoidFunc* onClick, onHover;
 
         Rectangle rect;
         Color color, hoveredColor, textColor, textHoveredColor;

@@ -30,9 +30,12 @@ int main(int, char**)
     Meatball::Console::init();
 
     auto consoleUIData = Meatball::loadData("data/consoleUI.meatdata");
-    auto consoleUI = Meatball::ConsoleUIScene(WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2); 
+    if (consoleUIData.count("margin"))
+        Meatball::ConsoleUIScene::margin = consoleUIData["margin"].unsignedCharV;
 
-    if (consoleUIData.size() < 4) {
+    auto consoleUI = Meatball::ConsoleUIScene(WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
+
+    if (consoleUIData.size() < 5) {
         consoleUI.mainPanel.color = BLACK;
         consoleUI.sendButton.setText("WRONG");
         consoleUI.sendButton.color = WHITE;
@@ -43,8 +46,10 @@ int main(int, char**)
 
         consoleUI.sendButton.setText(consoleUIData["sendButtonText"].stringV);
         consoleUI.sendButton.color = consoleUIData["sendButtonColor"].colorV;
+        consoleUI.sendButton.hoveredColor = consoleUIData["sendButtonHoveredColor"].colorV;
 
         consoleUI.closeButton.color = consoleUIData["closeButtonColor"].colorV;
+
     }
 
     while (!WindowShouldClose()) {

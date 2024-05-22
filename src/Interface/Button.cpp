@@ -2,20 +2,39 @@
 
 #include <sstream>
 
-Meatball::Button::Button(float x, float y, float width, float height)
-    : rect{.x=x, .y=y, .width=width, .height=height}, color(BLACK) {}
+static inline void setupButton(Meatball::Button* button) {
+    button->onClick = nullptr;
+    button->onHover = nullptr;
 
-Meatball::Button::Button(Rectangle rect) : rect(rect), color(BLACK) {}
+    button->color = BLACK;
+    button->hoveredColor = WHITE;
+
+    button->textColor = WHITE;
+    button->textHoveredColor = RAYWHITE;
+}
+
+Meatball::Button::Button() : rect{.x=0,.y=0,.width=0,.height=0} {
+    setupButton(this);
+}
+
+Meatball::Button::Button(float x, float y, float width, float height) {
+        rect = (Rectangle){x, y, width, height};
+        setupButton(this);
+    }
+
+Meatball::Button::Button(Rectangle rect) : rect(rect) {
+    setupButton(this);
+}
 
 void Meatball::Button::update() {
     bool wasHovered = hovered;
     hovered = CheckCollisionPointRec((Vector2){(float)GetMouseX(), (float)GetMouseY()}, rect);
     
-    if (!wasHovered && hovered)
-        onHover();
+    if (!wasHovered && hovered && onHover)
+        (*onHover)();
 
-    if (hovered && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        onClick();
+    if (hovered && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && onClick)
+        (*onClick)();
 }
 
 const std::string& Meatball::Button::getText() {
@@ -47,7 +66,7 @@ void Meatball::Button::drawText()
 void Meatball::Button::drawTextCentered(bool centerX, bool centerY) {
     int textWidthHalf = MeasureText(text.c_str(), fontSize)/2;
 
-    DrawText(text.c_str(), centerX? rect.x/2-textWidthHalf : rect.x, centerY? rect.y/2-fontSize/2 : rect.y, fontSize, hovered? textHoveredColor : textColor);
+    DrawText(text.c_str(), centerX? rect.x+rect.width/2-textWidthHalf : rect.x, centerY? rect.y+rect.height/2-fontSize/2 : rect.y, fontSize, hovered? textHoveredColor : textColor);
 }
 
 void Meatball::Button::drawRect() {
@@ -60,13 +79,13 @@ void Meatball::Button::drawX() {
      .
       .
     */
-    DrawLine(0,0, rect.x,rect.y, hovered? hoveredColor : color);
+    DrawLine(rect.x,rect.y, rect.x+rect.width,rect.y+rect.height, hovered? hoveredColor : color);
     /*
       .
      .
     .
     */
-    DrawLine(0,rect.y, rect.x,0, hovered? hoveredColor : color);
+    DrawLine(rect.x,rect.y+rect.height, rect.x+rect.width,rect.y, hovered? hoveredColor : color);
 }
 
 bool Meatball::Button::isHovered()
