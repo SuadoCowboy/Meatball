@@ -4,6 +4,12 @@
 
 std::unordered_map<std::string, std::string> Meatball::Console::variables = {};
 
+void Meatball::Console::init(std::function<void(const std::string&)> printFunction) {
+    HayBCMD::Output::setPrintFunction(printFunction);
+    HayBCMD::BaseCommands::init(&variables);
+    print("Console initialized\n");
+}
+
 void Meatball::Console::run(const std::string& input) {
     HayBCMD::Lexer* lexer = new HayBCMD::Lexer(input);
 
