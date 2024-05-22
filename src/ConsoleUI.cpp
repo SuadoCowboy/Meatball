@@ -8,7 +8,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	: Scene(), visible(visible) {
 	sendButton = {x+width-76-margin, y+height-21-margin, 76, 21};
 	mainPanel = {x, y, width, height};
-	closeButton = {x+width-9-margin, y+margin, 5, 5};
+	closeButton = {x+width-5-margin, y+margin, 5, 5};
 
 	sendButton.setText("", sendButton.rect.height-4);
 	/*Panel* mainPanel = new Panel{ x, y, width, height, mainPanelColor };
