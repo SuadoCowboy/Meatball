@@ -1,7 +1,5 @@
 #include "Button.h"
 
-#include <sstream>
-
 static inline void setupButton(Meatball::Button* button) {
     button->onClick = nullptr;
     button->onHover = nullptr;
@@ -31,10 +29,13 @@ void Meatball::Button::update() {
     hovered = CheckCollisionPointRec((Vector2){(float)GetMouseX(), (float)GetMouseY()}, rect);
     
     if (!wasHovered && hovered && onHover)
-        (*onHover)();
+        onHover();
 
-    if (hovered && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && onClick)
-        (*onClick)();
+    if (hovered && onClick && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        onClick();
+    
+    if (onRelease && IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+        onRelease();
 }
 
 const std::string& Meatball::Button::getText() {
