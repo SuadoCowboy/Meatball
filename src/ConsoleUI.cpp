@@ -4,6 +4,8 @@
 
 #include "Console.h"
 
+#include <iostream>
+
 unsigned char Meatball::ConsoleUIScene::margin = 4;
 
 Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float height, bool visible)
@@ -64,6 +66,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 
 void Meatball::ConsoleUIScene::print(const std::string& message) {
 	//outputTextbox.appendText(message);
+	std::cout << message; // THIS IS TEMPORARY!!! Todo: remove this after creating outputTextbox and make it work
 }
 
 void Meatball::ConsoleUIScene::draw() {

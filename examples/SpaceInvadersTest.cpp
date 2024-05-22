@@ -8,8 +8,6 @@
 #include <ConsoleUI.h>
 #include <Utils/Defaults.h>
 
-#include <HayBCMD.h>
-
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 700
 
@@ -27,10 +25,8 @@ int main(int, char**)
 
     Color backgroundColor = GetColor(0x181818FF);
 
-    Meatball::Console::init();
-
     // Utils/Defaults.h
-    auto consoleUI = Meatball::initConsoleUI((Rectangle){WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, "data/consoleUI.meatdata");
+    auto consoleUI = Meatball::initLocalConsole((Rectangle){WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, "data/consoleUI.meatdata");
 
     while (!WindowShouldClose()) {
         ClearBackground(RAYWHITE);
