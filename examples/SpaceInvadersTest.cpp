@@ -26,7 +26,7 @@ int main(int, char**)
     Color backgroundColor = GetColor(0x181818FF);
 
     // Utils/Defaults.h
-    auto consoleUI = Meatball::initLocalConsole((Rectangle){WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, 24, "data/consoleUI.meatdata");
+    auto consoleUI = Meatball::initLocalConsole((Rectangle){WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, "data/consoleUI.meatdata");
 
     while (!WindowShouldClose()) {
         ClearBackground(RAYWHITE);
