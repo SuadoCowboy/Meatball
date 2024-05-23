@@ -6,7 +6,8 @@ unsigned char Meatball::ScrollBar::scrollSpeed = 4;
 
 Meatball::ScrollBar::ScrollBar(Rectangle barRect, bool visible)
     : barRect(barRect), visible(visible),
-    barHovered(false), scrollHovered(false), scrollY(0), dragging(false) {
+    barHovered(false), scrollHovered(false), scrollY(0), dragging(false),
+    maxHeight((unsigned int)barRect.height) {
         barColor = (Color){15,15,15,255};
         barHoveredColor = (Color){25,25,25,255};
 
