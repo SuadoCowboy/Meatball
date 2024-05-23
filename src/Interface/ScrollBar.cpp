@@ -6,7 +6,7 @@ unsigned char Meatball::ScrollBar::scrollSpeed = 4;
 
 Meatball::ScrollBar::ScrollBar(Rectangle barRect, bool visible)
     : barRect(barRect), visible(visible),
-    barHovered(false), scrollHovered(false), scrollY(0) {
+    barHovered(false), scrollHovered(false), scrollY(0), dragging(false) {
         barColor = (Color){15,15,15,255};
         barHoveredColor = (Color){25,25,25,255};
 
@@ -47,16 +47,26 @@ void Meatball::ScrollBar::update() {
     scrollHovered = CheckCollisionPointRec(mousePosition,
         (Rectangle){barRect.x, (float)scrollY, barRect.width, scrollHeight});
 
-    if (barHovered) {
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) 
-            scrollY = mousePosition.y-barRect.y-scrollHeight/2;
-        else if (GetMouseWheelMove() != 0)
-            scrollY -= GetMouseWheelMove()*scrollSpeed;
-        else return;
+    if (barHovered && IsMouseButtonDown(MOUSE_BUTTON_LEFT)) dragging = true;
+    
+    if (dragging) {
+        scrollY = mousePosition.y-barRect.y-scrollHeight/2;
 
         // if up limit
         if (scrollY < 0) scrollY = 0;
         // if down limit
         if (scrollY+scrollHeight >= barRect.height) scrollY = barRect.height-scrollHeight;
-    } 
+    }
+
+    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) dragging = false;
+}
+
+void Meatball::ScrollBar::updateWheelScroll() {
+    if (GetMouseWheelMove() != 0)
+        scrollY -= GetMouseWheelMove()*scrollSpeed;
+
+        // if up limit
+        if (scrollY < 0) scrollY = 0;
+        // if down limit
+        if (scrollY+getScrollHeight() >= barRect.height) scrollY = barRect.height-getScrollHeight();
 }

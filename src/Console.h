@@ -18,7 +18,9 @@ namespace Meatball {
         static constexpr auto print = HayBCMD::Output::print;
 
         template<typename ...Args>
-        static void printf(const std::string &format, Args ...args);
+        static void printf(const std::string &format, Args ...args) {
+            HayBCMD::Output::printf(format, args...);
+        }
 
     private:
         static std::unordered_map<std::string, std::string> variables; // HayBCMD aliases are stored here

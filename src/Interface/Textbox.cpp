@@ -63,11 +63,16 @@ void Meatball::TextBox::setSize(float width, float height) {
 void Meatball::TextBox::draw() {
     DrawRectangle(rect.x, rect.y, rect.width, rect.height, color);
 
+    BeginScissorMode(rect.x, rect.y, rect.width, rect.height);
+    
     size_t lineIdx = 0;
     for (auto& line : text) {
-        if (lineIdx*fontSize >= rect.height) break;
+        float lineY = lineIdx*fontSize-scrollBar.getScrollY()*scrollBar.getScrollHeight()/2;
 
-        DrawText(line.c_str(), rect.x, rect.y+(lineIdx*fontSize), fontSize, textColor);
+        if (lineY > rect.height) break;
+        
+        if (lineY+fontSize > 0)
+            DrawText(line.c_str(), rect.x, rect.y+lineY, fontSize, textColor);
         
         size_t newLineIdx = 0;
         while (newLineIdx != std::string::npos) {
@@ -76,9 +81,14 @@ void Meatball::TextBox::draw() {
         }
     }
     
+    EndScissorMode();
+    
     scrollBar.draw();
 }
 
 void Meatball::TextBox::update() {
     scrollBar.update();
+
+    if (CheckCollisionPointRec(GetMousePosition(), rect))
+        scrollBar.updateWheelScroll();
 }

@@ -13,6 +13,9 @@ namespace Meatball {
         void draw();
         void update();
 
+        /// @brief the parent object should use this function if mouse is within the parent's bounds
+        void updateWheelScroll();
+
         float getScrollHeight() const;
         short getScrollY() const;
 
@@ -25,5 +28,7 @@ namespace Meatball {
     private:
         bool barHovered, scrollHovered;
         short scrollY;
+
+        bool dragging;
     };
 }

@@ -29,8 +29,15 @@ int main(int, char**)
     auto consoleUI = Meatball::initLocalConsole((Rectangle){WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, "data/consoleUI.meatdata");
     
     consoleUI.sendButton.onClick = [&]() {
-        consoleUI.print("THIS IS A MESSAGE BEING PRINTED!111\n");
+        for (unsigned short i = 1; i < 10; i++)
+            Meatball::Console::printf("THIS IS A MESSAGE BEING PRINTED!111 {}", i);
     };
+
+    consoleUI.closeButton.onClick = [&]() {
+        Meatball::Console::printf("YAY COOL MESSAGE FROM CLOSE BUTTON1!!");
+    };
+
+    consoleUI.sendButton.onClick();
 
     while (!WindowShouldClose()) {
         ClearBackground(RAYWHITE);
