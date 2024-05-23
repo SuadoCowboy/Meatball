@@ -9,11 +9,13 @@
 Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::string& meatdataPath) {
     auto consoleUIData = Config::loadData("data/consoleUI.meatdata");
     
-    auto marginData = Config::ifContainsGet(consoleUIData, "margin");
+    Config::ConfigData* marginData = Config::ifContainsGet(consoleUIData, "margin");
     Meatball::ConsoleUIScene::margin = marginData?
         marginData->unsignedCharV : Meatball::ConsoleUIScene::margin;
 
-    auto consoleUI = Meatball::ConsoleUIScene(rect.x, rect.y, rect.width, rect.height);
+    Config::ConfigData* fontSizeData = Config::ifContainsGet(consoleUIData, "fontSize");
+    auto consoleUI = Meatball::ConsoleUIScene(rect.x, rect.y, rect.width, rect.height,
+        fontSizeData? fontSizeData->unsignedCharV : 22);
 
     Config::ConfigData* mainPanelColorData = Config::ifContainsGet(consoleUIData, "mainPanelColor");
     if (mainPanelColorData) consoleUI.mainPanel.color = mainPanelColorData->colorV;
@@ -32,6 +34,12 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
 
     Config::ConfigData* closeButtonHoveredColorData = Config::ifContainsGet(consoleUIData, "closeButtonHoveredColor");
     if (closeButtonHoveredColorData) consoleUI.closeButton.hoveredColor = closeButtonHoveredColorData->colorV;
+
+    Config::ConfigData* outputBoxColorData = Config::ifContainsGet(consoleUIData, "outputBoxColor");
+    if (outputBoxColorData) consoleUI.outputBox.color = outputBoxColorData->colorV;
+
+    Config::ConfigData* outputBoxTextColorData = Config::ifContainsGet(consoleUIData, "outputBoxTextColor");
+    if (outputBoxTextColorData) consoleUI.outputBox.textColor = outputBoxTextColorData->colorV;
 
     Console::init([&](const std::string& message) {
         consoleUI.print(message);
