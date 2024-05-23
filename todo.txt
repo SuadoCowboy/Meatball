@@ -1,8 +1,9 @@
-Things made with events (onClick, onRelease, onHover, etc);
+WARNING: Alot of objects might create alot of new colors in memory.
+Maybe classes should use references or pointers.
 
-implement all kind of possible data types to Meatball::Config?
+make asynchronous tasks or threaded things or both?
 
-HayBCMD Console class;
+Console interface (WORK IN PROGRESS);
 Input handling with binds by HayBCMD;
 
 Multiplayer Stuff;
@@ -12,6 +13,6 @@ Make 3D easier in raylib;
 
 take source engine movement(Bhop, ABH, Strafe, etc);
 
-Good Collision Detection(AABB? Search more about It);
+Good Collision Detection(AABB? Search more about it);
 
 A* path finding for AI;
