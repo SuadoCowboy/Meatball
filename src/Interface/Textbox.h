@@ -20,7 +20,7 @@ namespace Meatball {
         const unsigned char& getFontSize();
 
         /// @warning it does not put newline on neither start or end of text(you should put it yourself)
-        void appendText(const std::string& text);
+        void appendText(std::string text);
         void clearText();
 
         const std::list<std::string>& getText();
@@ -32,8 +32,8 @@ namespace Meatball {
 
         const Rectangle& getRect();
 
-        void setPosition(Vector2 pos);
-        void setSize(Vector2 size);
+        void setPosition(float x, float y);
+        void setSize(float width, float height);
 
         // TODO: Events that can be used to drag and resize rect.
         // See appendText function, there is a good thing that

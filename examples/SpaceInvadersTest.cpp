@@ -27,6 +27,10 @@ int main(int, char**)
 
     // Utils/Defaults.h
     auto consoleUI = Meatball::initLocalConsole((Rectangle){WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, "data/consoleUI.meatdata");
+    
+    consoleUI.sendButton.onClick = [&]() {
+        consoleUI.print("THIS IS A MESSAGE BEING PRINTED!111\n");
+    };
 
     while (!WindowShouldClose()) {
         ClearBackground(RAYWHITE);

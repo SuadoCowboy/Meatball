@@ -65,7 +65,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 }
 
 void Meatball::ConsoleUIScene::print(const std::string& message) {
-	//outputBox.append(message);
+	outputBox.appendText(message);
 	std::cout << message; // THIS IS TEMPORARY!!! Todo: remove this after creating outputBox and make it work
 }
 

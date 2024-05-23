@@ -8,9 +8,12 @@ Meatball::TextBox::TextBox()
 
 Meatball::TextBox::TextBox(Rectangle rect, unsigned char fontSize)
     : rect(rect), fontSize(fontSize), color(BLACK), textColor(WHITE),
-    scrollBar((Rectangle){rect.x,rect.y+rect.width, 0, rect.height}) {}
+    scrollBar((Rectangle){rect.x+rect.width-20,rect.y, 20, rect.height}) {}
 
-void Meatball::TextBox::appendText(const std::string& newText) {
+void Meatball::TextBox::appendText(std::string newText) {
+    if (newText.size() == 0) return;
+    while (std::isspace(newText[newText.size()-1])) newText = newText.substr(0, newText.size()-1);
+
     if (MeasureText(newText.c_str(), fontSize) < rect.width-scrollBar.barRect.width) {
         text.push_back(newText);
         return;
@@ -43,14 +46,34 @@ const unsigned char& Meatball::TextBox::getFontSize() {
     return fontSize;
 }
 
+const Rectangle& Meatball::TextBox::getRect() {
+    return rect;
+}
+
+void Meatball::TextBox::setPosition(float x, float y) {
+    rect.x = x;
+    rect.y = y;
+}
+
+void Meatball::TextBox::setSize(float width, float height) {
+    rect.width = width;
+    rect.height = height;
+}
+
 void Meatball::TextBox::draw() {
     DrawRectangle(rect.x, rect.y, rect.width, rect.height, color);
 
     size_t lineIdx = 0;
     for (auto& line : text) {
         if (lineIdx*fontSize >= rect.height) break;
+
         DrawText(line.c_str(), rect.x, rect.y+(lineIdx*fontSize), fontSize, textColor);
-        lineIdx++;
+        
+        size_t newLineIdx = 0;
+        while (newLineIdx != std::string::npos) {
+            newLineIdx = line.find('\n', newLineIdx+1);
+            lineIdx++;
+        }
     }
     
     scrollBar.draw();

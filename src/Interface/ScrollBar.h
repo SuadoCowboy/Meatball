@@ -14,7 +14,7 @@ namespace Meatball {
         void update();
 
         float getScrollHeight() const;
-        unsigned short getScrollY() const;
+        short getScrollY() const;
 
         Color barColor, barHoveredColor, scrollColor, scrollHoveredColor1, scrollHoveredColor2;
         bool visible;
@@ -24,6 +24,6 @@ namespace Meatball {
         static unsigned char scrollSpeed;
     private:
         bool barHovered, scrollHovered;
-        unsigned short scrollY;
+        short scrollY;
     };
 }
