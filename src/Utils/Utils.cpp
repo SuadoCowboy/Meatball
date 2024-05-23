@@ -4,12 +4,12 @@ void Meatball::checkHovered(bool& hovered, const Rectangle& rect, VoidFunc* onHo
     bool wasHovered = hovered;
     hovered = CheckCollisionPointRec(GetMousePosition(), rect);
     
-    if (!wasHovered && hovered && onHover)
+    if (!wasHovered && hovered && onHover && *onHover)
         (*onHover)();
 
-    if (hovered && onClick && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    if (hovered && onClick && *onClick && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         (*onClick)();
     
-    if (onRelease && IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+    if (onRelease && *onRelease && IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         (*onRelease)();
 }
