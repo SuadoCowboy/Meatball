@@ -39,8 +39,6 @@ namespace Meatball {
         // See appendText function, there is a good thing that
         // should be used in the case of resizing the rect.
         //VoidFunc onClick, onRelease;
-
-        unsigned char scrollWidth;
     
     private:
         std::list<std::string> text;
