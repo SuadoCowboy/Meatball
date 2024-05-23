@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "Interface/Panel.h"
 #include "Interface/Button.h"
+#include "Interface/TextBox.h"
 
 namespace Meatball {
     class ConsoleUIScene : public Scene {
@@ -12,7 +13,7 @@ namespace Meatball {
         /// @param width mainPanel width
         /// @param height mainPanel height
         /// @param visible if scene is visible or not(only this class uses this)
-        ConsoleUIScene(float x, float y, float width, float height, bool visible = true);
+        ConsoleUIScene(float x, float y, float width, float height, unsigned char fontSize, bool visible = true);
 
         /// @brief appends text to outputTextbox
         void print(const std::string& message);
@@ -27,6 +28,7 @@ namespace Meatball {
         Panel mainPanel;
         Button closeButton;
         Button sendButton;
+        TextBox outputBox;
 
         // margin - the space between mainPanel border and objects close to it
         static unsigned char margin;

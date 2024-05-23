@@ -8,8 +8,8 @@
 
 unsigned char Meatball::ConsoleUIScene::margin = 4;
 
-Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float height, bool visible)
-	: Scene(), visible(visible) {
+Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float height, unsigned char fontSize, bool visible)
+	: Scene(), visible(visible), outputBox((Rectangle){x+margin, y+margin, width-5-margin*3, height-margin*3-21}, fontSize) {
 	sendButton = {x+width-76-margin, y+height-21-margin, 76, 21};
 	mainPanel = {x, y, width, height};
 	closeButton = {x+width-5-margin, y+margin, 5, 5};
@@ -65,8 +65,8 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 }
 
 void Meatball::ConsoleUIScene::print(const std::string& message) {
-	//outputTextbox.appendText(message);
-	std::cout << message; // THIS IS TEMPORARY!!! Todo: remove this after creating outputTextbox and make it work
+	//outputBox.append(message);
+	std::cout << message; // THIS IS TEMPORARY!!! Todo: remove this after creating outputBox and make it work
 }
 
 void Meatball::ConsoleUIScene::draw() {
@@ -76,12 +76,15 @@ void Meatball::ConsoleUIScene::draw() {
 	sendButton.drawRect();
 	sendButton.drawTextCentered(true, true);
 	
+	outputBox.draw();
+
 	closeButton.drawX();
 }
 
 void Meatball::ConsoleUIScene::update() {
 	if (!visible) return;
 
+	outputBox.update();
 	sendButton.update();
 	closeButton.update();
 }
