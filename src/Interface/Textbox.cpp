@@ -83,6 +83,8 @@ void Meatball::TextBox::draw() {
     
     EndScissorMode();
     
+    scrollBar.maxHeight = lineIdx*fontSize;
+
     scrollBar.draw();
 }
 
