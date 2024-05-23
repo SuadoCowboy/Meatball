@@ -1,9 +1,10 @@
 #pragma once
 
 #include <string>
-#include <functional>
 
 #include <raylib.h>
+
+#include "Shared.h"
 
 namespace Meatball {
     class Button
@@ -33,7 +34,7 @@ namespace Meatball {
 
         bool isHovered();
 
-        std::function<void()> onClick, onRelease, onHover;
+        VoidFunc onClick, onRelease, onHover;
 
         Rectangle rect;
         Color color, hoveredColor, textColor, textHoveredColor;
