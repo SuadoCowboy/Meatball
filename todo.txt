@@ -1,6 +1,8 @@
 WARNING: Alot of objects might create alot of new colors in memory.
 Maybe classes should use references or pointers.
 
+****SCROLLBAR CAN BE SCROLLED WITH MOUSE WITHOUT THE MOUSE COLLIDING WITH IT NOR THE OUTPUTBOX
+
 make asynchronous tasks or threaded things or both?
 
 Console interface (WORK IN PROGRESS);
