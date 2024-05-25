@@ -3,7 +3,10 @@ Maybe colors should use references, pointers OR static variables in another clas
 
 make asynchronous tasks or threaded things or both?
 
-Console interface (WORK IN PROGRESS);
+Console interface (WORK IN PROGRESS) {
+    missing inputbox;
+    missing a little text box that indicates possible words you're looking for(maybe do like ddrace one)
+}
 Input handling with binds by HayBCMD;
 
 Multiplayer Stuff;
