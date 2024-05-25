@@ -7,7 +7,7 @@
 #include "Utils/Utils.h"
 
 #ifndef CONSOLEUI_OUTPUT_MAX_LINES
-#define CONSOLEUI_OUTPUT_MAX_LINES 2000
+#define CONSOLEUI_OUTPUT_MAX_LINES 1000
 #endif
 
 namespace Meatball {
@@ -31,10 +31,9 @@ namespace Meatball {
             sendButton.update();
             closeButton.update();
 
-            while (getContentHeight(outputBox.getRect().height, outputBox.getFontSize(), outputBox.getText())
-                > CONSOLEUI_OUTPUT_MAX_LINES*outputBox.getFontSize()) {
-                    outputBox.popFront();
-                }
+            while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*outputBox.getFontSize()) {
+                outputBox.popFront();
+            }
         }
 
         // Only console can appear in every scene so only it needs visible boolean.
