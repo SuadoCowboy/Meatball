@@ -4,6 +4,7 @@ maybe colors should use references, pointers OR static variables in another clas
 # Maybe use char buffers instead of std::string because it seems like string is bad? idk, do more research
 
 # IMPORTANT: make things minimalist, things like borders and effects can be added using functions or classes
+## maybe everything related to drawing is handled by the dev, so everyone could make the style they want their game to be!!
 example:
 ```cpp
 // look for better name
