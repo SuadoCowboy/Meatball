@@ -4,6 +4,11 @@
 #include "Interface/Panel.h"
 #include "Interface/Button.h"
 #include "Interface/TextBox.h"
+#include "Utils/Utils.h"
+
+#ifndef CONSOLEUI_OUTPUT_MAX_LINES
+#define CONSOLEUI_OUTPUT_MAX_LINES 2000
+#endif
 
 namespace Meatball {
     class ConsoleUIScene : public Scene {
@@ -19,7 +24,18 @@ namespace Meatball {
         void print(const std::string& message);
 
         void draw();
-        void update();
+        void update() {
+            if (!visible) return;
+
+            outputBox.update();
+            sendButton.update();
+            closeButton.update();
+
+            while (getContentHeight(outputBox.getRect().height, outputBox.getFontSize(), outputBox.getText())
+                > CONSOLEUI_OUTPUT_MAX_LINES*outputBox.getFontSize()) {
+                    outputBox.popFront();
+                }
+        }
 
         // Only console can appear in every scene so only it needs visible boolean.
         // The rest of the scenes will be handled by a class or something that says which one should be used.

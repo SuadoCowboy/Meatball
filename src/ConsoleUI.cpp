@@ -77,11 +77,3 @@ void Meatball::ConsoleUIScene::draw() {
 
 	closeButton.drawX();
 }
-
-void Meatball::ConsoleUIScene::update() {
-	if (!visible) return;
-
-	outputBox.update();
-	sendButton.update();
-	closeButton.update();
-}

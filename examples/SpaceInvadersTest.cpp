@@ -1,9 +1,9 @@
-#include <iostream>
 #include <vector>
 #include <utility>
 
 #include <raylib.h>
 
+#define CONSOLEUI_OUTPUT_MAX_LINES 21
 #include <Console.h>
 #include <ConsoleUI.h>
 #include <Utils/Defaults.h>
@@ -29,15 +29,15 @@ int main(int, char**)
     auto consoleUI = Meatball::initLocalConsole((Rectangle){WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, "data/consoleUI.meatdata");
     
     consoleUI.sendButton.onClick = [&]() {
-        for (unsigned short i = 1; i < 10; i++)
+        for (unsigned short i = 1; i < 20; i++)
             Meatball::Console::printf("THIS IS A MESSAGE BEING PRINTED!111 {}", i);
     };
 
-    consoleUI.closeButton.onClick = [&]() {
-        Meatball::Console::printf("YAY COOL MESSAGE FROM CLOSE BUTTON1!!");
-    };
-
     consoleUI.sendButton.onClick();
+
+    consoleUI.closeButton.onClick = [&]() {
+        Meatball::Console::print("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur venenatis ante ut dui ullamcorper consectetur. Interdum et malesuada fames ac ante ipsum primis in faucibus. Sed sollicitudin finibus dui, in euismod sem dignissim a. In scelerisque viverra maximus. Maecenas fringilla eros dolor, sit amet blandit turpis maximus nec. Phasellus pretium.");
+    };
 
     while (!WindowShouldClose()) {
         ClearBackground(RAYWHITE);
@@ -46,6 +46,7 @@ int main(int, char**)
 
         BeginDrawing();
         consoleUI.draw();
+
         EndDrawing();
     }
 

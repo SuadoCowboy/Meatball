@@ -13,3 +13,19 @@ void Meatball::checkHovered(bool& hovered, const Rectangle& rect, VoidFunc* onHo
     if (onRelease && *onRelease && IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         (*onRelease)();
 }
+
+float Meatball::getContentHeight(const float& viewHeight, const float& fontSize, const std::list<std::string>& text) {
+    size_t lineIdx = 0;
+    for (auto& line : text) {
+        size_t newLineIdx = 0;
+        while (newLineIdx != std::string::npos) {
+            newLineIdx = line.find('\n');
+            lineIdx++;
+        }
+    }
+
+    float contentHeight = lineIdx*fontSize;
+    if (contentHeight < viewHeight) contentHeight = viewHeight;
+
+    return contentHeight;
+}

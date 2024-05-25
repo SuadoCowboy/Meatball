@@ -17,20 +17,23 @@ namespace Meatball {
         TextBox(Rectangle rect, unsigned char fontSize);
 
         void setFontSize(unsigned char newFontSize);
-        const unsigned char& getFontSize();
 
-        /// @warning it does not put newline on neither start or end of text(you should put it yourself)
+        const unsigned char& getFontSize() const;
+        const Rectangle& getRect() const;
+        ScrollBar& getScrollBar();
+
         void appendText(std::string text);
         void clearText();
+        
+        /// @brief removes the text at index 0
+        void popFront() noexcept;
 
-        const std::list<std::string>& getText();
+        const std::list<std::string>& getText() const;
 
         void draw();
         void update();
 
         Color color, textColor;
-
-        const Rectangle& getRect();
 
         void setPosition(float x, float y);
         void setSize(float width, float height);
@@ -39,7 +42,7 @@ namespace Meatball {
         // See appendText function, there is a good thing that
         // should be used in the case of resizing the rect.
         //VoidFunc onClick, onRelease;
-    
+
     private:
         std::list<std::string> text;
         unsigned char fontSize;

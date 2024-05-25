@@ -9,29 +9,30 @@ namespace Meatball {
     public:
         /// @param barRect the biggest rectangle that is drawn
         ScrollBar(Rectangle barRect, bool visible = true);
+        
+        /// @param parentRect to check if the mouse is between parent's boundaries to use mouse wheel 
+        void update(const Rectangle& parentRect);
 
         void draw();
-        void update();
 
-        /// @brief the parent object should use this function if mouse is within the parent's bounds
-        void updateWheelScroll();
+        float getScrollValue() const;
 
-        float getScrollHeight() const;
-        short getScrollY() const;
+        /// @param viewHeight basically, the height of the parent
+        /// @param contentHeight the maximum height that could be reached
+        void updateThumbHeight(float viewHeight, float contentHeight);
 
-        /// @brief maxHeight = parent.rect.height/parent maximum height size(including out of bounds)
-        unsigned int maxHeight;
-
-        Color barColor, barHoveredColor, scrollColor, scrollHoveredColor1, scrollHoveredColor2;
+        Color barColor, barHoveredColor, thumbColor, thumbHoveredColor1, thumbHoveredColor2;
         bool visible;
 
         Rectangle barRect;
 
         static unsigned char scrollSpeed;
     private:
-        bool barHovered, scrollHovered;
-        short scrollY;
+        bool barHovered, thumbHovered;
+        float thumbY, thumbHeight;
+        float scrollValue; // (0.0 - 1.0) it's %
 
-        bool dragging;
+        bool dragging; // Whether the thumb is currently being dragged
+        float dragOffsetY;
     };
 }
