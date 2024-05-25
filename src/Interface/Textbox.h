@@ -20,6 +20,7 @@ namespace Meatball {
 
         const unsigned char& getFontSize() const;
         const Rectangle& getRect() const;
+        const unsigned int getContentHeight() const;
         ScrollBar& getScrollBar();
 
         void appendText(std::string text);
@@ -46,6 +47,7 @@ namespace Meatball {
     private:
         std::list<std::string> text;
         unsigned char fontSize;
+        unsigned int contentHeight;
         
         ScrollBar scrollBar; // it appears when text is higher than rect.height
 

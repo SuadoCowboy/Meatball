@@ -12,19 +12,17 @@ Meatball::TextBox::TextBox(Rectangle rect, unsigned char fontSize)
 
 static inline void handleTextWrapping(std::list<std::string>& textList, const std::string& text, const float& fontSize, float maxWidth) {
     textList.push_back("");
-    
     std::string newText = text;
 
     while (MeasureText(newText.c_str(), fontSize) >= maxWidth) {
-        std::string newTextCopy = newText;
-        size_t columnIdx = newTextCopy.size()-1;
+        size_t columnIdx = 1; 
         
-        while (MeasureText(newTextCopy.c_str(), fontSize) >= maxWidth) {
-            newTextCopy = newText.substr(0, columnIdx);
-            columnIdx--;
-        }
+        while (MeasureText(newText.substr(0, columnIdx).c_str(), fontSize) < maxWidth)
+            ++columnIdx;
+        
+        --columnIdx;
 
-        textList.back() += newTextCopy+"\n";
+        textList.back() += newText.substr(0, columnIdx)+"\n";
         newText = newText.substr(columnIdx);
     }
 
@@ -39,7 +37,8 @@ void Meatball::TextBox::appendText(std::string newText) {
     } else
         handleTextWrapping(text, newText, fontSize, rect.width-scrollBar.barRect.width);
     
-    scrollBar.updateThumbHeight(rect.height, getContentHeight(rect.height, fontSize, text));
+    contentHeight = Meatball::getContentHeight(rect.height, fontSize, text);
+    scrollBar.updateThumbHeight(rect.height, contentHeight);
 }
 
 void Meatball::TextBox::clearText() {
@@ -47,17 +46,23 @@ void Meatball::TextBox::clearText() {
     scrollBar.visible = false;
     
     // to fix view
-    scrollBar.updateThumbHeight(rect.height, getContentHeight(rect.height, fontSize, text));
+    contentHeight = Meatball::getContentHeight(rect.height, fontSize, text);
+    scrollBar.updateThumbHeight(rect.height, contentHeight);
     scrollBar.update(rect);
 }
 
 void Meatball::TextBox::popFront() noexcept {
     text.pop_front();
-    scrollBar.updateThumbHeight(rect.height, getContentHeight(rect.height, fontSize, text));
+    contentHeight = Meatball::getContentHeight(rect.height, fontSize, text);
+    scrollBar.updateThumbHeight(rect.height, contentHeight);
 }
 
 const std::list<std::string>& Meatball::TextBox::getText() const {
     return text;
+}
+
+const unsigned int Meatball::TextBox::getContentHeight() const {
+    return contentHeight;
 }
 
 void Meatball::TextBox::setFontSize(unsigned char newFontSize) {
@@ -93,18 +98,21 @@ void Meatball::TextBox::draw() {
 
     size_t lineIdx = 0;
     for (auto& line : text) {
+        size_t newLineIdx = 0;
+        size_t newLineAmount = 0;
+        while (newLineIdx != std::string::npos) {
+            newLineIdx = line.find('\n', newLineIdx+1);
+            ++newLineAmount;
+        }
+
         int lineY = lineIdx*fontSize-scrollBar.getScrollValue()*rect.height;
 
         if (lineY > rect.height) break;
-        
-        if (lineY+fontSize > 0)
+
+        if (lineY+fontSize*newLineAmount > 0)
             DrawText(line.c_str(), rect.x, rect.y+(float)lineY, fontSize, textColor);
         
-        size_t newLineIdx = 0;
-        while (newLineIdx != std::string::npos) {
-            newLineIdx = line.find('\n', newLineIdx+1);
-            lineIdx++;
-        }
+        lineIdx += newLineAmount;
     }
     
     EndScissorMode();
