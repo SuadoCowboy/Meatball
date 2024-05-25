@@ -41,6 +41,8 @@ class ConsoleUI /*WORK IN PROGRESS*/ {
 }
 ```
 
+# UPDATE FUNCTION DESCRIPTIONS AND ANYTHING ELSE RELATED TO READING AT THE END
+
 Input handling with binds by HayBCMD;
 
 Multiplayer Stuff;
