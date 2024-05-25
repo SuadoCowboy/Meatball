@@ -7,6 +7,7 @@
 namespace Meatball {
     class ScrollBar {
     public:
+        ScrollBar();
         /// @param barRect the biggest rectangle that is drawn
         ScrollBar(Rectangle barRect, bool visible = true);
         

@@ -8,9 +8,14 @@ static inline void updateScrollValue(float& scrollValue, const float& thumbY, co
     scrollValue = thumbY / thumbHeight;
 }
 
+Meatball::ScrollBar::ScrollBar() : barRect({0,0,0,0}), visible(false),
+    barHovered(false), thumbHovered(false), thumbY(0), thumbHeight(barRect.height),
+    dragging(false), dragOffsetY(0) {}
+
 Meatball::ScrollBar::ScrollBar(Rectangle barRect, bool visible)
     : barRect(barRect), visible(visible),
-    barHovered(false), thumbHovered(false), thumbY(0), thumbHeight(barRect.height), dragging(false), dragOffsetY(0) {
+    barHovered(false), thumbHovered(false), thumbY(0),
+    thumbHeight(barRect.height), dragging(false), dragOffsetY(0) {
         barColor = (Color){15,15,15,255};
         barHoveredColor = (Color){25,25,25,255};
 

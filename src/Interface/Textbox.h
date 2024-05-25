@@ -14,7 +14,7 @@ namespace Meatball {
     class TextBox {
     public:
         TextBox();
-        TextBox(Rectangle rect, unsigned char fontSize);
+        TextBox(float x, float y, float width, float height, unsigned char fontSize);
 
         void setFontSize(unsigned char newFontSize);
 

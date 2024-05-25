@@ -1,12 +1,19 @@
 #include "Defaults.h"
 
-#include "Config.h"
-
-#include <Console.h>
-
+#include <sstream>
 #include <functional>
 
+#include <HayBCMD.h>
+
+#include "Config.h"
+#include "Console.h"
+
 Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::string& meatdataPath) {
+    std::vector<std::string> messages;
+    HayBCMD::Output::setPrintFunction([&](const std::string& message) {
+        messages.push_back(message);
+    });
+    
     auto consoleUIData = Config::loadData("data/consoleUI.meatdata");
     
     Config::ConfigData* marginData = Config::ifContainsGet(consoleUIData, "margin");
@@ -15,19 +22,10 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
 
     Config::ConfigData* fontSizeData = Config::ifContainsGet(consoleUIData, "fontSize");
     auto consoleUI = Meatball::ConsoleUIScene(rect.x, rect.y, rect.width, rect.height,
-        fontSizeData? fontSizeData->unsignedCharV : 22);
+        fontSizeData? fontSizeData->unsignedCharV : 16);
 
     Config::ConfigData* mainPanelColorData = Config::ifContainsGet(consoleUIData, "mainPanelColor");
     if (mainPanelColorData) consoleUI.mainPanel.color = mainPanelColorData->colorV;
-
-    Config::ConfigData* sendButtonTextData = Config::ifContainsGet(consoleUIData, "sendButtonText");
-    if (sendButtonTextData) consoleUI.sendButton.setText(sendButtonTextData->stringV);
-
-    Config::ConfigData* sendButtonColorData = Config::ifContainsGet(consoleUIData, "sendButtonColor");
-    if (sendButtonColorData) consoleUI.sendButton.color = sendButtonColorData->colorV;
-
-    Config::ConfigData* sendButtonHoveredColorData = Config::ifContainsGet(consoleUIData, "sendButtonHoveredColor");
-    if (sendButtonHoveredColorData) consoleUI.sendButton.hoveredColor = sendButtonHoveredColorData->colorV;
 
     Config::ConfigData* closeButtonColorData = Config::ifContainsGet(consoleUIData, "closeButtonColor");
     if (closeButtonColorData) consoleUI.closeButton.color = closeButtonColorData->colorV;
@@ -41,9 +39,23 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
     Config::ConfigData* outputBoxTextColorData = Config::ifContainsGet(consoleUIData, "outputBoxTextColor");
     if (outputBoxTextColorData) consoleUI.outputBox.textColor = outputBoxTextColorData->colorV;
 
+    Config::ConfigData* inputBoxColorData = Config::ifContainsGet(consoleUIData, "inputBoxColor");
+    if (inputBoxColorData) consoleUI.inputBox.color = inputBoxColorData->colorV;
+
+    Config::ConfigData* inputBoxTextColorData = Config::ifContainsGet(consoleUIData, "inputBoxTextColor");
+    if (inputBoxTextColorData) consoleUI.inputBox.textColor = inputBoxTextColorData->colorV;
+
+    Config::ConfigData* inputBoxCursorColorData = Config::ifContainsGet(consoleUIData, "inputBoxCursorColor");
+    if (inputBoxCursorColorData) consoleUI.inputBox.cursorColor = inputBoxCursorColorData->colorV;
+
     Console::init([&](const std::string& message) {
         consoleUI.print(message);
     });
+
+    Console::print("Console initialized");
+
+    for (auto& message : messages)
+        Console::print(message);
 
     return consoleUI;
 }

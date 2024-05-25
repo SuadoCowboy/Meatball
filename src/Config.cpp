@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-#include <HayBCMD.h>
+#include "Console.h"
 
 Meatball::Config::ConfigData::ConfigData(int i) : intV(i) {}
 Meatball::Config::ConfigData::ConfigData(double d): doubleV(d) {}
@@ -15,8 +15,8 @@ Meatball::Config::ConfigData::ConfigData() {}
 
 static bool handleSpaceError(size_t spaceIdx, size_t spaceIdxBefore, size_t lineIdx) {
     if (spaceIdx == std::string::npos || spaceIdx == 0 || spaceIdx == spaceIdxBefore+1) {
-            HayBCMD::Output::printf("ERROR: Could not load data: space error in line {}\n", lineIdx);
-            return true;
+        Meatball::Console::printf("ERROR: Could not load data: space error in line {}", lineIdx);
+        return true;
     }
 
     return false;
@@ -43,13 +43,13 @@ std::unordered_map<std::string, Meatball::Config::ConfigData> Meatball::Config::
         
         // "name "
         size_t spaceIdx = line.find(" ");
-        if (handleSpaceError(spaceIdx, 0, lineIdx)) return {};
+        if (handleSpaceError(spaceIdx, 0, lineIdx)) return data;
         
         std::string name = line.substr(0, spaceIdx);
 
         // " type "
         size_t secondSpaceIdx = line.find(" ", spaceIdx+1);
-        if (handleSpaceError(secondSpaceIdx, spaceIdx, lineIdx)) return {};
+        if (handleSpaceError(secondSpaceIdx, spaceIdx, lineIdx)) return data;
 
         std::string type = line.substr(spaceIdx+1, secondSpaceIdx-spaceIdx-1);
         std::string value = line.substr(secondSpaceIdx+1);
@@ -84,7 +84,7 @@ std::unordered_map<std::string, Meatball::Config::ConfigData> Meatball::Config::
         }
 
         else {
-            HayBCMD::Output::printf("ERROR: Could not load data: missing TYPE in line {}\n", lineIdx);
+            Meatball::Console::printf("ERROR: Could not load data: missing TYPE in line {}\n", lineIdx);
             return {};
         }
         

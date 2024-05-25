@@ -4,6 +4,7 @@
 #include "Interface/Panel.h"
 #include "Interface/Button.h"
 #include "Interface/TextBox.h"
+#include "Interface/InputTextBox.h"
 #include "Utils/Utils.h"
 
 #ifndef CONSOLEUI_OUTPUT_MAX_LINES
@@ -27,8 +28,8 @@ namespace Meatball {
         void update() {
             if (!visible) return;
 
+            inputBox.update();
             outputBox.update();
-            sendButton.update();
             closeButton.update();
 
             while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*outputBox.getFontSize()) {
@@ -39,11 +40,11 @@ namespace Meatball {
         // Only console can appear in every scene so only it needs visible boolean.
         // The rest of the scenes will be handled by a class or something that says which one should be used.
         bool visible;
-
+        
         Panel mainPanel;
         Button closeButton;
-        Button sendButton;
         TextBox outputBox;
+        InputTextBox inputBox;
 
         // margin - the space between mainPanel border and objects close to it
         static unsigned char margin;

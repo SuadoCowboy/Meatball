@@ -6,9 +6,11 @@ Meatball::TextBox::TextBox()
     : rect((Rectangle){0,0,0,0}), fontSize(1), color(BLACK),
     textColor(WHITE), scrollBar((Rectangle){0,0,0,0}) {}
 
-Meatball::TextBox::TextBox(Rectangle rect, unsigned char fontSize)
-    : rect(rect), fontSize(fontSize), color(BLACK), textColor(WHITE),
-    scrollBar((Rectangle){rect.x+rect.width-20,rect.y, 20, rect.height}) {}
+Meatball::TextBox::TextBox(float x, float y, float width, float height, unsigned char fontSize)
+    : fontSize(fontSize), color(BLACK), textColor(WHITE) {
+        rect = (Rectangle{x,y,width,height});
+        scrollBar = {(Rectangle){rect.x+rect.width-20,rect.y, 20, rect.height}, false};
+}
 
 static inline void handleTextWrapping(std::list<std::string>& textList, const std::string& text, const float& fontSize, float maxWidth) {
     textList.push_back("");
@@ -39,6 +41,7 @@ void Meatball::TextBox::appendText(std::string newText) {
     
     contentHeight = Meatball::getContentHeight(rect.height, fontSize, text);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
+    if (contentHeight > rect.height) scrollBar.visible = true;
 }
 
 void Meatball::TextBox::clearText() {

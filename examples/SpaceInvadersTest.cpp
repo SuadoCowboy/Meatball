@@ -26,12 +26,6 @@ int main(int, char**)
 
     // Utils/Defaults.h
     auto consoleUI = Meatball::initLocalConsole((Rectangle){WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2}, "data/consoleUI.meatdata");
-    
-    consoleUI.sendButton.onClick = [&]() {
-        Meatball::Console::print("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur venenatis ante ut dui ullamcorper consectetur. Interdum et malesuada fames ac ante ipsum primis in faucibus. Sed sollicitudin finibus dui, in euismod sem dignissim a. In scelerisque viverra maximus. Maecenas fringilla eros dolor, sit amet blandit turpis maximus nec. Phasellus pretium.");
-    };
-
-    consoleUI.sendButton.onClick();
 
     while (!WindowShouldClose()) {
         ClearBackground(RAYWHITE);
