@@ -44,25 +44,24 @@ void Meatball::ScrollBar::update(const Rectangle& parentRect) {
     barHovered = CheckCollisionPointRec(mousePosition, barRect);
     
     thumbHovered = CheckCollisionPointRec(mousePosition,
-        (Rectangle){barRect.x, (float)thumbY, barRect.width, thumbHeight});
+        (Rectangle){barRect.x, barRect.y+thumbY, barRect.width, thumbHeight});
 
-    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-        if (barHovered)
-            thumbY = mousePosition.y - thumbHeight/2;
-        
-        else if (thumbHovered) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if (thumbHovered) {
             dragging = true;
-            dragOffsetY = mousePosition.y - thumbY;
-        }
+            dragOffsetY = thumbY+barRect.y - mousePosition.y;
+        } else if (barHovered)
+            thumbY = mousePosition.y - thumbHeight/2 - barRect.y;
+        
     } else if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) dragging = false;
     
     float mouseWheelMove = GetMouseWheelMove();
     if (mouseWheelMove != 0 && CheckCollisionPointRec(GetMousePosition(), parentRect)) {
-        thumbY -= mouseWheelMove*scrollSpeed*thumbHeight/barRect.height*100;
+        thumbY -= mouseWheelMove * scrollSpeed * (thumbHeight/barRect.height);
     }
     
     if (dragging) {
-        thumbY = mousePosition.y-dragOffsetY;
+        thumbY = mousePosition.y-barRect.y+dragOffsetY;
     }
     
     // if up limit
