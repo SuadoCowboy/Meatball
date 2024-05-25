@@ -19,7 +19,7 @@ float Meatball::getContentHeight(const float& viewHeight, const float& fontSize,
     for (auto& line : text) {
         size_t newLineIdx = 0;
         while (newLineIdx != std::string::npos) {
-            newLineIdx = line.find('\n');
+            newLineIdx = line.find('\n', newLineIdx+1);
             lineIdx++;
         }
     }
