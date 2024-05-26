@@ -1,6 +1,8 @@
 # WARNING: Alot of objects might create alot of new colors in memory.
 maybe colors should use references, pointers OR static variables in another class.
 
+# TODO: Auto completion
+
 # Maybe use char buffers instead of std::string because it seems like string is bad? idk, do more research
 
 # IMPORTANT: make things minimalist, things like borders and effects can be added using functions or classes
