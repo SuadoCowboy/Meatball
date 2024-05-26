@@ -2,7 +2,7 @@
 
 #include "Utils/Utils.h"
 
-unsigned char Meatball::ScrollBar::scrollSpeed = 10;
+unsigned char Meatball::ScrollBar::scrollSpeed = 50;
 
 static inline void updateScrollValue(float& scrollValue, const float& thumbY, const float& thumbHeight, const Rectangle& barRect) {
     scrollValue = thumbY / thumbHeight;
