@@ -14,7 +14,7 @@ void Meatball::checkHovered(bool& hovered, const Rectangle& rect, VoidFunc* onHo
         (*onRelease)();
 }
 
-float Meatball::getContentHeight(const float& viewHeight, const float& fontSize, const std::list<std::string>& text) {
+float Meatball::getContentHeight(float viewHeight, float fontSize, const std::list<std::string>& text) {
     size_t lineIdx = 0;
     for (auto& line : text) {
         size_t newLineIdx = 0;

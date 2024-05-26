@@ -1,6 +1,9 @@
 #include "Button.h"
 
 #include "Utils/Utils.h"
+#include "FontsHandler.h"
+
+using fh = Meatball::FontsHandler;
 
 static inline void setupButton(Meatball::Button* button) {
     button->onClick = nullptr;
@@ -34,18 +37,12 @@ const std::string& Meatball::Button::getText() {
     return text;
 }
 
-const unsigned char& Meatball::Button::getFontSize() {
-    return fontSize;
-}
-
-void Meatball::Button::setText(std::string newText, unsigned char newFontSize) {
-    if (newFontSize != 0) fontSize = newFontSize;
-
-    int textWidth = MeasureText(newText.c_str(), fontSize);
+void Meatball::Button::setText(std::string newText) {
+    int textWidth = fh::MeasureTextWidth(font, newText.c_str());
 
     while (textWidth > rect.width) {
         newText = newText.substr(0, newText.size()-1);
-        textWidth = MeasureText(newText.c_str(), fontSize);
+        textWidth = fh::MeasureTextWidth(font, newText.c_str());
     }
 
     text = newText;
@@ -53,13 +50,13 @@ void Meatball::Button::setText(std::string newText, unsigned char newFontSize) {
 
 void Meatball::Button::drawText()
 {   
-    DrawText(text.c_str(), rect.x, rect.y, fontSize, hovered? textHoveredColor : textColor);
+    fh::DrawText(font,text.c_str(), rect.x, rect.y, hovered? textHoveredColor : textColor);
 }
 
 void Meatball::Button::drawTextCentered(bool centerX, bool centerY) {
-    int textWidthHalf = MeasureText(text.c_str(), fontSize)/2;
+    int textWidthHalf = fh::MeasureTextWidth(font, text.c_str())/2;
 
-    DrawText(text.c_str(), centerX? rect.x+rect.width/2-textWidthHalf : rect.x, centerY? rect.y+rect.height/2-fontSize/2 : rect.y, fontSize, hovered? textHoveredColor : textColor);
+    fh::DrawText(font, text.c_str(), centerX? rect.x+rect.width/2-textWidthHalf : rect.x, centerY? rect.y+rect.height/2-(float)font->baseSize/2 : rect.y, hovered? textHoveredColor : textColor);
 }
 
 void Meatball::Button::drawRect() {

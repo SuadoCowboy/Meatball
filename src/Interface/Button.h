@@ -40,15 +40,14 @@ namespace Meatball {
         Color color, hoveredColor, textColor, textHoveredColor;
         
         const std::string& getText();
-        const unsigned char& getFontSize();
 
-        /// @param fontSize 0 to maintain current fontSize else change fontSize
-        void setText(std::string newText, unsigned char newFontSize = 0);
+        void setText(std::string newText);
     
+        Font* font;
+
     private:
         bool hovered;
 
         std::string text;
-        unsigned char fontSize;
     };
 }

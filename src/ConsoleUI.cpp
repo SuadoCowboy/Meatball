@@ -6,14 +6,24 @@
 
 unsigned char Meatball::ConsoleUIScene::margin = 4;
 
-Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float height, unsigned char fontSize, bool visible)
+Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float height, Font* font, bool visible)
 	: Scene(), visible(visible) {
 	mainPanel = {x, y, width, height};
 	
 	closeButton = {x+width-margin-margin/2, y+margin/2, (float)margin, (float)margin}; // is inside the margin
 
-	outputBox = {x+margin, y+margin, width-margin*2-3, height-margin*2-21, fontSize};
-	inputBox = {x+margin, y+height-margin-21, width-margin*2-3, 21, fontSize};
+	outputBox = {x+margin, y+margin, width-margin*2-3, height-margin*2-21, font};
+	inputBox = {x+margin, y+height-margin-21, width-margin*2-3, 21, font};
+
+	// add auto completion
+	inputBox.onTextChange = [&](const std::string& text) {
+
+	};
+
+	inputBox.onSend = [&](const std::string& text) {
+		print(text);
+		Console::run(text);
+	};
 
 	/*
 	---------------------
@@ -32,12 +42,6 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 		// TODO: fading effect (maybe add a task system? Meatball::Task() or Meatball::newTask() or something)
 	};
 
-	//inputBox.onSend = [&]() {
-		//print(inputTextbox.getText());
-		//Console::run(inputTextbox.getText());
-		//inputTextbox.setText("");
-	//};
-
 	/*
 	TODOS:
 	rounded border in mainPanel
@@ -52,7 +56,11 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 }
 
 void Meatball::ConsoleUIScene::print(const std::string& message) {
-	outputBox.appendText(message);
+	// if you want a newline you will need to put "\n\n"
+	if (message[message.size()-1] == '\n')
+		outputBox.appendText(message.substr(0,message.size()-1));
+	else
+		outputBox.appendText(message);
 }
 
 void Meatball::ConsoleUIScene::draw() {

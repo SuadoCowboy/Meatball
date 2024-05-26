@@ -14,11 +14,8 @@ namespace Meatball {
     class TextBox {
     public:
         TextBox();
-        TextBox(float x, float y, float width, float height, unsigned char fontSize);
+        TextBox(float x, float y, float width, float height, Font* font);
 
-        void setFontSize(unsigned char newFontSize);
-
-        const unsigned char& getFontSize() const;
         const Rectangle& getRect() const;
         const unsigned int getContentHeight() const;
         ScrollBar& getScrollBar();
@@ -44,9 +41,10 @@ namespace Meatball {
         // should be used in the case of resizing the rect.
         //VoidFunc onClick, onRelease;
 
+        Font* font;
+
     private:
         std::list<std::string> text;
-        unsigned char fontSize;
         unsigned int contentHeight;
         
         ScrollBar scrollBar; // it appears when text is higher than rect.height

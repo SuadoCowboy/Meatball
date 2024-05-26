@@ -1,25 +1,30 @@
 #include "TextBox.h"
 
 #include "Utils/Utils.h"
+#include "FontsHandler.h"
+
+using fh = Meatball::FontsHandler;
 
 Meatball::TextBox::TextBox()
-    : rect((Rectangle){0,0,0,0}), fontSize(1), color(BLACK),
-    textColor(WHITE), scrollBar((Rectangle){0,0,0,0}) {}
+    : rect((Rectangle){0,0,0,0}), font(nullptr), color(BLACK),
+    textColor(WHITE), scrollBar((Rectangle){0,0,0,0}) {
+        font = FontsHandler::get("default");
+    }
 
-Meatball::TextBox::TextBox(float x, float y, float width, float height, unsigned char fontSize)
-    : fontSize(fontSize), color(BLACK), textColor(WHITE) {
+Meatball::TextBox::TextBox(float x, float y, float width, float height, Font* font)
+    : font(font), color(BLACK), textColor(WHITE) {
         rect = (Rectangle{x,y,width,height});
         scrollBar = {(Rectangle){rect.x+rect.width-20,rect.y, 20, rect.height}, false};
 }
 
-static inline void handleTextWrapping(std::list<std::string>& textList, const std::string& text, const float& fontSize, float maxWidth) {
+static inline void handleTextWrapping(std::list<std::string>& textList, const std::string& text, Font* font, float maxWidth) {
     textList.push_back("");
     std::string newText = text;
 
-    while (MeasureText(newText.c_str(), fontSize) >= maxWidth) {
+    while (fh::MeasureTextWidth(font, newText.c_str()) >= maxWidth) {
         size_t columnIdx = 1; 
         
-        while (MeasureText(newText.substr(0, columnIdx).c_str(), fontSize) < maxWidth)
+        while (fh::MeasureTextWidth(font, newText.substr(0, columnIdx).c_str()) < maxWidth)
             ++columnIdx;
         
         --columnIdx;
@@ -34,12 +39,12 @@ static inline void handleTextWrapping(std::list<std::string>& textList, const st
 void Meatball::TextBox::appendText(std::string newText) {
     if (newText.size() == 0) return;
     
-    if (MeasureText(newText.c_str(), fontSize) < rect.width-scrollBar.barRect.width) {
+    if (fh::MeasureTextWidth(font, newText.c_str()) < rect.width-scrollBar.barRect.width) {
         text.push_back(newText);
     } else
-        handleTextWrapping(text, newText, fontSize, rect.width-scrollBar.barRect.width);
+        handleTextWrapping(text, newText, font, rect.width-scrollBar.barRect.width);
     
-    contentHeight = Meatball::getContentHeight(rect.height, fontSize, text);
+    contentHeight = Meatball::getContentHeight(rect.height, (float)font->baseSize, text);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
     if (contentHeight > rect.height) scrollBar.visible = true;
 }
@@ -49,14 +54,14 @@ void Meatball::TextBox::clearText() {
     scrollBar.visible = false;
     
     // to fix view
-    contentHeight = Meatball::getContentHeight(rect.height, fontSize, text);
+    contentHeight = Meatball::getContentHeight(rect.height, (float)font->baseSize, text);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
     scrollBar.update(rect);
 }
 
 void Meatball::TextBox::popFront() noexcept {
     text.pop_front();
-    contentHeight = Meatball::getContentHeight(rect.height, fontSize, text);
+    contentHeight = Meatball::getContentHeight(rect.height, (float)font->baseSize, text);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
 }
 
@@ -66,14 +71,6 @@ const std::list<std::string>& Meatball::TextBox::getText() const {
 
 const unsigned int Meatball::TextBox::getContentHeight() const {
     return contentHeight;
-}
-
-void Meatball::TextBox::setFontSize(unsigned char newFontSize) {
-    fontSize = newFontSize;
-}
-
-const unsigned char& Meatball::TextBox::getFontSize() const {
-    return fontSize;
 }
 
 const Rectangle& Meatball::TextBox::getRect() const {
@@ -108,12 +105,13 @@ void Meatball::TextBox::draw() {
             ++newLineAmount;
         }
 
-        int lineY = lineIdx*fontSize-scrollBar.getScrollValue()*rect.height;
+        int lineY = lineIdx*(float)font->baseSize-scrollBar.getScrollValue()*rect.height;
 
         if (lineY > rect.height) break;
 
-        if (lineY+fontSize*newLineAmount > 0)
-            DrawText(line.c_str(), rect.x, rect.y+(float)lineY, fontSize, textColor);
+        if (lineY+(float)font->baseSize*newLineAmount > 0)
+            fh::DrawText(font, line.c_str(), rect.x,
+            rect.y+(float)lineY+1/*+1 because letters get stuck 1 pixel in the top*/, textColor);
         
         lineIdx += newLineAmount;
     }

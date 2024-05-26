@@ -2,11 +2,13 @@
 
 #include <sstream>
 #include <functional>
+#include <filesystem>
 
 #include <HayBCMD.h>
 
 #include "Config.h"
 #include "Console.h"
+#include "FontsHandler.h"
 
 Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::string& meatdataPath) {
     std::vector<std::string> messages;
@@ -21,9 +23,22 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
         marginData->unsignedCharV : Meatball::ConsoleUIScene::margin;
 
     Config::ConfigData* fontSizeData = Config::ifContainsGet(consoleUIData, "fontSize");
-    auto consoleUI = Meatball::ConsoleUIScene(rect.x, rect.y, rect.width, rect.height,
-        fontSizeData? fontSizeData->unsignedCharV : 16);
+    Config::ConfigData* fontData = Config::ifContainsGet(consoleUIData, "font");
+    
+    std::filesystem::path fontPath = fontData->stringV;
+    std::string fontName = fontPath.filename().string();
 
+    // WARNING: if the developer does not use this function, he might need to define a default font
+    FontsHandler::add(GetFontDefault(), "default");
+
+    Font* font = nullptr;
+    if (FontsHandler::loadEx(fontPath, fontName, fontSizeData? fontSizeData->unsignedCharV : 16, nullptr, 0))
+        font = FontsHandler::get(fontName);
+    else
+        font = FontsHandler::get("default");
+    
+    auto consoleUI = Meatball::ConsoleUIScene(rect.x, rect.y, rect.width, rect.height, font);
+    
     Config::ConfigData* mainPanelColorData = Config::ifContainsGet(consoleUIData, "mainPanelColor");
     if (mainPanelColorData) consoleUI.mainPanel.color = mainPanelColorData->colorV;
 
