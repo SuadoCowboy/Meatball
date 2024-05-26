@@ -28,7 +28,7 @@ Meatball::Config::ConfigData* Meatball::Config::ifContainsGet(std::unordered_map
 
 std::unordered_map<std::string, Meatball::Config::ConfigData> Meatball::Config::loadData(std::filesystem::path path) {
     if (!std::filesystem::exists(path) || std::filesystem::is_directory(path) || path.extension() != ".meatdata") {
-        HayBCMD::Output::printf("ERROR: Could not load data: \"{}\" is not compatible or does not exist\n", path.c_str());
+        Console::printf("ERROR: Could not load data: \"{}\" is not compatible or does not exist\n", path.string());
         return {};
     }
 
