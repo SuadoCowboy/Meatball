@@ -11,3 +11,4 @@ inputBoxTextColor COLOR 0,255,0
 inputBoxCursorColor COLOR 255,0,255
 
 fontSize UNSIGNED_CHAR 16
+font STRING fonts/CooperHewitt-Medium.otf
