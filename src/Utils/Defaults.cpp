@@ -16,14 +16,14 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
         messages.push_back(message);
     });
     
-    auto consoleUIData = Config::loadData("data/consoleUI.meatdata");
+    auto consoleData = Config::loadData(meatdataPath);
     
-    Config::ConfigData* marginData = Config::ifContainsGet(consoleUIData, "margin");
+    Config::ConfigData* marginData = Config::ifContainsGet(consoleData, "margin");
     Meatball::ConsoleUIScene::margin = marginData?
         marginData->unsignedCharV : Meatball::ConsoleUIScene::margin;
 
-    Config::ConfigData* fontSizeData = Config::ifContainsGet(consoleUIData, "fontSize");
-    Config::ConfigData* fontData = Config::ifContainsGet(consoleUIData, "font");
+    Config::ConfigData* fontSizeData = Config::ifContainsGet(consoleData, "fontSize");
+    Config::ConfigData* fontData = Config::ifContainsGet(consoleData, "font");
     
     std::filesystem::path fontPath = fontData->stringV;
     std::string fontName = fontPath.filename().string();
@@ -39,28 +39,28 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
     
     auto consoleUI = Meatball::ConsoleUIScene(rect.x, rect.y, rect.width, rect.height, font);
     
-    Config::ConfigData* mainPanelColorData = Config::ifContainsGet(consoleUIData, "mainPanelColor");
+    Config::ConfigData* mainPanelColorData = Config::ifContainsGet(consoleData, "mainPanelColor");
     if (mainPanelColorData) consoleUI.mainPanel.color = mainPanelColorData->colorV;
 
-    Config::ConfigData* closeButtonColorData = Config::ifContainsGet(consoleUIData, "closeButtonColor");
+    Config::ConfigData* closeButtonColorData = Config::ifContainsGet(consoleData, "closeButtonColor");
     if (closeButtonColorData) consoleUI.closeButton.color = closeButtonColorData->colorV;
 
-    Config::ConfigData* closeButtonHoveredColorData = Config::ifContainsGet(consoleUIData, "closeButtonHoveredColor");
+    Config::ConfigData* closeButtonHoveredColorData = Config::ifContainsGet(consoleData, "closeButtonHoveredColor");
     if (closeButtonHoveredColorData) consoleUI.closeButton.hoveredColor = closeButtonHoveredColorData->colorV;
 
-    Config::ConfigData* outputBoxColorData = Config::ifContainsGet(consoleUIData, "outputBoxColor");
+    Config::ConfigData* outputBoxColorData = Config::ifContainsGet(consoleData, "outputBoxColor");
     if (outputBoxColorData) consoleUI.outputBox.color = outputBoxColorData->colorV;
 
-    Config::ConfigData* outputBoxTextColorData = Config::ifContainsGet(consoleUIData, "outputBoxTextColor");
+    Config::ConfigData* outputBoxTextColorData = Config::ifContainsGet(consoleData, "outputBoxTextColor");
     if (outputBoxTextColorData) consoleUI.outputBox.textColor = outputBoxTextColorData->colorV;
 
-    Config::ConfigData* inputBoxColorData = Config::ifContainsGet(consoleUIData, "inputBoxColor");
+    Config::ConfigData* inputBoxColorData = Config::ifContainsGet(consoleData, "inputBoxColor");
     if (inputBoxColorData) consoleUI.inputBox.color = inputBoxColorData->colorV;
 
-    Config::ConfigData* inputBoxTextColorData = Config::ifContainsGet(consoleUIData, "inputBoxTextColor");
+    Config::ConfigData* inputBoxTextColorData = Config::ifContainsGet(consoleData, "inputBoxTextColor");
     if (inputBoxTextColorData) consoleUI.inputBox.textColor = inputBoxTextColorData->colorV;
 
-    Config::ConfigData* inputBoxCursorColorData = Config::ifContainsGet(consoleUIData, "inputBoxCursorColor");
+    Config::ConfigData* inputBoxCursorColorData = Config::ifContainsGet(consoleData, "inputBoxCursorColor");
     if (inputBoxCursorColorData) consoleUI.inputBox.cursorColor = inputBoxCursorColorData->colorV;
 
     Console::init([&](const std::string& message) {
