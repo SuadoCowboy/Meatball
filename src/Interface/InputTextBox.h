@@ -25,9 +25,12 @@ namespace Meatball {
         // onSend by default runs when KEY_ENTER/KEY_KP_ENTER is pressed
         std::function<void(const std::string&)> onSend, onTextChange;
     
+        bool focused;
+
     private:
         Rectangle rect;
 
+        float offsetX;
         unsigned int cursorPos;
     };
 }
