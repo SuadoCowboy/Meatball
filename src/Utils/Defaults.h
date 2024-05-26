@@ -10,12 +10,19 @@ namespace Meatball {
     /// @brief does the boring part for you.
     /// @param rect position and size of the console
     /// @param meatdataPath the path to the .meatdata file
-    /// @note console UI meatdata consists of:
-    /// @note mainPanelColor COLOR RRR,GGG,BBB,AAA (AAA is optional)
-    /// @note sendButtonText STRING EXAMPLE
-    /// @note sendButtonColor COLOR RRR,GGG,BBB,AAA (AAA is optional)
-    /// @note sendButtonHoveredColor COLOR RRR,GGG,BBB,AAA (AAA is optional)
-    /// @note closeButtonColor COLOR RRR,GGG,BBB,AAA (AAA is optional)
     /// @return ConsoleUIScene since it's not a static class
+    /// @note console UI meatdata consists of:
+    /// @note mainPanelColor COLOR RRR,GGG,BBB,AAA (AAA is optional for any variable that is a color)
+    /// @note sendButtonColor COLOR RRR,GGG,BBB,AAA
+    /// @note sendButtonHoveredColor COLOR RRR,GGG,BBB,AAA
+    /// @note closeButtonColor COLOR RRR,GGG,BBB,AAA
+    /// @note closeButtonHoveredColor COLOR RRR,GGG,BBB,AAA
+    /// @note outputBoxColor COLOR RRR,GGG,BBB,AAA
+    /// @note outputBoxTextColor COLOR RRR,GGG,BBB,AAA
+    /// @note inputBoxColor COLOR RRR,GGG,BBB,AAA
+    /// @note inputBoxTextColor COLOR RRR,GGG,BBB,AAA
+    /// @note inputBoxCursorColor COLOR RRR,GGG,BBB,AAA
+    /// @note fontSize UNSIGNED_CHAR 255 // [0-255]
+    /// @note font STRING example/path/to/font/my font.otf
     ConsoleUIScene initLocalConsole(Rectangle rect, const std::string& meatdataPath);
 }
