@@ -24,18 +24,20 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
 
     Config::ConfigData* fontSizeData = Config::ifContainsGet(consoleData, "fontSize");
     Config::ConfigData* fontData = Config::ifContainsGet(consoleData, "font");
-    
-    std::filesystem::path fontPath = fontData->stringV;
-    std::string fontName = fontPath.filename().string();
 
     // WARNING: if the developer does not use this function, he might need to define a default font
     FontsHandler::add(GetFontDefault(), "default");
 
     Font* font = nullptr;
-    if (FontsHandler::loadEx(fontPath, fontName, fontSizeData? fontSizeData->unsignedCharV : 16, nullptr, 0))
-        font = FontsHandler::get(fontName);
-    else
-        font = FontsHandler::get("default");
+    if (fontData) {
+        std::filesystem::path fontPath = fontData->stringV;
+        std::string fontName = fontPath.filename().string();
+        if (FontsHandler::loadEx(fontPath, fontName, fontSizeData? fontSizeData->unsignedCharV : 16, nullptr, 0))
+            font = FontsHandler::get(fontName);
+        else
+            font = FontsHandler::get("default");
+    } else font = FontsHandler::get("default");
+
     
     auto consoleUI = Meatball::ConsoleUIScene(rect.x, rect.y, rect.width, rect.height, font);
     
