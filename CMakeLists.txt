@@ -4,6 +4,9 @@ project(Meatball VERSION 0.1.0 LANGUAGES C CXX)
 file(GLOB SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/src/Interface/*.cpp ${PROJECT_SOURCE_DIR}/src/Utils/*.cpp)
 
 add_library(Meatball SHARED ${SOURCES})
+set_target_properties(Meatball PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    POSITION_INDEPENDENT_CODE 1)
 
 target_include_directories(Meatball PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
 
