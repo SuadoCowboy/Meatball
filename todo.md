@@ -32,6 +32,8 @@ void update() {
 }
 ```
 
+# Let .meatdata have variables to identify colors and transparency stuff in the code or just variables, and also let have comments with # or something idk
+
 # Use asynchronous tasks/threaded/both?
 
 ```cpp
