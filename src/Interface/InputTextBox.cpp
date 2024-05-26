@@ -50,7 +50,7 @@ void Meatball::InputTextBox::update() {
     int codePoint = 0;
     if (codePoint = GetCharPressed(), codePoint) {
         text = text.substr(0, cursorPos)+(char)codePoint+text.substr(cursorPos);
-        onTextChange(text);
+        if (onTextChange) onTextChange(text);
         
         if (cursorPos != text.size())
             ++cursorPos;
@@ -62,7 +62,7 @@ void Meatball::InputTextBox::update() {
     
     if ((IsKeyPressedRepeat(KEY_BACKSPACE) || IsKeyPressed(KEY_BACKSPACE)) && text.size() != 0) {
         text = text.substr(0, cursorPos-1)+text.substr(cursorPos);
-        onTextChange(text);
+        if (onTextChange) onTextChange(text);
 
         if (cursorPos != 0)
             --cursorPos;
@@ -75,7 +75,7 @@ void Meatball::InputTextBox::update() {
     }
 
     if (onSend && IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER)) {
-        onSend(text);
+        if (onSend) onSend(text);
         text.clear();
         cursorPos = text.size();
         offsetX = 0;
