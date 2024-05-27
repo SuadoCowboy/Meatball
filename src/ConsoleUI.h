@@ -30,6 +30,45 @@ namespace Meatball {
             if (!visible) return;
 
             inputBox.update();
+
+            if (inputBox.focused && (IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB))) {
+                inputBox.onTextChange(inputBox.text); // to reset colors
+
+                if (IsKeyDown(KEY_LEFT_SHIFT) && autoCompleteSelectedIdx != 0)
+                    --autoCompleteSelectedIdx;
+                
+                else if (autoCompleteSelectedIdx) {
+                    ++autoCompleteSelectedIdx;
+                    // THE SELECTED INDEX WORKS DIFFERENT FROM COLOREDTEXT!!
+                    // TODO: FIXME!
+                    if (autoCompleteSelectedIdx > autoCompleteBox.coloredText.size())
+                }
+                
+                std::string fullString = "";
+                size_t idx = 0; // index of the text split by ' ' 
+                size_t nextRealIndex = 0; // index of the next coloredText pair
+                for (auto& pair: autoCompleteBox.coloredText) {
+                    nextRealIndex++;
+                    // if there were only one coloredText, it would still have a ' ', so idx start with 1
+                    // this is just a way to know when the string was read completly
+                    if (pair.first.back() == ' ') idx++;
+
+                    if (idx-1 != autoCompleteSelectedIdx)
+                        continue;
+                    
+                    pair.second = autoCompleteSelectedTextColor;
+                    
+                    nextRealIndex -= 2;
+                    while (autoCompleteBox.coloredText[nextRealIndex].first.back() != ' ') {
+                        autoCompleteBox.coloredText[nextRealIndex].second = autoCompleteSelectedTextColor;
+                        
+                        if (nextRealIndex == 0) break;
+                        --nextRealIndex;
+                    }
+                    break;
+                }
+            }
+
             outputBox.update();
             closeButton.update();
 
@@ -48,7 +87,11 @@ namespace Meatball {
         ColoredTextBox autoCompleteBox;
         InputTextBox inputBox;
 
+        Color autoCompleteHighlightTextColor, autoCompleteTextColor, autoCompleteSelectedTextColor;
+
         // margin - the space between mainPanel border and objects close to it
         static unsigned char margin;
+    
+        unsigned char autoCompleteSelectedIdx;
     };
 }

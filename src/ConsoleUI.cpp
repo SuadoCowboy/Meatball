@@ -10,6 +10,10 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	: Scene(), visible(visible) {
 	mainPanel = {x, y, width, height};
 	
+	autoCompleteTextColor = WHITE;
+	autoCompleteHighlightTextColor = YELLOW;
+	autoCompleteSelectedTextColor = PURPLE;
+
 	closeButton = {x+width-margin-margin/2, y+margin/2, (float)margin, (float)margin}; // is inside the margin
 
 	outputBox = {x+margin, y+margin, width-margin*2-3, height-margin*2-42, font};
@@ -20,7 +24,11 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	// add auto completion
 	inputBox.onTextChange = [&](const std::string& text) {
 		autoCompleteBox.coloredText.clear();
-		if (text.size() == 0) return;
+		
+		if (text.size() == 0) {
+			autoCompleteSelectedIdx = 0;
+			return;
+		}
 
 		for (auto& command : HayBCMD::Command::getCommands()) {
 			size_t idx = command.name.find(text);
@@ -28,9 +36,11 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 
 			std::string leftText = command.name.substr(0, idx);
 			if (leftText.size() != 0)
-				autoCompleteBox.pushText(leftText, WHITE);
-			autoCompleteBox.pushText(command.name.substr(idx, text.size()), YELLOW); // middleText
-			autoCompleteBox.pushText(command.name.substr(idx+text.size())+" ", WHITE); // rightText
+				autoCompleteBox.pushText(leftText, autoCompleteTextColor);
+			
+			autoCompleteBox.pushText(command.name.substr(idx, text.size()), autoCompleteHighlightTextColor); // middleText
+			
+			autoCompleteBox.pushText(command.name.substr(idx+text.size())+" ", autoCompleteTextColor); // rightText
 		}
 	};
 
@@ -47,7 +57,8 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	{  {            }   }
 	{  {            }   }
 	{                   }
-	{{input text      } }
+	{{auto complete    }}
+	{{input text       }}
 	---------------------
 	*/
 
@@ -62,10 +73,6 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	a text on the top left written: Console or Local Console(developers can change this how they want)
 	F1 key as default to toggle the console
 	buildVersion on the top right OF THE SCREEN, NOT ON THE PANEL
-
-	//scene->addNode(inputBox) // the inputBox filling the down part without counting the borders
-	//scene->addNode(outputBox); // the box that shows all the console data
-	//scene->addNode(buildVersion) // this one is at the top right of the window itself
 	*/
 }
 
@@ -82,6 +89,7 @@ void Meatball::ConsoleUIScene::draw() {
 	mainPanel.draw();
 	
 	autoCompleteBox.draw();
+
 	inputBox.draw();
 	outputBox.draw();
 
