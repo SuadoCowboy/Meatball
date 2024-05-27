@@ -3,7 +3,8 @@
 #include "Scene.h"
 #include "Interface/Panel.h"
 #include "Interface/Button.h"
-#include "Interface/TextBox.h"
+#include "Interface/ScrollTextBox.h"
+#include "Interface/ColoredTextBox.h"
 #include "Interface/InputTextBox.h"
 #include "Utils/Utils.h"
 
@@ -43,7 +44,8 @@ namespace Meatball {
         
         Panel mainPanel;
         Button closeButton;
-        TextBox outputBox;
+        ScrollTextBox outputBox;
+        ColoredTextBox autoCompleteBox;
         InputTextBox inputBox;
 
         // margin - the space between mainPanel border and objects close to it

@@ -8,13 +8,13 @@
 #include "ScrollBar.h"
 
 namespace Meatball {
-    /// @brief basically, a rect being used to draw text
+    /// @brief basically, a rect being used to draw text but with scrolling
     /// @note it also have a scrollable bar when text is higher than rect.height
     /// @note if you're looking for text input see TextInputBox instead
-    class TextBox {
+    class ScrollTextBox {
     public:
-        TextBox();
-        TextBox(float x, float y, float width, float height, Font* font);
+        ScrollTextBox();
+        ScrollTextBox(float x, float y, float width, float height, Font* font);
 
         const Rectangle& getRect() const;
         const unsigned int getContentHeight() const;

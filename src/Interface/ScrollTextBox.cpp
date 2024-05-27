@@ -1,17 +1,17 @@
-#include "TextBox.h"
+#include "ScrollTextBox.h"
 
 #include "Utils/Utils.h"
 #include "FontsHandler.h"
 
 using fh = Meatball::FontsHandler;
 
-Meatball::TextBox::TextBox()
+Meatball::ScrollTextBox::ScrollTextBox()
     : rect((Rectangle){0,0,0,0}), font(nullptr), color(BLACK),
     textColor(WHITE), scrollBar((Rectangle){0,0,0,0}) {
         font = FontsHandler::get("default");
     }
 
-Meatball::TextBox::TextBox(float x, float y, float width, float height, Font* font)
+Meatball::ScrollTextBox::ScrollTextBox(float x, float y, float width, float height, Font* font)
     : font(font), color(BLACK), textColor(WHITE) {
         rect = (Rectangle{x,y,width,height});
         scrollBar = {(Rectangle){rect.x+rect.width-20,rect.y, 20, rect.height}, false};
@@ -36,7 +36,7 @@ static inline void handleTextWrapping(std::list<std::string>& textList, const st
     textList.back() += newText;
 }
 
-void Meatball::TextBox::appendText(std::string newText) {
+void Meatball::ScrollTextBox::appendText(std::string newText) {
     if (newText.size() == 0) return;
     
     if (fh::MeasureTextWidth(font, newText.c_str()) < rect.width-scrollBar.barRect.width) {
@@ -49,7 +49,7 @@ void Meatball::TextBox::appendText(std::string newText) {
     if (contentHeight > rect.height) scrollBar.visible = true;
 }
 
-void Meatball::TextBox::clearText() {
+void Meatball::ScrollTextBox::clearText() {
     text.clear();
     scrollBar.visible = false;
     
@@ -59,39 +59,39 @@ void Meatball::TextBox::clearText() {
     scrollBar.update(rect);
 }
 
-void Meatball::TextBox::popFront() noexcept {
+void Meatball::ScrollTextBox::popFront() noexcept {
     text.pop_front();
     contentHeight = Meatball::getContentHeight(rect.height, (float)font->baseSize, text);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
 }
 
-const std::list<std::string>& Meatball::TextBox::getText() const {
+const std::list<std::string>& Meatball::ScrollTextBox::getText() const {
     return text;
 }
 
-const unsigned int Meatball::TextBox::getContentHeight() const {
+const unsigned int Meatball::ScrollTextBox::getContentHeight() const {
     return contentHeight;
 }
 
-const Rectangle& Meatball::TextBox::getRect() const {
+const Rectangle& Meatball::ScrollTextBox::getRect() const {
     return rect;
 }
 
-Meatball::ScrollBar& Meatball::TextBox::getScrollBar() {
+Meatball::ScrollBar& Meatball::ScrollTextBox::getScrollBar() {
     return scrollBar;
 }
 
-void Meatball::TextBox::setPosition(float x, float y) {
+void Meatball::ScrollTextBox::setPosition(float x, float y) {
     rect.x = x;
     rect.y = y;
 }
 
-void Meatball::TextBox::setSize(float width, float height) {
+void Meatball::ScrollTextBox::setSize(float width, float height) {
     rect.width = width;
     rect.height = height;
 }
 
-void Meatball::TextBox::draw() {
+void Meatball::ScrollTextBox::draw() {
     DrawRectangle(rect.x, rect.y, rect.width, rect.height, color);
 
     BeginScissorMode(rect.x, rect.y, rect.width, rect.height);
@@ -121,6 +121,6 @@ void Meatball::TextBox::draw() {
     scrollBar.draw();
 }
 
-void Meatball::TextBox::update() {
+void Meatball::ScrollTextBox::update() {
     scrollBar.update(rect);
 }

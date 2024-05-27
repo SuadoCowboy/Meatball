@@ -12,12 +12,26 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	
 	closeButton = {x+width-margin-margin/2, y+margin/2, (float)margin, (float)margin}; // is inside the margin
 
-	outputBox = {x+margin, y+margin, width-margin*2-3, height-margin*2-21, font};
+	outputBox = {x+margin, y+margin, width-margin*2-3, height-margin*2-42, font};
 	inputBox = {x+margin, y+height-margin-21, width-margin*2-3, 21, font};
+
+	autoCompleteBox = {x+margin, y+height-margin-42, width-margin*2-3, 21, font};
 
 	// add auto completion
 	inputBox.onTextChange = [&](const std::string& text) {
+		autoCompleteBox.coloredText.clear();
+		if (text.size() == 0) return;
 
+		for (auto& command : HayBCMD::Command::getCommands()) {
+			size_t idx = command.name.find(text);
+			if (idx == std::string::npos) continue;
+
+			std::string leftText = command.name.substr(0, idx);
+			if (leftText.size() != 0)
+				autoCompleteBox.pushText(leftText, WHITE);
+			autoCompleteBox.pushText(command.name.substr(idx, text.size()), YELLOW); // middleText
+			autoCompleteBox.pushText(command.name.substr(idx+text.size())+" ", WHITE); // rightText
+		}
 	};
 
 	inputBox.onSend = [&](const std::string& text) {
@@ -67,6 +81,7 @@ void Meatball::ConsoleUIScene::draw() {
 	if (!visible) return;
 	mainPanel.draw();
 	
+	autoCompleteBox.draw();
 	inputBox.draw();
 	outputBox.draw();
 
