@@ -18,9 +18,9 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
     
     auto consoleData = Config::loadData(meatdataPath);
     
-    Config::ConfigData* marginData = Config::ifContainsGet(consoleData, "margin");
-    Meatball::ConsoleUIScene::margin = marginData?
-        marginData->unsignedCharV : Meatball::ConsoleUIScene::margin;
+    Config::ConfigData* data = Config::ifContainsGet(consoleData, "margin");
+    Meatball::ConsoleUIScene::margin = data?
+        data->unsignedCharV : Meatball::ConsoleUIScene::margin;
 
     Config::ConfigData* fontSizeData = Config::ifContainsGet(consoleData, "fontSize");
     Config::ConfigData* fontData = Config::ifContainsGet(consoleData, "font");
@@ -37,33 +37,41 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
         else
             font = FontsHandler::get("default");
     } else font = FontsHandler::get("default");
-
     
     auto consoleUI = Meatball::ConsoleUIScene(rect.x, rect.y, rect.width, rect.height, font);
     
-    Config::ConfigData* mainPanelColorData = Config::ifContainsGet(consoleData, "mainPanelColor");
-    if (mainPanelColorData) consoleUI.mainPanel.color = mainPanelColorData->colorV;
+    data = Config::ifContainsGet(consoleData, "autoCompleteTextColor");
+    if (data) consoleUI.autoCompleteTextColor = data->colorV;
 
-    Config::ConfigData* closeButtonColorData = Config::ifContainsGet(consoleData, "closeButtonColor");
-    if (closeButtonColorData) consoleUI.closeButton.color = closeButtonColorData->colorV;
+    data = Config::ifContainsGet(consoleData, "autoCompleteHightlightTextColor");
+    if (data) consoleUI.autoCompleteHighlightTextColor = data->colorV;
 
-    Config::ConfigData* closeButtonHoveredColorData = Config::ifContainsGet(consoleData, "closeButtonHoveredColor");
-    if (closeButtonHoveredColorData) consoleUI.closeButton.hoveredColor = closeButtonHoveredColorData->colorV;
+    data = Config::ifContainsGet(consoleData, "autoCompleteSelectedTextColor");
+    if (data) consoleUI.autoCompleteSelectedTextColor = data->colorV;
 
-    Config::ConfigData* outputBoxColorData = Config::ifContainsGet(consoleData, "outputBoxColor");
-    if (outputBoxColorData) consoleUI.outputBox.color = outputBoxColorData->colorV;
+    data = Config::ifContainsGet(consoleData, "mainPanelColor");
+    if (data) consoleUI.mainPanel.color = data->colorV;
 
-    Config::ConfigData* outputBoxTextColorData = Config::ifContainsGet(consoleData, "outputBoxTextColor");
-    if (outputBoxTextColorData) consoleUI.outputBox.textColor = outputBoxTextColorData->colorV;
+    data = Config::ifContainsGet(consoleData, "closeButtonColor");
+    if (data) consoleUI.closeButton.color = data->colorV;
 
-    Config::ConfigData* inputBoxColorData = Config::ifContainsGet(consoleData, "inputBoxColor");
-    if (inputBoxColorData) consoleUI.inputBox.color = inputBoxColorData->colorV;
+    data = Config::ifContainsGet(consoleData, "closeButtonHoveredColor");
+    if (data) consoleUI.closeButton.hoveredColor = data->colorV;
 
-    Config::ConfigData* inputBoxTextColorData = Config::ifContainsGet(consoleData, "inputBoxTextColor");
-    if (inputBoxTextColorData) consoleUI.inputBox.textColor = inputBoxTextColorData->colorV;
+    data = Config::ifContainsGet(consoleData, "outputBoxColor");
+    if (data) consoleUI.outputBox.color = data->colorV;
 
-    Config::ConfigData* inputBoxCursorColorData = Config::ifContainsGet(consoleData, "inputBoxCursorColor");
-    if (inputBoxCursorColorData) consoleUI.inputBox.cursorColor = inputBoxCursorColorData->colorV;
+    data = Config::ifContainsGet(consoleData, "outputBoxTextColor");
+    if (data) consoleUI.outputBox.textColor = data->colorV;
+
+    data = Config::ifContainsGet(consoleData, "inputBoxColor");
+    if (data) consoleUI.inputBox.color = data->colorV;
+
+    data = Config::ifContainsGet(consoleData, "inputBoxTextColor");
+    if (data) consoleUI.inputBox.textColor = data->colorV;
+
+    data = Config::ifContainsGet(consoleData, "inputBoxCursorColor");
+    if (data) consoleUI.inputBox.cursorColor = data->colorV;
 
     Console::init([&](const std::string& message) {
         consoleUI.print(message);

@@ -24,5 +24,8 @@ namespace Meatball {
     /// @note inputBoxCursorColor COLOR RRR,GGG,BBB,AAA
     /// @note fontSize UNSIGNED_CHAR 255 // [0-255]
     /// @note font STRING example/path/to/font/my font.otf
+    /// @note autoCompleteTextColor COLOR RRR,GGG,BBB,AAA
+    /// @note autoCompleteHightlightTextColor COLOR RRR,GGG,BBB,AAA
+    /// @note autoCompleteSelectedTextColor COLOR RRR,GGG,BBB,AAA
     ConsoleUIScene initLocalConsole(Rectangle rect, const std::string& meatdataPath);
 }
