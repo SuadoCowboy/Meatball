@@ -36,11 +36,6 @@ namespace Meatball {
         void setPosition(float x, float y);
         void setSize(float width, float height);
 
-        // TODO: Events that can be used to drag and resize rect.
-        // See appendText function, there is a good thing that
-        // should be used in the case of resizing the rect.
-        //VoidFunc onClick, onRelease;
-
         Font* font;
 
     private:
