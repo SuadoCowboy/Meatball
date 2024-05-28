@@ -6,7 +6,6 @@
 using fh = Meatball::FontsHandler;
 
 static inline void setupButton(Meatball::Button* button) {
-    button->onClick = nullptr;
     button->onHover = nullptr;
 
     button->color = BLACK;
@@ -30,7 +29,7 @@ Meatball::Button::Button(Rectangle rect) : rect(rect) {
 }
 
 void Meatball::Button::update() {
-    checkHovered(hovered, rect, &onHover, &onClick, &onRelease);
+    checkHovered(hovered, rect, &onHover, &onRelease);
 }
 
 const std::string& Meatball::Button::getText() {

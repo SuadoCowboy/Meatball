@@ -34,7 +34,7 @@ namespace Meatball {
 
         bool isHovered();
 
-        VoidFunc onClick, onRelease, onHover;
+        VoidFunc onRelease, onHover;
 
         Rectangle rect;
         Color color, hoveredColor, textColor, textHoveredColor;
