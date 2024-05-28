@@ -39,10 +39,10 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 		}
 
 		size_t spaceIdx = text.find(' ');
-		if (spaceIdx != std::string::npos) {
-			std::string commandName = text.substr(0, spaceIdx);
-			HayBCMD::Command* pCommand = HayBCMD::Command::getCommand(commandName, false);
-			if (pCommand) autoCompleteBox.pushText(pCommand->name+" "+pCommand->usage, autoCompleteTextColor);
+		std::string commandName = text.substr(0, spaceIdx);
+		HayBCMD::Command* pCommand = HayBCMD::Command::getCommand(commandName, false);
+		if (pCommand) {
+			autoCompleteBox.pushText(pCommand->name+" "+pCommand->usage, autoCompleteTextColor);
 			return;
 		}
 
