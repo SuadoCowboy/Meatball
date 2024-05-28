@@ -10,7 +10,7 @@ void Meatball::checkHovered(bool& hovered, const Rectangle& rect, VoidFunc* onHo
     if (hovered && onClick && *onClick && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         (*onClick)();
     
-    if (onRelease && *onRelease && IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+    if (hovered && onRelease && *onRelease && IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         (*onRelease)();
 }
 

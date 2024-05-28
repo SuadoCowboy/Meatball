@@ -80,7 +80,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	*/
 
 	closeButton.onRelease = [&]() {
-		visible = false;
+		this->visible = false; // WHY USING this->visible WORKS AND visible = false DOESN'T?
 		// TODO: fading effect (maybe add a task system? Meatball::Task() or Meatball::newTask() or something)
 	};
 
