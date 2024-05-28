@@ -10,6 +10,9 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	: Scene(), visible(visible) {
 	mainPanel = {x, y, width, height};
 	
+	inputHistoryPos = 0;
+	inputHistorySize = 0;
+
 	autoCompleteTextColor = WHITE;
 	autoCompleteHighlightTextColor = YELLOW;
 	autoCompleteSelectedTextColor = PURPLE;
@@ -64,8 +67,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 		autoCompleteBox.coloredText.clear();
 		print(text);
 		Console::run(text);
-		inputHistory.push_back(text);
-		inputHistoryPos = inputHistory.size();
+		addToInputHistory(text);
 	};
 
 	/*

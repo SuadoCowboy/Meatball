@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "Scene.h"
 #include "Interface/Panel.h"
 #include "Interface/Button.h"
@@ -12,11 +14,15 @@
 #define CONSOLEUI_OUTPUT_MAX_LINES 1000
 #endif
 
-static void handleInputHistoryPos(Meatball::InputTextBox& inputBox, const std::vector<std::string>& inputHistory, size_t& inputHistoryPos) {
+#ifndef CONSOLEUI_INPUT_MAX_HISTORY
+#define CONSOLEUI_INPUT_MAX_HISTORY 30 // [0-255]
+#endif
+
+static void handleInputHistoryPos(Meatball::InputTextBox& inputBox, std::string* inputHistory, const unsigned char& inputHistorySize, unsigned char& inputHistoryPos) {
     if (IsKeyPressed(KEY_UP) && inputHistoryPos != 0)
         --inputHistoryPos;
     
-    else if (IsKeyPressed(KEY_DOWN) && inputHistoryPos != inputHistory.size()-1)
+    else if (IsKeyPressed(KEY_DOWN) && inputHistoryPos != inputHistorySize-1)
         ++inputHistoryPos;
     
     else return;
@@ -95,8 +101,8 @@ namespace Meatball {
                     }
                 }
 
-                else if (inputHistory.size() != 0)
-                    handleInputHistoryPos(inputBox, inputHistory, inputHistoryPos);
+                else if (inputHistorySize != 0)
+                    handleInputHistoryPos(inputBox, inputHistory, inputHistorySize, inputHistoryPos);
             }
 
             outputBox.update();
@@ -120,11 +126,28 @@ namespace Meatball {
 
         // margin - the space between mainPanel border and objects close to it
         static unsigned char margin;
-    
-        std::vector<std::string> inputHistory;
-        size_t inputHistoryPos; // the position the user is when using inputHistory
-
+        
         size_t autoCompleteSelectedIdxBegin, autoCompleteSelectedIdxEnd;
         std::string inputBoxOriginalText; // the inputBox text that was used before selecting in auto complete
+
+    
+    private:
+        std::string inputHistory[CONSOLEUI_INPUT_MAX_HISTORY];
+        unsigned char inputHistorySize;
+        unsigned char inputHistoryPos; // the position the user is when using inputHistory
+
+        void addToInputHistory(const std::string& string) {
+            if (inputHistorySize >= CONSOLEUI_INPUT_MAX_HISTORY) {
+                for (unsigned char i = 1; i < inputHistorySize; i++) {
+                    inputHistory[i-1] = inputHistory[i];
+                }
+                --inputHistorySize;
+            }
+            
+            inputHistory[inputHistorySize] = string;
+            ++inputHistorySize;
+
+            inputHistoryPos = inputHistorySize;
+        }
     };
 }
