@@ -26,11 +26,11 @@ namespace Meatball {
         std::function<void(const std::string&)> onSend, onTextChange;
     
         bool focused;
+        unsigned int cursorPos;
 
     private:
         Rectangle rect;
 
         float offsetX;
-        unsigned int cursorPos;
     };
 }
