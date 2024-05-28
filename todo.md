@@ -5,7 +5,6 @@ maybe colors should use references, pointers OR static variables in another clas
 # TODO: InputBox Mouse click moves cursor
 # MAYBE TODO: InputBox mouse select string
 
-# TODO: Auto completion
 # TODO: FUTURE: optimize code and use the right data structures. Also research const char* vs char[] vs std::string and look which is better for what
 
 # The developers could make their draw functions instead of the classes drawing, because then they could use the same classes but with different styles whether they want. All the classes could make is give specific drawing functions for stuff that requires a complexity level or private/protected-access. And together with that idea, the classes shall not store colors. Maybe store in a ColorsHandler or something and then the draw functions get the colors that way
