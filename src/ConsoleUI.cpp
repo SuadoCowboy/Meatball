@@ -64,6 +64,8 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 		autoCompleteBox.coloredText.clear();
 		print(text);
 		Console::run(text);
+		inputHistory.push_back(text);
+		inputHistoryPos = inputHistory.size();
 	};
 
 	/*
@@ -88,7 +90,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	TODOS:
 	rounded border in mainPanel
 	a text on the top left written: Console or Local Console(developers can change this how they want)
-	F1 key as default to toggle the console
+	F1 key as default to toggle the local console
 	buildVersion on the top right OF THE SCREEN, NOT ON THE PANEL
 	*/
 }
