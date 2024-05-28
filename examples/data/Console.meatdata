@@ -3,12 +3,17 @@ mainPanelColor COLOR 15,15,15,200
 closeButtonColor COLOR 255,255,200
 closeButtonHoveredColor COLOR 0,0,0
 
-outputBoxColor COLOR 10,10,10,255
-outputBoxTextColor COLOR 255,255,255,200
+outputBoxColor COLOR 10,10,10,200
+outputBoxTextColor COLOR 255,255,255
 
 inputBoxColor COLOR 10,10,10,200
 inputBoxTextColor COLOR 210,210,210,200
 inputBoxCursorColor COLOR 210,210,210,200
+
+autoCompleteColor COLOR 15,15,15,200
+autoCompleteTextColor COLOR 255,255,255
+autoCompleteHightlightedTextColor COLOR 0,255,255
+autoCompleteSelectedTextColor COLOR 255,0,255
 
 fontSize UNSIGNED_CHAR 18
 font STRING data/fonts/Cooper Hewitt/CooperHewitt-Medium.otf
