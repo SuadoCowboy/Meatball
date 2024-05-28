@@ -24,6 +24,6 @@ namespace Meatball {
         Rectangle rect;
 
         Font* font;
-        Color backgroundColor;
+        Color color;
     };
 }

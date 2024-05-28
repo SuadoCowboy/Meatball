@@ -6,15 +6,15 @@
 using fh = Meatball::FontsHandler;
 
 Meatball::ScrollTextBox::ScrollTextBox()
-    : rect((Rectangle){0,0,0,0}), font(nullptr), color(BLACK),
-    textColor(WHITE), scrollBar((Rectangle){0,0,0,0}) {
+    : rect({0,0,0,0}), font(nullptr), color(BLACK),
+    textColor(WHITE), scrollBar({0,0,0,0}) {
         font = FontsHandler::get("default");
     }
 
 Meatball::ScrollTextBox::ScrollTextBox(float x, float y, float width, float height, Font* font)
     : font(font), color(BLACK), textColor(WHITE) {
-        rect = (Rectangle{x,y,width,height});
-        scrollBar = {(Rectangle){rect.x+rect.width-20,rect.y, 20, rect.height}, false};
+        rect = {x,y,width,height};
+        scrollBar = {{rect.x+rect.width-20,rect.y, 20, rect.height}, false};
 }
 
 static inline void handleTextWrapping(std::list<std::string>& textList, const std::string& text, Font* font, float maxWidth) {

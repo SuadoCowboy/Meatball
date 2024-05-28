@@ -20,7 +20,7 @@ Meatball::Button::Button() : rect{.x=0,.y=0,.width=0,.height=0} {
 }
 
 Meatball::Button::Button(float x, float y, float width, float height) {
-        rect = (Rectangle){x, y, width, height};
+        rect = {x, y, width, height};
         setupButton(this);
     }
 

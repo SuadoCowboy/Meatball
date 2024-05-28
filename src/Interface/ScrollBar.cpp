@@ -47,7 +47,7 @@ void Meatball::ScrollBar::update(const Rectangle& parentRect) {
     barHovered = CheckCollisionPointRec(mousePosition, barRect);
     
     thumbHovered = CheckCollisionPointRec(mousePosition,
-        (Rectangle){barRect.x, barRect.y+thumbY, barRect.width, thumbHeight});
+        {barRect.x, barRect.y+thumbY, barRect.width, thumbHeight});
 
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         if (thumbHovered) {

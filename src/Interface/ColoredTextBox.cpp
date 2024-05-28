@@ -4,13 +4,13 @@
 
 using fh = Meatball::FontsHandler;
 
-Meatball::ColoredTextBox::ColoredTextBox() : backgroundColor(BLACK) {
+Meatball::ColoredTextBox::ColoredTextBox() : color(BLACK) {
     rect = {0,0,0,0};
     font = FontsHandler::get("default");
 }
 
 Meatball::ColoredTextBox::ColoredTextBox(float x, float y, float width, float height, Font* font)
-    : font(font), backgroundColor(BLACK) {
+    : font(font), color(BLACK) {
         rect = {x, y, width, height};
 }
 
@@ -19,7 +19,7 @@ void Meatball::ColoredTextBox::pushText(const std::string& text, Color color) {
 }
 
 void Meatball::ColoredTextBox::draw() {
-    DrawRectangle(rect.x, rect.y, rect.width, rect.height, backgroundColor);
+    DrawRectangle(rect.x, rect.y, rect.width, rect.height, color);
     BeginScissorMode(rect.x, rect.y, rect.width, rect.height);
 
     float x = rect.x;

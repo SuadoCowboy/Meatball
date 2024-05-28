@@ -14,7 +14,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	inputHistorySize = 0;
 
 	autoCompleteTextColor = WHITE;
-	autoCompleteHighlightTextColor = YELLOW;
+	autoCompleteHighlightedTextColor = YELLOW;
 	autoCompleteSelectedTextColor = PURPLE;
 
 	autoCompleteSelectedIdxBegin = 0;
@@ -57,7 +57,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 			if (leftText.size() != 0)
 				autoCompleteBox.pushText(leftText, autoCompleteTextColor);
 			
-			autoCompleteBox.pushText(command.name.substr(idx, text.size()), autoCompleteHighlightTextColor); // middleText
+			autoCompleteBox.pushText(command.name.substr(idx, text.size()), autoCompleteHighlightedTextColor); // middleText
 			
 			autoCompleteBox.pushText(command.name.substr(idx+text.size())+" ", autoCompleteTextColor); // rightText
 		}

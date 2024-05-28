@@ -122,7 +122,7 @@ namespace Meatball {
         ColoredTextBox autoCompleteBox;
         InputTextBox inputBox;
 
-        Color autoCompleteHighlightTextColor, autoCompleteTextColor, autoCompleteSelectedTextColor;
+        Color autoCompleteHighlightedTextColor, autoCompleteTextColor, autoCompleteSelectedTextColor;
 
         // margin - the space between mainPanel border and objects close to it
         static unsigned char margin;

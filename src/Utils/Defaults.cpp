@@ -40,11 +40,14 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
     
     auto consoleUI = Meatball::ConsoleUIScene(rect.x, rect.y, rect.width, rect.height, font);
     
+    data = Config::ifContainsGet(consoleData, "autoCompleteColor");
+    if (data) consoleUI.autoCompleteBox.color = data->colorV;
+
     data = Config::ifContainsGet(consoleData, "autoCompleteTextColor");
     if (data) consoleUI.autoCompleteTextColor = data->colorV;
 
-    data = Config::ifContainsGet(consoleData, "autoCompleteHightlightTextColor");
-    if (data) consoleUI.autoCompleteHighlightTextColor = data->colorV;
+    data = Config::ifContainsGet(consoleData, "autoCompleteHightlightedTextColor");
+    if (data) consoleUI.autoCompleteHighlightedTextColor = data->colorV;
 
     data = Config::ifContainsGet(consoleData, "autoCompleteSelectedTextColor");
     if (data) consoleUI.autoCompleteSelectedTextColor = data->colorV;
