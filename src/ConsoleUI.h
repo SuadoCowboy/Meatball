@@ -19,10 +19,10 @@
 #endif
 
 static void handleInputHistoryPos(Meatball::InputTextBox& inputBox, std::string* inputHistory, const unsigned char& inputHistorySize, unsigned char& inputHistoryPos) {
-    if (IsKeyPressed(KEY_UP) && inputHistoryPos != 0)
+    if ((IsKeyPressed(KEY_UP) || IsKeyPressedRepeat(KEY_UP)) && inputHistoryPos != 0)
         --inputHistoryPos;
     
-    else if (IsKeyPressed(KEY_DOWN) && inputHistoryPos != inputHistorySize-1)
+    else if ((IsKeyPressed(KEY_DOWN) || IsKeyPressedRepeat(KEY_DOWN)) && inputHistoryPos != inputHistorySize-1)
         ++inputHistoryPos;
     
     else return;
@@ -137,13 +137,15 @@ namespace Meatball {
         unsigned char inputHistoryPos; // the position the user is when using inputHistory
 
         void addToInputHistory(const std::string& string) {
+            if (inputHistorySize != 0 && inputHistory[inputHistorySize-1].compare(string) == 0) return;
+            
             if (inputHistorySize >= CONSOLEUI_INPUT_MAX_HISTORY) {
                 for (unsigned char i = 1; i < inputHistorySize; i++) {
                     inputHistory[i-1] = inputHistory[i];
                 }
                 --inputHistorySize;
             }
-            
+
             inputHistory[inputHistorySize] = string;
             ++inputHistorySize;
 
