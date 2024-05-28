@@ -31,41 +31,52 @@ namespace Meatball {
 
             inputBox.update();
 
-            if (inputBox.focused && (IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB))) {
-                inputBox.onTextChange(inputBox.text); // to reset colors
+            // TODO: make the logic be in a function and then we call 2 times, 1 for +1 and other for -1
+            if (inputBox.focused && (IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB)) && autoCompleteBox.coloredText.size() != 0) {
+                // -1
+                if (IsKeyDown(KEY_LEFT_SHIFT)) {
+                    if (autoCompleteSelectedIdxBegin != 0) {
+                        inputBox.onTextChange(inputBoxOriginalText);
 
-                if (IsKeyDown(KEY_LEFT_SHIFT) && autoCompleteSelectedIdx != 0)
-                    --autoCompleteSelectedIdx;
-                
-                else if (autoCompleteSelectedIdx) {
-                    ++autoCompleteSelectedIdx;
-                    // THE SELECTED INDEX WORKS DIFFERENT FROM COLOREDTEXT!!
-                    // TODO: FIXME!
-                    if (autoCompleteSelectedIdx > autoCompleteBox.coloredText.size())
+                        autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
+                        
+                        size_t idx = autoCompleteSelectedIdxEnd;
+                        autoCompleteBox.coloredText[idx].second = autoCompleteSelectedTextColor;
+                        std::string newText = autoCompleteBox.coloredText[idx].first;
+                        
+                        --idx;
+                        while (autoCompleteBox.coloredText[idx].first.back() != ' ') {
+                            autoCompleteBox.coloredText[idx].second = autoCompleteSelectedTextColor;
+                            newText = autoCompleteBox.coloredText[idx].first+newText;
+                            if (idx == 0) break;
+                            --idx;
+                        }
+                        newText.pop_back();
+                        inputBox.text = newText;
+                        inputBox.cursorPos = inputBox.text.size();
+                        autoCompleteSelectedIdxBegin = idx == 0? 0 : idx+1;
+                    }
                 }
                 
-                std::string fullString = "";
-                size_t idx = 0; // index of the text split by ' ' 
-                size_t nextRealIndex = 0; // index of the next coloredText pair
-                for (auto& pair: autoCompleteBox.coloredText) {
-                    nextRealIndex++;
-                    // if there were only one coloredText, it would still have a ' ', so idx start with 1
-                    // this is just a way to know when the string was read completly
-                    if (pair.first.back() == ' ') idx++;
-
-                    if (idx-1 != autoCompleteSelectedIdx)
-                        continue;
+                // +1
+                else if (autoCompleteSelectedIdxEnd != autoCompleteBox.coloredText.size()-1) {
+                    inputBox.onTextChange(inputBoxOriginalText);
                     
-                    pair.second = autoCompleteSelectedTextColor;
+                    autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd+1;
+                    if (autoCompleteSelectedIdxEnd == 0) autoCompleteSelectedIdxBegin = 0;
                     
-                    nextRealIndex -= 2;
-                    while (autoCompleteBox.coloredText[nextRealIndex].first.back() != ' ') {
-                        autoCompleteBox.coloredText[nextRealIndex].second = autoCompleteSelectedTextColor;
-                        
-                        if (nextRealIndex == 0) break;
-                        --nextRealIndex;
+                    size_t idx = autoCompleteSelectedIdxBegin;
+                    autoCompleteBox.coloredText[idx].second = autoCompleteSelectedTextColor;
+                    std::string newText = autoCompleteBox.coloredText[idx].first;
+                    while (autoCompleteBox.coloredText[idx].first.back() != ' ') {
+                        ++idx;
+                        autoCompleteBox.coloredText[idx].second = autoCompleteSelectedTextColor;
+                        newText += autoCompleteBox.coloredText[idx].first;
                     }
-                    break;
+                    newText.pop_back();
+                    inputBox.text = newText;
+                    inputBox.cursorPos = inputBox.text.size();
+                    autoCompleteSelectedIdxEnd = idx;
                 }
             }
 
@@ -92,6 +103,7 @@ namespace Meatball {
         // margin - the space between mainPanel border and objects close to it
         static unsigned char margin;
     
-        unsigned char autoCompleteSelectedIdx;
+        size_t autoCompleteSelectedIdxBegin, autoCompleteSelectedIdxEnd;
+        std::string inputBoxOriginalText; // the inputBox text that was used before selecting in auto complete
     };
 }

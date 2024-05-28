@@ -14,6 +14,9 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	autoCompleteHighlightTextColor = YELLOW;
 	autoCompleteSelectedTextColor = PURPLE;
 
+	autoCompleteSelectedIdxBegin = 0;
+	autoCompleteSelectedIdxEnd = 0;
+
 	closeButton = {x+width-margin-margin/2, y+margin/2, (float)margin, (float)margin}; // is inside the margin
 
 	outputBox = {x+margin, y+margin, width-margin*2-3, height-margin*2-42, font};
@@ -24,9 +27,22 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	// add auto completion
 	inputBox.onTextChange = [&](const std::string& text) {
 		autoCompleteBox.coloredText.clear();
+
+		if (inputBoxOriginalText != text) {
+			autoCompleteSelectedIdxBegin = 0;
+			autoCompleteSelectedIdxEnd = 0;
+			inputBoxOriginalText = text;
+		}
 		
 		if (text.size() == 0) {
-			autoCompleteSelectedIdx = 0;
+			return;
+		}
+
+		size_t spaceIdx = text.find(' ');
+		if (spaceIdx != std::string::npos) {
+			std::string commandName = text.substr(0, spaceIdx);
+			HayBCMD::Command* pCommand = HayBCMD::Command::getCommand(commandName, false);
+			if (pCommand) autoCompleteBox.pushText(pCommand->name+" "+pCommand->usage, autoCompleteTextColor);
 			return;
 		}
 
@@ -45,6 +61,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	};
 
 	inputBox.onSend = [&](const std::string& text) {
+		autoCompleteBox.coloredText.clear();
 		print(text);
 		Console::run(text);
 	};
