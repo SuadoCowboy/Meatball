@@ -1,6 +1,10 @@
 # WARNING: Alot of objects might create alot of new colors in memory.
 maybe colors should use references, pointers OR static variables in another class.
 
+# TODO: InputBox CTRL+A/LEFT/RIGHT/ (MAYBE)+SHIFT+LEFT/RIGHT
+# TODO: InputBox Mouse click moves cursor
+# MAYBE TODO: InputBox mouse select string
+
 # TODO: Auto completion
 # TODO: FUTURE: optimize code and use the right data structures. Also research const char* vs char[] vs std::string and look which is better for what
 
