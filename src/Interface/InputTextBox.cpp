@@ -74,7 +74,7 @@ void Meatball::InputTextBox::update() {
         }
     }
 
-    if (onSend && IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER)) {
+    if ((IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER)) && text.size() != 0) {
         if (onSend) onSend(text);
         text.clear();
         cursorPos = text.size();
