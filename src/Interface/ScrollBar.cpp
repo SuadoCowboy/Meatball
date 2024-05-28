@@ -42,8 +42,6 @@ void Meatball::ScrollBar::draw() {
 }
 
 void Meatball::ScrollBar::update(const Rectangle& parentRect) {
-    if (!visible) return;
-
     Vector2 mousePosition = GetMousePosition();
     
     barHovered = CheckCollisionPointRec(mousePosition, barRect);

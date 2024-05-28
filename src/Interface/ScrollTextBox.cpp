@@ -122,5 +122,5 @@ void Meatball::ScrollTextBox::draw() {
 }
 
 void Meatball::ScrollTextBox::update() {
-    scrollBar.update(rect);
+    if (scrollBar.visible) scrollBar.update(rect);
 }
