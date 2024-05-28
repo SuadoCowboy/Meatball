@@ -3,7 +3,7 @@
 #include <string>
 
 #include "Scene.h"
-#include "Interface/Panel.h"
+#include "Interface/DynamicPanel.h"
 #include "Interface/Button.h"
 #include "Interface/ScrollTextBox.h"
 #include "Interface/ColoredTextBox.h"
@@ -110,13 +110,15 @@ namespace Meatball {
 
             while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*outputBox.font->baseSize)
                 outputBox.popFront();
+
+            mainPanel.update();
         }
 
         // Only console can appear in every scene so only it needs visible boolean.
         // The rest of the scenes will be handled by a class or something that says which one should be used.
         bool visible;
         
-        Panel mainPanel;
+        DynamicPanel mainPanel;
         Button closeButton;
         ScrollTextBox outputBox;
         ColoredTextBox autoCompleteBox;
