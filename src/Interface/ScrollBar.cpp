@@ -52,7 +52,7 @@ void Meatball::ScrollBar::update(const Rectangle& parentRect) {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         if (thumbHovered) {
             dragging = true;
-            dragOffsetY = thumbY+barRect.y - mousePosition.y;
+            dragOffsetY = thumbY - mousePosition.y;
         } else if (barHovered)
             thumbY = mousePosition.y - thumbHeight/2 - barRect.y;
         
@@ -64,7 +64,7 @@ void Meatball::ScrollBar::update(const Rectangle& parentRect) {
     }
     
     if (dragging) {
-        thumbY = mousePosition.y-barRect.y+dragOffsetY;
+        thumbY = mousePosition.y+dragOffsetY;
     }
     
     // if up limit
