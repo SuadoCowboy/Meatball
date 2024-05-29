@@ -139,7 +139,10 @@ namespace Meatball {
         unsigned char inputHistoryPos; // the position the user is when using inputHistory
 
         void addToInputHistory(const std::string& string) {
-            if (inputHistorySize != 0 && inputHistory[inputHistorySize-1].compare(string) == 0) return;
+            if (inputHistorySize != 0 && inputHistory[inputHistorySize-1].compare(string) == 0) {
+                inputHistoryPos = inputHistorySize;
+                return;
+            }
             
             if (inputHistorySize >= CONSOLEUI_INPUT_MAX_HISTORY) {
                 for (unsigned char i = 1; i < inputHistorySize; i++) {
