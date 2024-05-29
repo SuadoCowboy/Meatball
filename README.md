@@ -1,4 +1,4 @@
-## THIS IS JUST A IDEA, NOTHING IS COMPLETE/IMPLEMENTED YET
+##### THIS IS JUST A IDEA, NOTHING IS COMPLETE/IMPLEMENTED YET
 
 # Meatball
 Meatball is a project that focus on adding specific features for Raylib.
