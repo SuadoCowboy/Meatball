@@ -76,7 +76,7 @@ void Meatball::DynamicPanel::update() {
     }
 
     // Resize South West
-    else if (CheckCollisionPointRec(mousePos, {rect.x, rect.y+rect.height-2, 2, 2})) {
+    else if (CheckCollisionPointRec(mousePos, {rect.x-1, rect.y+rect.height-2, 3, 3})) {
         SetMouseCursor(MOUSE_CURSOR_RESIZE_NESW);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.height};
@@ -86,7 +86,7 @@ void Meatball::DynamicPanel::update() {
     }
     
     // Resize North West
-    else if (CheckCollisionPointRec(mousePos, {rect.x, rect.y, 2, 2})) {
+    else if (CheckCollisionPointRec(mousePos, {rect.x-1, rect.y-1, 3, 3})) {
         SetMouseCursor(MOUSE_CURSOR_RESIZE_NWSE);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.y};
@@ -96,7 +96,7 @@ void Meatball::DynamicPanel::update() {
     }
 
     // Resize North East
-    else if (CheckCollisionPointRec(mousePos, {rect.x+rect.width-2, rect.y, 2, 2})) {
+    else if (CheckCollisionPointRec(mousePos, {rect.x+rect.width-2, rect.y-1, 3, 3})) {
         SetMouseCursor(MOUSE_CURSOR_RESIZE_NESW);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.width, GetMouseY()-rect.y};
@@ -106,7 +106,7 @@ void Meatball::DynamicPanel::update() {
     }
 
     // Resize South East
-    else if (CheckCollisionPointRec(mousePos, {rect.x+rect.width-2, rect.y+rect.height-2, 2, 2})) {
+    else if (CheckCollisionPointRec(mousePos, {rect.x+rect.width-2, rect.y+rect.height-2, 3, 3})) {
         SetMouseCursor(MOUSE_CURSOR_RESIZE_NWSE);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.width, GetMouseY()-rect.height};
@@ -142,7 +142,7 @@ void Meatball::DynamicPanel::update() {
         }
         
         if (offset.y != -1) {
-            if (resizingFromW) {
+            if (resizingFromN) {
                 float oldY = rect.y;
                 rect.y = mousePos.y-offset.y;
                 if (oldY+rect.height > rect.y)
