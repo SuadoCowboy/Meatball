@@ -2,11 +2,13 @@
 - Alot of objects might create alot of new colors in memory.
 
 
-# TODOS:
-- colors should use references, pointers OR (static) variables in another class.
+# TODOS (to actually do them right know):
+- stuff inside DynamicPanel actually changes together with it
+- maintain aspect ratio stuff
 - InputBox CTRL+A/LEFT/RIGHT/ (MAYBE)+SHIFT+LEFT/RIGHT
 - InputBox Mouse click moves cursor
 - InputBox mouse select string
+- colors should use references, pointers OR (static) variables in another class.
 
 # FUTURE TODOS:
 - optimize code and use the right data structures. Also research const char* vs char[] vs std::string and look which is better and for what
