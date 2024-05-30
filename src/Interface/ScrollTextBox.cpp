@@ -42,28 +42,21 @@ static inline void handleTextWrapping(std::list<std::string>& textList, const st
 void Meatball::ScrollTextBox::updateTextWrap() {
     for (auto& currentText : text) {
         std::string newText = "";
-        
+
         if (currentText.find('\n') != std::string::npos) {
-            size_t newLineStreak = 0;
             bool foundNonNewLine = false;
             
             for (auto& c : currentText) {
-                if (c == '\n' && foundNonNewLine) {
-                    if (foundNonNewLine) {
-                        ++newLineStreak;
-                    }
+                if (c == '\n' && foundNonNewLine)
                     continue;
-                }
 
                 newText += c;
                 if (c != '\n') {
                     foundNonNewLine = true;
-                    newLineStreak = 0;
                 }
             }
 
-            if (fh::MeasureTextWidth(font, newText.c_str()) < rect.width-scrollBar.getRect().width)
-                currentText = newText;
+            currentText = newText;
         }
 
         newText.clear();
