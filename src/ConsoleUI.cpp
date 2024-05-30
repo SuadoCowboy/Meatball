@@ -38,8 +38,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	};
 	
 	mainPanel.onResize = [&]() {
-			//mainPanelRatio.x = mainPanel.rect.width/width;
-			//mainPanelRatio.y = mainPanel.rect.height/height;
+			// TODO: FIXME: console is glitchy af
 
 			closeButton.rect.width = (float)margin; // is inside the margin
 			closeButton.rect.height = (float)margin;
