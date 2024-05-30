@@ -42,8 +42,23 @@ void Meatball::InputTextBox::draw() {
 }
 
 void Meatball::InputTextBox::update() {
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        bool wasFocusedBefore = focused;
         focused = CheckCollisionPointRec(GetMousePosition(), rect);
+        
+        if (wasFocusedBefore && focused && text.size() != 0) {
+            unsigned int newCursorPos = 0;
+            float textWidth = 0;
+            
+            while (newCursorPos < text.size() && textWidth < GetMouseX()-rect.x+offsetX) {
+                textWidth += fh::MeasureTextWidth(font, text.substr(newCursorPos, 1).c_str())+1;
+                ++newCursorPos;
+            }
+            
+            cursorPos = newCursorPos;
+        }
+
+    }
 
     if (!focused) return;
     
