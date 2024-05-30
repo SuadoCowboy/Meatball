@@ -134,6 +134,8 @@ namespace Meatball {
 
     
     private:
+        Vector2 mainPanelRatio;
+
         std::string inputHistory[CONSOLEUI_INPUT_MAX_HISTORY];
         unsigned char inputHistorySize;
         unsigned char inputHistoryPos; // the position the user is when using inputHistory

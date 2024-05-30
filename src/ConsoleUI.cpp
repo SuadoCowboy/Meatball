@@ -19,13 +19,47 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 
 	autoCompleteSelectedIdxBegin = 0;
 	autoCompleteSelectedIdxEnd = 0;
+	
+	outputBox.font = font;
+	inputBox.font = font;
+	autoCompleteBox.font = font;
 
-	closeButton = {x+width-margin-margin/2, y+margin/2, (float)margin, (float)margin}; // is inside the margin
+	mainPanel.onMove = [&]() {
+		closeButton.rect.x = mainPanel.rect.x+mainPanel.rect.width-margin-margin*0.5;
+		closeButton.rect.y = mainPanel.rect.y+margin*0.5;
 
-	outputBox = {x+margin, y+margin, width-margin*2-3, height-margin*2-42, font};
-	inputBox = {x+margin, y+height-margin-21, width-margin*2-3, 21, font};
+		outputBox.setPosition(mainPanel.rect.x+margin, mainPanel.rect.y+margin);
 
-	autoCompleteBox = {x+margin, y+height-margin-42, width-margin*2-3, 21, font};
+		inputBox.rect.x = mainPanel.rect.x+margin;
+		inputBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin-21;
+
+		autoCompleteBox.rect.x = mainPanel.rect.x+margin;
+		autoCompleteBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin-42;
+	};
+	
+	mainPanel.onResize = [&]() {
+			//mainPanelRatio.x = mainPanel.rect.width/width;
+			//mainPanelRatio.y = mainPanel.rect.height/height;
+
+			closeButton.rect.width = (float)margin; // is inside the margin
+			closeButton.rect.height = (float)margin;
+
+			inputBox.rect.width = mainPanel.rect.width-margin*2-3;
+			inputBox.rect.height = 21;
+
+			autoCompleteBox.rect.width = mainPanel.rect.width-margin*2-3;
+			autoCompleteBox.rect.height = 21;
+
+			outputBox.setSize(mainPanel.rect.width-margin*2-3, mainPanel.rect.height-margin*2-42);
+
+			mainPanel.onMove();
+	};
+
+	mainPanel.onResizeStop = [&]() {
+		outputBox.updateTextWrap();
+	};
+
+	mainPanel.onResize();
 
 	// add auto completion
 	inputBox.onTextChange = [&](const std::string& text) {
