@@ -75,6 +75,10 @@ void Meatball::ScrollTextBox::updateTextWrap() {
         currentText = newText;
     }
 
+    contentHeight = Meatball::getContentHeight(rect.height, font->baseSize, text);
+    scrollBar.updateThumbHeight(rect.height, contentHeight);
+    scrollBar.update(rect);
+    scrollBar.visible = contentHeight > rect.height;
 }
 
 void Meatball::ScrollTextBox::appendText(std::string newText) {
@@ -85,7 +89,7 @@ void Meatball::ScrollTextBox::appendText(std::string newText) {
     } else
         handleTextWrapping(text, newText, font, rect.width-scrollBar.getRect().width);
     
-    contentHeight = Meatball::getContentHeight(rect.height, (float)font->baseSize, text);
+    contentHeight = Meatball::getContentHeight(rect.height, font->baseSize, text);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
     if (contentHeight > rect.height) scrollBar.visible = true;
 }
@@ -95,14 +99,14 @@ void Meatball::ScrollTextBox::clearText() {
     scrollBar.visible = false;
     
     // to fix view
-    contentHeight = Meatball::getContentHeight(rect.height, (float)font->baseSize, text);
+    contentHeight = Meatball::getContentHeight(rect.height, font->baseSize, text);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
     scrollBar.update(rect);
 }
 
 void Meatball::ScrollTextBox::popFront() noexcept {
     text.pop_front();
-    contentHeight = Meatball::getContentHeight(rect.height, (float)font->baseSize, text);
+    contentHeight = Meatball::getContentHeight(rect.height, font->baseSize, text);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
 }
 
@@ -134,10 +138,6 @@ void Meatball::ScrollTextBox::setSize(float width, float height) {
     rect.height = height;
 
     scrollBar.setSize(width*0.04, height);
-    scrollBar.updateThumbHeight(rect.height, contentHeight);
-    scrollBar.update(rect);
-
-    scrollBar.visible = contentHeight > rect.height;
 }
 
 void Meatball::ScrollTextBox::draw() {
@@ -154,13 +154,13 @@ void Meatball::ScrollTextBox::draw() {
             ++newLineAmount;
         }
 
-        int lineY = lineIdx*(float)font->baseSize-scrollBar.getScrollValue()*rect.height;
+        int lineY = lineIdx*font->baseSize-scrollBar.getScrollValue()*rect.height;
 
         if (lineY > rect.height) break;
 
-        if (lineY+(float)font->baseSize*newLineAmount > 0)
+        if (lineY+font->baseSize*newLineAmount > 0)
             fh::DrawText(font, line.c_str(), rect.x,
-            rect.y+(float)lineY+1/*+1 because letters get stuck 1 pixel in the top*/, textColor);
+            rect.y+lineY+1/*+1 because letters get stuck 1 pixel in the top*/, textColor);
         
         lineIdx += newLineAmount;
     }
