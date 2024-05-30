@@ -39,17 +39,17 @@ Font* Meatball::FontsHandler::get(const std::string& name) {
 
 Vector2 Meatball::FontsHandler::MeasureText(Font* font, const char* text, float spacing) {
     use(font);
-    return MeasureTextEx(*font, text, (float)font->baseSize, spacing);
+    return MeasureTextEx(*font, text, font->baseSize, spacing);
 }
 
 float Meatball::FontsHandler::MeasureTextWidth(Font* font, const char* text, float spacing) {
     use(font);
-    return MeasureTextEx(*font, text, (float)font->baseSize, spacing).x;
+    return MeasureTextEx(*font, text, font->baseSize, spacing).x;
 }
 
 float Meatball::FontsHandler::MeasureTextHeight(Font* font, const char* text, float spacing) {
     use(font);
-    return MeasureTextEx(*font, text, (float)font->baseSize, spacing).y;
+    return MeasureTextEx(*font, text, font->baseSize, spacing).y;
 }
 
 bool Meatball::FontsHandler::add(Font font, const std::string& name) {
@@ -61,7 +61,7 @@ bool Meatball::FontsHandler::add(Font font, const std::string& name) {
 
 void Meatball::FontsHandler::DrawText(Font* font, const char* text, float x, float y, Color textColor, float spacing) {
     //use(font); // is this required?
-    DrawTextEx(*font, text, (Vector2){x, y}, (float)font->baseSize, spacing, textColor);
+    DrawTextEx(*font, text, (Vector2){x, y}, font->baseSize, spacing, textColor);
 }
 
 void Meatball::FontsHandler::clear() {
