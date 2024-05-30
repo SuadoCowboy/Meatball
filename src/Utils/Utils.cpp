@@ -21,8 +21,5 @@ float Meatball::getContentHeight(float viewHeight, float fontSize, const std::li
         }
     }
 
-    float contentHeight = lineIdx*fontSize;
-    if (contentHeight < viewHeight) contentHeight = viewHeight;
-
-    return contentHeight;
+    return lineIdx*fontSize; // contentHeight
 }

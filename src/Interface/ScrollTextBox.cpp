@@ -6,18 +6,16 @@
 using fh = Meatball::FontsHandler;
 
 Meatball::ScrollTextBox::ScrollTextBox()
-    : font(nullptr), color(BLACK), textColor(WHITE) {
+    : font(nullptr), color(BLACK), textColor(WHITE), contentHeight(0) {
         font = FontsHandler::get("default");
         setSize(0,0);
         setPosition(0,0);
-        scrollBar.visible = false;
     }
 
 Meatball::ScrollTextBox::ScrollTextBox(float x, float y, float width, float height, Font* font)
-    : font(font), color(BLACK), textColor(WHITE) {
+    : font(font), color(BLACK), textColor(WHITE), contentHeight(0) {
         setSize(width, height);
         setPosition(x, y);
-        scrollBar.visible = false;
 }
 
 static inline void handleTextWrapping(std::list<std::string>& textList, const std::string& text, Font* font, float maxWidth) {
@@ -136,7 +134,6 @@ void Meatball::ScrollTextBox::setSize(float width, float height) {
     rect.height = height;
 
     scrollBar.setSize(width*0.04, height);
-    contentHeight = Meatball::getContentHeight(rect.height, (float)font->baseSize, text);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
     scrollBar.update(rect);
 

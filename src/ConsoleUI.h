@@ -108,8 +108,10 @@ namespace Meatball {
             outputBox.update();
             closeButton.update();
 
-            while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*outputBox.font->baseSize)
+            while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*(float)outputBox.font->baseSize) {
+                if (outputBox.getText().size() == 0) break;
                 outputBox.popFront();
+            }
 
             mainPanel.update();
         }
