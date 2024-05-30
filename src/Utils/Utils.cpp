@@ -23,3 +23,10 @@ float Meatball::getContentHeight(float viewHeight, float fontSize, const std::li
 
     return lineIdx*fontSize; // contentHeight
 }
+
+bool operator==(const Color& left, const Color& right) {
+    return (left.r == right.r) && 
+     (left.g == right.g) && 
+     (left.b == right.b) && 
+     (left.a == right.a);
+}

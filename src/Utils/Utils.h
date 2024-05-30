@@ -13,3 +13,5 @@ namespace Meatball {
 
     float getContentHeight(float viewHeight, float fontSize, const std::list<std::string>& text);
 }
+
+bool operator==(const Color& left, const Color& right);
