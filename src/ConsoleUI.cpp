@@ -33,23 +33,21 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 		inputBox.rect.x = mainPanel.rect.x+margin;
 		inputBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin-21;
 
-		autoCompleteBox.rect.x = mainPanel.rect.x+margin;
-		autoCompleteBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin-42;
+		autoCompleteBox.rect.x = mainPanel.rect.x;
+		autoCompleteBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin;
 	};
 	
 	mainPanel.onResize = [&]() {
-			// TODO: FIXME: console is glitchy af
-
 			closeButton.rect.width = (float)margin; // is inside the margin
 			closeButton.rect.height = (float)margin;
 
 			inputBox.rect.width = mainPanel.rect.width-margin*2-3;
 			inputBox.rect.height = 21;
 
-			autoCompleteBox.rect.width = mainPanel.rect.width-margin*2-3;
+			autoCompleteBox.rect.width = mainPanel.rect.width;
 			autoCompleteBox.rect.height = 21;
 
-			outputBox.setSize(mainPanel.rect.width-margin*2-3, mainPanel.rect.height-margin*2-42);
+			outputBox.setSize(mainPanel.rect.width-margin*2-3, mainPanel.rect.height-margin*2-21);
 
 			mainPanel.onMove();
 	};
@@ -142,10 +140,11 @@ void Meatball::ConsoleUIScene::draw() {
 	if (!visible) return;
 	mainPanel.draw();
 	
-	autoCompleteBox.draw();
-
 	inputBox.draw();
 	outputBox.draw();
+
+	if (autoCompleteBox.coloredText.size() != 0)
+		autoCompleteBox.draw();
 
 	closeButton.drawX();
 }
