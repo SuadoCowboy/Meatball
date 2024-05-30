@@ -22,6 +22,9 @@ namespace Meatball {
 
         void appendText(std::string text);
         void clearText();
+
+        /// @brief checks the current rect size and wraps the whole text
+        void updateTextWrap();
         
         /// @brief removes the text at index 0
         void popFront() noexcept;
