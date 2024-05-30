@@ -3,8 +3,6 @@
 
 
 # TODOS (to actually do them right know):
-- stuff inside DynamicPanel actually changes together with it
-- maintain aspect ratio stuff
 - InputBox CTRL+A/LEFT/RIGHT/ (MAYBE)+SHIFT+LEFT/RIGHT
 - InputBox Mouse click moves cursor
 - InputBox mouse select string
