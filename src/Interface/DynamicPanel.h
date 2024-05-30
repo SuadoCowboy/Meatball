@@ -20,6 +20,8 @@ namespace Meatball {
         Rectangle rect;
         Vector2 minSize; // width & height
 
+        float grabHeight; // the range from top-down to grab the panel
+
         VoidFunc onResize, onMove;
 
         /// @brief resizing was just set to false

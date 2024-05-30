@@ -1,11 +1,11 @@
 #include "DynamicPanel.h"
 
 Meatball::DynamicPanel::DynamicPanel()
- : color(BLACK), rect({0,0,0,0}), offset({0,0}), minSize({1,1}),
+ : color(BLACK), rect({0,0,0,0}), offset({0,0}), minSize({1,1}), grabHeight(2),
  resizing(false), dragging(false), resizingFromN(false), resizingFromW(false) {}
 
 Meatball::DynamicPanel::DynamicPanel(Rectangle rect, Vector2 minSize)
- : rect(rect), offset({0,0}), minSize(minSize),
+ : rect(rect), offset({0,0}), minSize(minSize), grabHeight(2),
  resizing(false), dragging(false), resizingFromN(false), resizingFromW(false) {}
 
 Meatball::DynamicPanel::DynamicPanel(float x, float y, float width, float height, Vector2 minSize)
@@ -29,7 +29,7 @@ void Meatball::DynamicPanel::update() {
     // Dragging and Resizing
     if (!resizing && !dragging) {
     SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    if (CheckCollisionPointRec(mousePos, {rect.x, rect.y+2, rect.width, 2})) {
+    if (CheckCollisionPointRec(mousePos, {rect.x, rect.y+2, rect.width, grabHeight})) {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.y};
