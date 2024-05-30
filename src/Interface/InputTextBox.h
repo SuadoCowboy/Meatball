@@ -28,9 +28,9 @@ namespace Meatball {
         bool focused;
         unsigned int cursorPos;
 
-    private:
         Rectangle rect;
 
+    private:
         float offsetX;
     };
 }
