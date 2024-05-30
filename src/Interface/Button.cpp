@@ -55,7 +55,7 @@ void Meatball::Button::drawText()
 void Meatball::Button::drawTextCentered(bool centerX, bool centerY) {
     int textWidthHalf = fh::MeasureTextWidth(font, text.c_str())/2;
 
-    fh::DrawText(font, text.c_str(), centerX? rect.x+rect.width/2-textWidthHalf : rect.x, centerY? rect.y+rect.height/2-(float)font->baseSize/2 : rect.y, hovered? textHoveredColor : textColor);
+    fh::DrawText(font, text.c_str(), centerX? rect.x+rect.width/2-textWidthHalf : rect.x, centerY? rect.y+rect.height/2-font->baseSize/2 : rect.y, hovered? textHoveredColor : textColor);
 }
 
 void Meatball::Button::drawRect() {

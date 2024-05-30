@@ -29,7 +29,7 @@ void Meatball::InputTextBox::draw() {
 
     fh::DrawText(font, text.c_str(),
         rect.x-offsetX,
-        rect.y+rect.height/2-(float)font->baseSize/2+1/*+1 because it sticks 1 pixel on top*/,
+        rect.y+rect.height/2-font->baseSize/2+1/*+1 because it sticks 1 pixel on top*/,
         textColor);
     
     // maybe cursor should be outside inputtextbox and be a function or class too like borders and stuff
