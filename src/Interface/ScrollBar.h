@@ -8,8 +8,8 @@ namespace Meatball {
     class ScrollBar {
     public:
         ScrollBar();
-        /// @param barRect the biggest rectangle that is drawn
-        ScrollBar(Rectangle barRect, bool visible = true);
+        /// @param rect the bar rect
+        ScrollBar(Rectangle rect, bool visible = true);
         
         /// @param parentRect to check if the mouse is between parent's boundaries to use mouse wheel 
         void update(const Rectangle& parentRect);
@@ -25,10 +25,16 @@ namespace Meatball {
         Color barColor, barHoveredColor, thumbColor, thumbHoveredColor1, thumbHoveredColor2;
         bool visible;
 
-        Rectangle barRect;
+        void setPosition(float x, float y);
+        /// @warning should call updateThumbHeight and update after calling this function or else things might break
+        void setSize(float width, float height);
+        
+        const Rectangle& getRect();
 
         static unsigned char scrollSpeed;
     private:
+        Rectangle rect;
+
         bool barHovered, thumbHovered;
         float thumbY, thumbHeight;
         float scrollValue; // (0.0 - 1.0) it's %
