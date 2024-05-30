@@ -39,7 +39,7 @@ int main(int, char**)
     }
 
     for (unsigned char i = 0; i < 100; i++)
-        HayBCMD::Command(HayBCMD::formatString("empty{}", (int)i), 0, 0, emptyCommand, "that's just a empty function frfr");
+        HayBCMD::Command(HayBCMD::formatString("this_is_a_big_fucking_command{}", (int)i), 0, 0, emptyCommand, "that's just a empty function frfr");
 
     while (!WindowShouldClose()) {
         ClearBackground(backgroundColor);
