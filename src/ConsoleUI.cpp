@@ -7,8 +7,9 @@
 #include "Console.h"
 #include "FontsHandler.h"
 
-
 unsigned char Meatball::ConsoleUIScene::margin = 4;
+
+using fh = Meatball::FontsHandler;
 
 Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float height, Font* font, Font* _labelFont, bool visible)
 	: Scene(), visible(visible) {
@@ -69,7 +70,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	mainPanel.onResize();
 
 	mainPanel.minSize = {
-		outputBox.getScrollBar().getRect().width+margin*2+FontsHandler::MeasureTextWidth(labelFont, labelText),
+		outputBox.getScrollBar().getRect().width+margin*2+fh::MeasureTextWidth(labelFont, labelText),
 		outputBox.font->baseSize+inputBox.rect.height+margin*2};
 
 	// add auto completion
@@ -118,13 +119,13 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	/*
 	---------------------
 	{Console           x}
-	{  {output      }   }
-	{  {            }   }
-	{  {            }   }
-	{  {            }   }
+	{{output           }}
+	{{                 }}
+	{{                 }}
+	{{                 }}
 	{                   }
-	{{auto complete    }}
 	{{input text       }}
+	{auto complete      }
 	---------------------
 	*/
 
@@ -157,10 +158,43 @@ void Meatball::ConsoleUIScene::draw() {
 	inputBox.draw();
 	outputBox.draw();
 
-	if (autoCompleteBox.coloredText.size() != 0)
-		autoCompleteBox.draw();
+	if (autoCompleteBox.coloredText.size() != 0) {
+		// I can't use draw method since I'm using offsetX
+		float offsetX = 0;
+		if (autoCompleteSelectedIdxEnd != 0) {
+			float selectedTextWidth = 0;
+			bool passedThroughSelectedText = false;
+			
+			for (auto& pair : autoCompleteBox.coloredText) {
+				if (pair.second == autoCompleteSelectedTextColor) {
+					selectedTextWidth += fh::MeasureTextWidth(autoCompleteBox.font, pair.first.c_str());
+					passedThroughSelectedText = true;
+					continue;
+				}
 
-	FontsHandler::DrawText(labelFont, labelText, mainPanel.rect.x+margin, mainPanel.rect.y+margin, labelColor);
+				if (passedThroughSelectedText) break;
+				
+				offsetX += fh::MeasureTextWidth(autoCompleteBox.font, pair.first.c_str())+1;
+			}
+
+			if (offsetX+selectedTextWidth < autoCompleteBox.rect.width) offsetX = 0;
+			
+			else offsetX -= (autoCompleteBox.rect.width-selectedTextWidth)*0.5;
+		}
+
+		DrawRectangle(autoCompleteBox.rect.x, autoCompleteBox.rect.y, autoCompleteBox.rect.width, autoCompleteBox.rect.height, autoCompleteBox.color);
+		BeginScissorMode(autoCompleteBox.rect.x, autoCompleteBox.rect.y, autoCompleteBox.rect.width, autoCompleteBox.rect.height);
+
+		float x = autoCompleteBox.rect.x;
+		for (auto& pair : autoCompleteBox.coloredText) {
+			fh::DrawText(autoCompleteBox.font, pair.first.c_str(), x-offsetX, autoCompleteBox.rect.y+1, pair.second);
+			x += fh::MeasureTextWidth(autoCompleteBox.font, pair.first.c_str())+1;
+		}
+
+		EndScissorMode();
+	}
+
+	fh::DrawText(labelFont, labelText, mainPanel.rect.x+margin, mainPanel.rect.y+margin, labelColor);
 
 	closeButton.drawX();
 }

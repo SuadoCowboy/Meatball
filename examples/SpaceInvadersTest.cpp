@@ -1,5 +1,8 @@
+#include <vector>
+
 #include <raylib.h>
 
+#include <HayBCMD.h>
 #include <ConsoleUI.h>
 #include <Utils/Defaults.h>
 #include <Config.h>
@@ -8,6 +11,8 @@
 #define WINDOW_HEIGHT 700
 
 namespace Config = Meatball::Config;
+
+static void emptyCommand(HayBCMD::Command* pCommand, const std::vector<std::string>& args) {}
 
 int main(int, char**)
 {
@@ -32,6 +37,9 @@ int main(int, char**)
         if (backgroundColorData != nullptr)
             backgroundColor = backgroundColorData->colorV;
     }
+
+    for (unsigned char i = 0; i < 100; i++)
+        HayBCMD::Command(HayBCMD::formatString("empty{}", (int)i), 0, 0, emptyCommand, "that's just a empty function frfr");
 
     while (!WindowShouldClose()) {
         ClearBackground(backgroundColor);

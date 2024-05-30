@@ -144,8 +144,6 @@ namespace Meatball {
         unsigned char inputHistorySize;
         unsigned char inputHistoryPos; // the position the user is when using inputHistory
 
-        float autoCompleteOffsetX;
-
         void addToInputHistory(const std::string& string) {
             if (inputHistorySize != 0 && inputHistory[inputHistorySize-1].compare(string) == 0) {
                 inputHistoryPos = inputHistorySize;
