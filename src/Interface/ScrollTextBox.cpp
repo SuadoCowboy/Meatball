@@ -42,7 +42,31 @@ static inline void handleTextWrapping(std::list<std::string>& textList, const st
 void Meatball::ScrollTextBox::updateTextWrap() {
     for (auto& currentText : text) {
         std::string newText = "";
+        
+        if (currentText.find('\n') != std::string::npos) {
+            size_t newLineStreak = 0;
+            bool foundNonNewLine = false;
+            
+            for (auto& c : currentText) {
+                if (c == '\n' && foundNonNewLine) {
+                    if (foundNonNewLine) {
+                        ++newLineStreak;
+                    }
+                    continue;
+                }
 
+                newText += c;
+                if (c != '\n') {
+                    foundNonNewLine = true;
+                    newLineStreak = 0;
+                }
+            }
+
+            if (fh::MeasureTextWidth(font, newText.c_str()) < rect.width-scrollBar.getRect().width)
+                currentText = newText;
+        }
+
+        newText.clear();
         while (fh::MeasureTextWidth(font, currentText.c_str()) >= rect.width-scrollBar.getRect().width) {
             size_t columnIdx = 1;
 
@@ -58,32 +82,6 @@ void Meatball::ScrollTextBox::updateTextWrap() {
 
         newText += currentText;
         currentText = newText;
-
-        size_t spaceIdx = currentText.find('\n');
-        if (spaceIdx == std::string::npos)
-            continue;
-
-        newText.clear();
-        size_t newLineStreak = 0;
-        bool foundNonNewLine = false;
-        
-        for (auto& c : currentText) {
-            if (c == '\n' && foundNonNewLine) {
-                if (foundNonNewLine) {
-                    ++newLineStreak;
-                }
-                continue;
-            }
-            
-            newText += c;
-            if (c != '\n') {
-                foundNonNewLine = true;
-                newLineStreak = 0;
-            }
-        }
-
-        if (fh::MeasureTextWidth(font, newText.c_str()) < rect.width-scrollBar.getRect().width)
-            currentText = newText;
     }
 
 }
@@ -136,9 +134,8 @@ Meatball::ScrollBar& Meatball::ScrollTextBox::getScrollBar() {
 void Meatball::ScrollTextBox::setPosition(float x, float y) {
     rect.x = x;
     rect.y = y;
-
-    const Rectangle& scrollBarRect = scrollBar.getRect();
-    scrollBar.setPosition(rect.x+rect.width-scrollBarRect.width, y);
+    
+    scrollBar.setPosition(rect.x+rect.width-scrollBar.getRect().width, y);
 }
 
 void Meatball::ScrollTextBox::setSize(float width, float height) {
@@ -156,7 +153,7 @@ void Meatball::ScrollTextBox::setSize(float width, float height) {
 void Meatball::ScrollTextBox::draw() {
     DrawRectangle(rect.x, rect.y, rect.width, rect.height, color);
 
-    BeginScissorMode(rect.x, rect.y, rect.width, rect.height);
+    BeginScissorMode(rect.x, rect.y, rect.width-scrollBar.getRect().width, rect.height);
 
     size_t lineIdx = 0;
     for (auto& line : text) {
