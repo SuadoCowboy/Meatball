@@ -1,15 +1,23 @@
 #include "ConsoleUI.h"
 
+#include <cstring>
+
 #include <HayBCMD.h>
 
 #include "Console.h"
+#include "FontsHandler.h"
+
 
 unsigned char Meatball::ConsoleUIScene::margin = 4;
 
-Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float height, Font* font, bool visible)
+Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float height, Font* font, Font* _labelFont, bool visible)
 	: Scene(), visible(visible) {
 	mainPanel = {x, y, width, height};
 	
+	std::strcpy(labelText, "Local Console\0");
+	labelColor = WHITE;
+	labelFont = _labelFont;
+
 	inputHistoryPos = 0;
 	inputHistorySize = 0;
 
@@ -28,7 +36,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 		closeButton.rect.x = mainPanel.rect.x+mainPanel.rect.width-margin-margin*0.5;
 		closeButton.rect.y = mainPanel.rect.y+margin*0.5;
 
-		outputBox.setPosition(mainPanel.rect.x+margin, mainPanel.rect.y+margin);
+		outputBox.setPosition(mainPanel.rect.x+margin, mainPanel.rect.y+labelFont->baseSize+margin);
 
 		inputBox.rect.x = mainPanel.rect.x+margin;
 		inputBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin-21;
@@ -37,17 +45,19 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 		autoCompleteBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin;
 	};
 	
-	mainPanel.onResize = [&]() {
-			closeButton.rect.width = (float)margin; // is inside the margin
-			closeButton.rect.height = (float)margin;
+	mainPanel.grabHeight = labelFont->baseSize;
 
-			inputBox.rect.width = mainPanel.rect.width-margin*2-3;
-			inputBox.rect.height = 21;
+	mainPanel.onResize = [&]() {
+			closeButton.rect.width = margin; // is inside the margin
+			closeButton.rect.height = margin;
 
 			autoCompleteBox.rect.width = mainPanel.rect.width;
 			autoCompleteBox.rect.height = 21;
 
-			outputBox.setSize(mainPanel.rect.width-margin*2-3, mainPanel.rect.height-margin*2-21);
+			outputBox.setSize(mainPanel.rect.width-margin*2, mainPanel.rect.height-labelFont->baseSize-1-margin*2-21);
+			
+			inputBox.rect.width = outputBox.getRect().width;
+			inputBox.rect.height = 21;
 
 			mainPanel.onMove();
 	};
@@ -57,6 +67,10 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	};
 
 	mainPanel.onResize();
+
+	mainPanel.minSize = {
+		outputBox.getScrollBar().getRect().width+margin*2+FontsHandler::MeasureTextWidth(labelFont, labelText),
+		outputBox.font->baseSize+inputBox.rect.height+margin*2};
 
 	// add auto completion
 	inputBox.onTextChange = [&](const std::string& text) {
@@ -145,6 +159,8 @@ void Meatball::ConsoleUIScene::draw() {
 
 	if (autoCompleteBox.coloredText.size() != 0)
 		autoCompleteBox.draw();
+
+	FontsHandler::DrawText(labelFont, labelText, mainPanel.rect.x+margin, mainPanel.rect.y+margin, labelColor);
 
 	closeButton.drawX();
 }

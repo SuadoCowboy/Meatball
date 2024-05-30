@@ -28,6 +28,7 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
     // WARNING: if the developer does not use this function, he might need to define a default font
     FontsHandler::add(GetFontDefault(), "default");
 
+    Font* halfSizedFont = nullptr;
     Font* font = nullptr;
     if (fontData) {
         std::filesystem::path fontPath = fontData->stringV;
@@ -36,9 +37,16 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
             font = FontsHandler::get(fontName);
         else
             font = FontsHandler::get("default");
-    } else font = FontsHandler::get("default");
+
+        if (FontsHandler::loadEx(fontPath, fontName+"Half", fontSizeData? fontSizeData->unsignedCharV*0.5 : 8, nullptr, 0))
+            halfSizedFont = FontsHandler::get(fontName+"Half");
+        else
+            halfSizedFont = FontsHandler::get("default");
+    } else {
+        halfSizedFont = font = FontsHandler::get("default");
+    }
     
-    auto consoleUI = Meatball::ConsoleUIScene(rect.x, rect.y, rect.width, rect.height, font);
+    auto consoleUI = Meatball::ConsoleUIScene(rect.x, rect.y, rect.width, rect.height, font, halfSizedFont);
     
     data = Config::ifContainsGet(consoleData, "autoCompleteColor");
     if (data) consoleUI.autoCompleteBox.color = data->colorV;
@@ -75,6 +83,9 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
 
     data = Config::ifContainsGet(consoleData, "inputBoxCursorColor");
     if (data) consoleUI.inputBox.cursorColor = data->colorV;
+
+    data = Config::ifContainsGet(consoleData, "labelColor");
+    if (data) consoleUI.labelColor = data->colorV;
 
     Console::init([&](const std::string& message) {
         consoleUI.print(message);

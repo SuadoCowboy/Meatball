@@ -40,7 +40,7 @@ namespace Meatball {
         /// @param width mainPanel width
         /// @param height mainPanel height
         /// @param visible if scene is visible or not(only this class uses this)
-        ConsoleUIScene(float x, float y, float width, float height, Font* font, bool visible = true);
+        ConsoleUIScene(float x, float y, float width, float height, Font* font, Font* labelFont, bool visible = true);
 
         /// @brief appends text to outputTextbox
         void print(const std::string& message);
@@ -108,7 +108,7 @@ namespace Meatball {
             outputBox.update();
             closeButton.update();
 
-            while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*(float)outputBox.font->baseSize) {
+            while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*outputBox.font->baseSize) {
                 if (outputBox.getText().size() == 0) break;
                 outputBox.popFront();
             }
@@ -126,19 +126,25 @@ namespace Meatball {
         ColoredTextBox autoCompleteBox;
         InputTextBox inputBox;
 
+        // by default labelText = "Local Console"
+        char labelText[20];
+        Color labelColor;
+        Font* labelFont;
+
         Color autoCompleteHighlightedTextColor, autoCompleteTextColor, autoCompleteSelectedTextColor;
 
         // margin - the space between mainPanel border and objects close to it
         static unsigned char margin;
-        
+
+    private:
         size_t autoCompleteSelectedIdxBegin, autoCompleteSelectedIdxEnd;
         std::string inputBoxOriginalText; // the inputBox text that was used before selecting in auto complete
 
-    
-    private:
         std::string inputHistory[CONSOLEUI_INPUT_MAX_HISTORY];
         unsigned char inputHistorySize;
         unsigned char inputHistoryPos; // the position the user is when using inputHistory
+
+        float autoCompleteOffsetX;
 
         void addToInputHistory(const std::string& string) {
             if (inputHistorySize != 0 && inputHistory[inputHistorySize-1].compare(string) == 0) {
