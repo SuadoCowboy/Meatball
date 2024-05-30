@@ -117,45 +117,63 @@ void Meatball::DynamicPanel::update() {
 
     if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
         dragging = false;
+        if (onResizeStop && resizing) onResizeStop();
         resizing = false;
         resizingFromN = false;
         resizingFromW = false;
     }
 
     if (dragging) {
+        float oldX = rect.x;
+        float oldY = rect.y;
         rect.x = mousePos.x-offset.x;
         rect.y = mousePos.y-offset.y;
+
+        if (onMove && rect.x != oldX || oldY != rect.y) onMove();
     
     } else if (resizing) {
+        float oldX = rect.x;
+        float oldY = rect.y;
+        float oldWidth = rect.width;
+        float oldHeight = rect.height;
+
         if (offset.x != -1) {
             if (resizingFromW) {
-                float oldX = rect.x;
+                float xBefore = rect.x;
                 rect.x = mousePos.x-offset.x;
-                if (oldX+rect.width > rect.x)
-                    rect.width -= rect.x-oldX;
+                
+                if (xBefore+rect.width > rect.x)
+                    rect.width -= rect.x-xBefore;
+                
                 else {
-                    rect.x = oldX+rect.width-1;
+                    rect.x = xBefore+rect.width-1;
                     rect.width = 1;
                 }
-            } else
-                rect.width = mousePos.x-offset.x;
+            
+            } else rect.width = mousePos.x-offset.x;
         }
         
         if (offset.y != -1) {
             if (resizingFromN) {
-                float oldY = rect.y;
+                float yBefore = rect.y;
                 rect.y = mousePos.y-offset.y;
-                if (oldY+rect.height > rect.y)
-                    rect.height -= rect.y-oldY;
+                
+                if (yBefore+rect.height > rect.y)
+                    rect.height -= rect.y-yBefore;
+                
                 else {
-                    rect.y = oldY+rect.height-1;
+                    rect.y = yBefore+rect.height-1;
                     rect.height = 1;
                 }
+            
             } else rect.height = mousePos.y-offset.y;
         }
 
         if (rect.width < minSize.x) rect.width = minSize.x;
         if (rect.height < minSize.y) rect.height = minSize.y;
+
+        if (onMove && oldX != rect.x || oldY != rect.y) onMove();
+        if (onResize && oldWidth != rect.width || oldHeight != rect.height) onResize();
     }
 }
 

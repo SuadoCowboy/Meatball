@@ -2,6 +2,8 @@
 
 #include <raylib.h>
 
+#include "Shared.h"
+
 namespace Meatball {
     /// @brief a panel that can be resized and moved
     class DynamicPanel {
@@ -17,6 +19,11 @@ namespace Meatball {
         Color color;
         Rectangle rect;
         Vector2 minSize; // width & height
+
+        VoidFunc onResize, onMove;
+
+        /// @brief resizing was just set to false
+        VoidFunc onResizeStop;
     private:
         Vector2 offset; // this is used for dragging and resizing
         bool dragging, resizing, resizingFromN, resizingFromW, wasHovered;
