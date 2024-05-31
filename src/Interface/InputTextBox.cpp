@@ -48,7 +48,7 @@ void Meatball::InputTextBox::draw() {
                 selectedWidth = getRealCursorPos(selectedTextStartIdx, font, text)-selectedX;
             }
             
-            DrawRectangle(rect.x+selectedX, rect.y, selectedWidth, rect.height, {100,100,100,50});
+            DrawRectangle(rect.x-offsetX+selectedX, rect.y, selectedWidth, rect.height, {100,100,100,50});
         }
     }
 
@@ -77,12 +77,48 @@ void Meatball::InputTextBox::update() {
 
     bool selectMode = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
     bool moveMode = IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL);
-       
-    // CTRL+A/SHIFT+LEFT/RIGHT
-    /*
-    Possibilities:
-    A = SELECT ALL(todo select logic)
-    */
+
+    if (moveMode) {
+        if (IsKeyPressed(KEY_A) && text.size() != 0) {
+            selectedTextStartIdx = 0;
+            cursorPos = text.size();
+            selectedTextFinalIdx = cursorPos;
+        }
+
+        if (IsKeyPressed(KEY_C) && selectedTextFinalIdx != std::string::npos)
+            SetClipboardText(text.substr(selectedTextFinalIdx > selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx, selectedTextFinalIdx > selectedTextStartIdx? selectedTextFinalIdx-selectedTextStartIdx
+             : selectedTextStartIdx-selectedTextFinalIdx).c_str());
+        
+        else if (IsKeyPressed(KEY_V)) {
+            const char* clipboard = GetClipboardText();
+
+            size_t i = 0;
+            if (selectedTextFinalIdx != std::string::npos) {
+                cursorPos = selectedTextFinalIdx > selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx;
+                size_t delta = selectedTextFinalIdx > selectedTextStartIdx? selectedTextFinalIdx-selectedTextStartIdx
+                : selectedTextStartIdx-selectedTextFinalIdx;
+                
+                for (size_t i = 0; i < delta; i++)
+                    text.erase(text.begin()+cursorPos);
+            
+                selectedTextStartIdx = selectedTextFinalIdx = std::string::npos;
+
+                while (clipboard[i] != '\0') {
+                    text.insert(text.begin()+cursorPos, clipboard[i]);
+                    ++i;
+                    ++cursorPos;
+                }
+
+            } else {
+                while (clipboard[i] != '\0') {
+                    text.insert(text.begin()+cursorPos, clipboard[i]);
+                    ++i;
+                    ++cursorPos;
+                }
+            }
+        }
+    
+    }
     
     if (IsKeyPressed(KEY_LEFT) || IsKeyPressedRepeat(KEY_LEFT)) {
         if (selectMode && selectedTextStartIdx == std::string::npos)
@@ -91,23 +127,26 @@ void Meatball::InputTextBox::update() {
         if (moveMode) {
             while (cursorPos != 0 && text[cursorPos-1] == ' ') --cursorPos;
             while (cursorPos != 0 && text[cursorPos-1] != ' ') --cursorPos;
+        } else if (!selectMode && selectedTextFinalIdx != std::string::npos) {
+            cursorPos = selectedTextFinalIdx > selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx;
+
         } else if (cursorPos != 0) --cursorPos;
         
         if (selectMode)
             selectedTextFinalIdx = cursorPos;
-        else {
-            selectedTextStartIdx = std::string::npos;
-            selectedTextFinalIdx = std::string::npos;
-        }
-    }
+        else
+            selectedTextStartIdx = selectedTextFinalIdx = std::string::npos;
     
-    else if (IsKeyPressed(KEY_RIGHT) || IsKeyPressedRepeat(KEY_RIGHT)) {
+    } else if (IsKeyPressed(KEY_RIGHT) || IsKeyPressedRepeat(KEY_RIGHT)) {
         if (selectMode && selectedTextStartIdx == std::string::npos)
             selectedTextStartIdx = cursorPos;
         
         if (moveMode) {
             while (cursorPos != text.size() && text[cursorPos] == ' ') ++cursorPos;
             while (cursorPos != text.size() && text[cursorPos] != ' ') ++cursorPos;
+        } else if (!selectMode && selectedTextFinalIdx != std::string::npos) {
+            cursorPos = selectedTextFinalIdx > selectedTextStartIdx? selectedTextFinalIdx : selectedTextStartIdx;
+
         } else if (cursorPos != text.size()) ++cursorPos;
         
         if (selectMode)
@@ -116,10 +155,19 @@ void Meatball::InputTextBox::update() {
             selectedTextStartIdx = std::string::npos;
             selectedTextFinalIdx = std::string::npos;
         }
-    }
-
-    else if ((IsKeyPressed(KEY_BACKSPACE) || IsKeyPressedRepeat(KEY_BACKSPACE)) && cursorPos != 0) {
-        if (moveMode) {
+    
+    } else if ((IsKeyPressed(KEY_BACKSPACE) || IsKeyPressedRepeat(KEY_BACKSPACE)) && cursorPos != 0) {
+        if (selectedTextFinalIdx != std::string::npos) {
+            cursorPos = selectedTextFinalIdx > selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx;
+            size_t delta = selectedTextFinalIdx > selectedTextStartIdx? selectedTextFinalIdx-selectedTextStartIdx
+             : selectedTextStartIdx-selectedTextFinalIdx;
+            
+            for (size_t i = 0; i < delta; i++)
+                text.erase(text.begin()+cursorPos);
+            
+            selectedTextStartIdx = selectedTextFinalIdx = std::string::npos;
+        
+        } else if (moveMode) {
             // if already erased space, to not erase other chars
             bool usedSpaceVersion = false;
             
@@ -139,9 +187,11 @@ void Meatball::InputTextBox::update() {
         }
         
         if (onTextChange) onTextChange(text);
-    }
-
-    else if ((IsKeyPressed(KEY_DELETE) || IsKeyPressedRepeat(KEY_DELETE)) && cursorPos != text.size()) {
+    
+    } else if ((IsKeyPressed(KEY_DELETE) || IsKeyPressedRepeat(KEY_DELETE)) && cursorPos != text.size()) {
+        if (selectedTextFinalIdx != std::string::npos)
+            selectedTextStartIdx = selectedTextFinalIdx = std::string::npos;
+        
         if (moveMode) {
             // if already erased space, to not erase other chars
             bool usedSpaceVersion = false;
@@ -161,10 +211,21 @@ void Meatball::InputTextBox::update() {
     
     int codePoint = 0;
     if (codePoint = GetCharPressed(), codePoint) {
+        if (selectedTextFinalIdx != std::string::npos) {
+            cursorPos = selectedTextFinalIdx > selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx;
+            size_t delta = selectedTextFinalIdx > selectedTextStartIdx? selectedTextFinalIdx-selectedTextStartIdx
+             : selectedTextStartIdx-selectedTextFinalIdx;
+            
+            for (size_t i = 0; i < delta; i++)
+                text.erase(text.begin()+cursorPos);
+        }
+
         text.insert(text.begin()+cursorPos, (char)codePoint);
         if (onTextChange) onTextChange(text);
         
         ++cursorPos;
+
+        selectedTextStartIdx = selectedTextFinalIdx = std::string::npos;
     }
 
     if (onSend && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER)) && text.size() != 0) {
@@ -172,6 +233,8 @@ void Meatball::InputTextBox::update() {
         text.clear();
         cursorPos = text.size();
         offsetX = 0;
+        selectedTextStartIdx = selectedTextFinalIdx = std::string::npos;
+    
     } else {
         float x = getRealCursorPos(cursorPos, font, text);
         if (x-offsetX > rect.width)
