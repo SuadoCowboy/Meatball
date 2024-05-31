@@ -88,7 +88,16 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
     if (data) consoleUI.labelColor = data->colorV;
 
     Console::init([&](const std::string& message) {
-        consoleUI.print(message);
+        size_t spaceIdxBefore = 0;
+        size_t currentSpaceIdx = message.find('\n');
+        
+        while (currentSpaceIdx != std::string::npos) {
+            consoleUI.print(message.substr(spaceIdxBefore, currentSpaceIdx-spaceIdxBefore));
+            spaceIdxBefore = currentSpaceIdx+1;
+            currentSpaceIdx = message.find('\n', spaceIdxBefore);
+        }
+
+        consoleUI.print(message.substr(spaceIdxBefore));
     });
 
     Console::print("Console initialized");
