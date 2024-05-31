@@ -33,6 +33,6 @@ namespace Meatball {
     private:
         float offsetX;
 
-        size_t selectedTextBeginIdx, selectedTextEndIdx;
+        size_t selectedTextStartIdx, selectedTextFinalIdx;
     };
 }

@@ -12,14 +12,14 @@ static float getRealCursorPos(unsigned int cursorPos, Font* font, const std::str
 
 Meatball::InputTextBox::InputTextBox()
     : color(BLACK), textColor(WHITE), cursorColor(WHITE), cursorPos(0),
-    offsetX(0), focused(false), selectedTextBeginIdx(std::string::npos), selectedTextEndIdx(std::string::npos) {
+    offsetX(0), focused(false), selectedTextStartIdx(std::string::npos), selectedTextFinalIdx(std::string::npos) {
     rect = {0,0,0,0};
     font = FontsHandler::get("default");
 }
 
 Meatball::InputTextBox::InputTextBox(float x, float y, float width, float height, Font* font)
  : color(BLACK), textColor(WHITE), cursorColor(WHITE), font(font), cursorPos(0),
- offsetX(0), focused(false), selectedTextBeginIdx(std::string::npos), selectedTextEndIdx(std::string::npos) {
+ offsetX(0), focused(false), selectedTextStartIdx(std::string::npos), selectedTextFinalIdx(std::string::npos) {
     rect = {x, y, width, height};
 }
 
@@ -37,12 +37,20 @@ void Meatball::InputTextBox::draw() {
         float x = rect.x-offsetX+getRealCursorPos(cursorPos, font, text);
         DrawLine(x, rect.y, x, rect.y+rect.height, cursorColor);
         
-        if (selectedTextBeginIdx != std::string::npos && selectedTextBeginIdx != selectedTextEndIdx) {
-            float selectedX = getRealCursorPos(selectedTextBeginIdx, font, text);
-            DrawRectangle(rect.x+selectedX, rect.y, getRealCursorPos(selectedTextEndIdx, font, text)-selectedX, rect.height, {100,100,100,50});
+        if (selectedTextStartIdx != std::string::npos && selectedTextStartIdx != selectedTextFinalIdx) {
+            float selectedX, selectedWidth;
+            
+            if (selectedTextFinalIdx > selectedTextStartIdx) {
+                selectedX = getRealCursorPos(selectedTextStartIdx, font, text);
+                selectedWidth = getRealCursorPos(selectedTextFinalIdx, font, text)-selectedX;
+            } else {
+                selectedX = getRealCursorPos(selectedTextFinalIdx, font, text);
+                selectedWidth = getRealCursorPos(selectedTextStartIdx, font, text)-selectedX;
+            }
+            
+            DrawRectangle(rect.x+selectedX, rect.y, selectedWidth, rect.height, {100,100,100,50});
         }
     }
-
 
     EndScissorMode();
 }
@@ -77,40 +85,36 @@ void Meatball::InputTextBox::update() {
     */
     
     if (IsKeyPressed(KEY_LEFT) || IsKeyPressedRepeat(KEY_LEFT)) {
-        if (selectMode && selectedTextEndIdx == selectedTextBeginIdx)
-                    selectedTextEndIdx = cursorPos;
+        if (selectMode && selectedTextStartIdx == std::string::npos)
+            selectedTextStartIdx = cursorPos;
 
         if (moveMode) {
             while (cursorPos != 0 && text[cursorPos-1] == ' ') --cursorPos;
             while (cursorPos != 0 && text[cursorPos-1] != ' ') --cursorPos;
         } else if (cursorPos != 0) --cursorPos;
         
-        if (selectMode) {
-            if (selectedTextBeginIdx >= cursorPos)
-                selectedTextBeginIdx = cursorPos;
-            else selectedTextEndIdx = cursorPos;
-        } else {
-            selectedTextBeginIdx = std::string::npos;
-            selectedTextEndIdx = std::string::npos;
+        if (selectMode)
+            selectedTextFinalIdx = cursorPos;
+        else {
+            selectedTextStartIdx = std::string::npos;
+            selectedTextFinalIdx = std::string::npos;
         }
     }
     
     else if (IsKeyPressed(KEY_RIGHT) || IsKeyPressedRepeat(KEY_RIGHT)) {
-        if (selectMode && selectedTextBeginIdx == selectedTextEndIdx)
-                    selectedTextBeginIdx = cursorPos;
+        if (selectMode && selectedTextStartIdx == std::string::npos)
+            selectedTextStartIdx = cursorPos;
         
         if (moveMode) {
             while (cursorPos != text.size() && text[cursorPos] == ' ') ++cursorPos;
             while (cursorPos != text.size() && text[cursorPos] != ' ') ++cursorPos;
         } else if (cursorPos != text.size()) ++cursorPos;
         
-        if (selectMode) {
-            if (selectedTextEndIdx <= cursorPos || selectedTextEndIdx == std::string::npos)
-                selectedTextEndIdx = cursorPos;
-            else selectedTextBeginIdx = cursorPos;
-        } else {
-            selectedTextBeginIdx = std::string::npos;
-            selectedTextEndIdx = std::string::npos;
+        if (selectMode)
+            selectedTextFinalIdx = cursorPos;
+        else {
+            selectedTextStartIdx = std::string::npos;
+            selectedTextFinalIdx = std::string::npos;
         }
     }
 
