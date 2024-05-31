@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(Meatball VERSION 0.1.0 LANGUAGES C CXX)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 file(GLOB SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/src/Interface/*.cpp ${PROJECT_SOURCE_DIR}/src/Utils/*.cpp)
 
 add_library(Meatball SHARED ${SOURCES})
