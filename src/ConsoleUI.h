@@ -11,7 +11,7 @@
 #include "Utils/Utils.h"
 
 #ifndef CONSOLEUI_OUTPUT_MAX_LINES
-#define CONSOLEUI_OUTPUT_MAX_LINES 1000
+#define CONSOLEUI_OUTPUT_MAX_LINES (unsigned int)1000
 #endif
 
 #ifndef CONSOLEUI_INPUT_MAX_HISTORY

@@ -13,16 +13,16 @@ static void setupScrollBarColors(Meatball::ScrollBar* scrollBar) {
     scrollBar->thumbHoveredColor2 = (Color){90,90,90,255};
 }
 
-Meatball::ScrollBar::ScrollBar() : rect({0,0,0,0}), visible(false),
+Meatball::ScrollBar::ScrollBar() : visible(false), rect({0,0,0,0}),
  barHovered(false), thumbHovered(false), thumbY(0), thumbHeight(rect.height),
- dragging(false), dragOffsetY(0) {
+ scrollValue(0), dragging(false), dragOffsetY(0) {
     setupScrollBarColors(this);
 }
 
 Meatball::ScrollBar::ScrollBar(Rectangle rect, bool visible)
-    : rect(rect), visible(visible),
-    barHovered(false), thumbHovered(false), thumbY(0),
-    thumbHeight(rect.height), dragging(false), dragOffsetY(0) {
+    : visible(visible), rect(rect), barHovered(false),
+    thumbHovered(false), thumbY(0), thumbHeight(rect.height),
+    scrollValue(0), dragging(false), dragOffsetY(0) {
         setupScrollBarColors(this);
     }
 

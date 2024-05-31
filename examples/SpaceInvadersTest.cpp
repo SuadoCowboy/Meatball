@@ -12,7 +12,7 @@
 
 namespace Config = Meatball::Config;
 
-static void emptyCommand(HayBCMD::Command* pCommand, const std::vector<std::string>& args) {}
+static void emptyCommand(HayBCMD::Command*, const std::vector<std::string>&) {}
 
 int main(int, char**)
 {

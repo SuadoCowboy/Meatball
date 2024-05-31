@@ -11,15 +11,15 @@ static float getRealCursorPos(unsigned int cursorPos, Font* font, const std::str
 }
 
 Meatball::InputTextBox::InputTextBox()
-    : color(BLACK), textColor(WHITE), cursorColor(WHITE), cursorPos(0),
-    offsetX(0), focused(false), selectedTextStartIdx(std::string::npos), selectedTextFinalIdx(std::string::npos) {
+    : color(BLACK), textColor(WHITE), cursorColor(WHITE), focused(false), cursorPos(0),
+    offsetX(0), selectedTextStartIdx(std::string::npos), selectedTextFinalIdx(std::string::npos) {
     rect = {0,0,0,0};
     font = FontsHandler::get("default");
 }
 
 Meatball::InputTextBox::InputTextBox(float x, float y, float width, float height, Font* font)
- : color(BLACK), textColor(WHITE), cursorColor(WHITE), font(font), cursorPos(0),
- offsetX(0), focused(false), selectedTextStartIdx(std::string::npos), selectedTextFinalIdx(std::string::npos) {
+ : font(font), color(BLACK), textColor(WHITE), cursorColor(WHITE), focused(false), cursorPos(0),
+ offsetX(0), selectedTextStartIdx(std::string::npos), selectedTextFinalIdx(std::string::npos) {
     rect = {x, y, width, height};
 }
 

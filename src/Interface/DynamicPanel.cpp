@@ -1,18 +1,16 @@
 #include "DynamicPanel.h"
 
 Meatball::DynamicPanel::DynamicPanel()
- : color(BLACK), rect({0,0,0,0}), offset({0,0}), minSize({1,1}), grabHeight(2),
- resizing(false), dragging(false), resizingFromN(false), resizingFromW(false) {}
+ : color(BLACK), rect({0,0,0,0}), minSize({1,1}), grabHeight(2), offset({0,0}), dragging(false),
+ resizing(false), resizingFromN(false), resizingFromW(false), wasHovered(false) {}
 
 Meatball::DynamicPanel::DynamicPanel(Rectangle rect, Vector2 minSize)
- : rect(rect), offset({0,0}), minSize(minSize), grabHeight(2),
- resizing(false), dragging(false), resizingFromN(false), resizingFromW(false) {}
+ : rect(rect), minSize(minSize), grabHeight(2), offset({0,0}),
+ dragging(false), resizing(false), resizingFromN(false), resizingFromW(false), wasHovered(false) {}
 
 Meatball::DynamicPanel::DynamicPanel(float x, float y, float width, float height, Vector2 minSize)
- : offset({0,0}), minSize(minSize),
- resizing(false), dragging(false), resizingFromN(false), resizingFromW(false) {
-    rect = {x, y, width, height};
-}
+ : rect({x,y,width,height}), minSize(minSize), grabHeight(2), offset({0,0}),
+ dragging(false), resizing(false), resizingFromN(false), resizingFromW(false), wasHovered(false) {}
 
 void Meatball::DynamicPanel::update() {
     Vector2 mousePos = GetMousePosition();
@@ -129,7 +127,7 @@ void Meatball::DynamicPanel::update() {
         rect.x = mousePos.x-offset.x;
         rect.y = mousePos.y-offset.y;
 
-        if (onMove && rect.x != oldX || oldY != rect.y) onMove();
+        if (onMove && (rect.x != oldX || oldY != rect.y)) onMove();
     
     } else if (resizing) {
         float oldX = rect.x;
@@ -168,8 +166,8 @@ void Meatball::DynamicPanel::update() {
         if (rect.width < minSize.x) rect.width = minSize.x;
         if (rect.height < minSize.y) rect.height = minSize.y;
 
-        if (onResize && oldWidth != rect.width || oldHeight != rect.height) onResize(); // onResize should also call onMove
-        else if (onMove && oldX != rect.x || oldY != rect.y) onMove();
+        if (onResize && (oldWidth != rect.width || oldHeight != rect.height)) onResize(); // onResize should also call onMove
+        else if (onMove && (oldX != rect.x || oldY != rect.y)) onMove();
     }
 }
 
