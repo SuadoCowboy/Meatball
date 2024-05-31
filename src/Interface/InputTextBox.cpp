@@ -112,7 +112,7 @@ void Meatball::InputTextBox::update() {
             SetClipboardText(text.substr(selectedTextFinalIdx > selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx, selectedTextFinalIdx > selectedTextStartIdx? selectedTextFinalIdx-selectedTextStartIdx
              : selectedTextStartIdx-selectedTextFinalIdx).c_str());
         
-        else if (IsKeyPressed(KEY_V)) {
+        else if (IsKeyPressed(KEY_V) || IsKeyPressedRepeat(KEY_V)) {
             const char* clipboard = GetClipboardText();
 
             size_t i = 0;
@@ -260,9 +260,9 @@ void Meatball::InputTextBox::update() {
     
     } else {
         float x = getRealCursorPos(cursorPos, font, text);
-        if (x-offsetX > rect.width)
+        if (x-offsetX > rect.width || x-offsetX < 0 || offsetX > rect.width) {
             offsetX = x-rect.width+1;
-        else if (x-offsetX < 0)
-            offsetX = x-1;
+            if (offsetX < 0) offsetX = 0;
+        }
     }
 }
