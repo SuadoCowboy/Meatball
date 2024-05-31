@@ -70,7 +70,30 @@ void Meatball::InputTextBox::update() {
             }
             
             cursorPos = newCursorPos;
+            selectedTextStartIdx = selectedTextFinalIdx = std::string::npos;
+            mousePressed = true;
         }
+    }
+
+    if (mousePressed) {
+        if (text.size() != 0 && IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            if (selectedTextStartIdx == std::string::npos)
+                selectedTextStartIdx = cursorPos;
+            
+            float newCursorPos = 0;
+            float textWidth = 0;
+            
+            while (newCursorPos < text.size() && textWidth < GetMouseX()-rect.x+offsetX) {
+                textWidth += fh::MeasureTextWidth(font, text.substr(newCursorPos, 1).c_str())+1;
+                ++newCursorPos;
+            }
+            
+            cursorPos = newCursorPos;
+            selectedTextFinalIdx = cursorPos;
+        }
+
+        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+            mousePressed = false;
     }
 
     if (!focused) return;
