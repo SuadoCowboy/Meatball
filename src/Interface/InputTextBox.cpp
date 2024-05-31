@@ -57,36 +57,87 @@ void Meatball::InputTextBox::update() {
             
             cursorPos = newCursorPos;
         }
-
     }
 
     if (!focused) return;
+
+    if (IsKeyDown(KEY_LEFT_CONTROL)) { // Move
+        if (cursorPos != 0) { // left logic
+            if (IsKeyPressed(KEY_LEFT) || IsKeyPressedRepeat(KEY_LEFT)) {
+                while (cursorPos != 0 && text[cursorPos-1] == ' ') --cursorPos; // skip whitespaces to go to word if there's any
+                while (cursorPos != 0 && text[cursorPos-1] != ' ') --cursorPos; // skip the word until end of the word
+            
+            } else if (IsKeyPressed(KEY_BACKSPACE) || IsKeyPressedRepeat(KEY_BACKSPACE)) {
+                // if already erased space, to not erase other chars
+                bool usedSpaceVersion = false;
+                
+                while (cursorPos != 0 && text[cursorPos-1] == ' ') {
+                    text.erase(text.begin()+cursorPos-1);
+                    --cursorPos;
+                    usedSpaceVersion = true;
+                }
+                
+                if (!usedSpaceVersion) while (cursorPos != 0 && text[cursorPos-1] != ' ') {
+                    text.erase(text.begin()+cursorPos-1);
+                    --cursorPos;
+                }
+                
+                if (onTextChange) onTextChange(text);
+            }
+        }
+        if (cursorPos != text.size()) { // right logic
+            if (IsKeyPressed(KEY_RIGHT) || IsKeyPressedRepeat(KEY_RIGHT)) {
+                while (cursorPos != text.size() && text[cursorPos] == ' ') ++cursorPos;
+                while (cursorPos != text.size() && text[cursorPos] != ' ') ++cursorPos;
+            
+            } else if (IsKeyPressed(KEY_DELETE) || IsKeyPressedRepeat(KEY_DELETE)) {
+                // if already erased space, to not erase other chars
+                bool usedSpaceVersion = false;
+                
+                while (cursorPos != text.size() && text[cursorPos] == ' ') {
+                    text.erase(text.begin()+cursorPos);
+                    usedSpaceVersion = true;
+                }
+                
+                if (!usedSpaceVersion) while (cursorPos != text.size() && text[cursorPos] != ' ')
+                    text.erase(text.begin()+cursorPos);
+                
+                if (onTextChange) onTextChange(text);
+            }
+        }
+        
+        // CTRL+A/LEFT/RIGHT/ (MAYBE)+SHIFT+LEFT/RIGHT
+        /*
+        Possibilities:
+        A = SELECT ALL(todo select logic)
+        */
+    } else if (IsKeyDown(KEY_LEFT_SHIFT)) { // Select
+
+    }
+
+    else if ((IsKeyPressedRepeat(KEY_LEFT) || IsKeyPressed(KEY_LEFT)) && cursorPos != 0)
+        --cursorPos;
+    else if ((IsKeyPressedRepeat(KEY_RIGHT) || IsKeyPressed(KEY_RIGHT)) && cursorPos != text.size())
+        ++cursorPos;
+
+    else if ((IsKeyPressed(KEY_BACKSPACE) || IsKeyPressedRepeat(KEY_BACKSPACE)) && cursorPos != 0) {
+        text.erase(text.begin()+cursorPos-1);
+        --cursorPos;
+        
+        if (onTextChange) onTextChange(text);
+    }
+
+    else if ((IsKeyPressed(KEY_DELETE) || IsKeyPressedRepeat(KEY_DELETE)) && cursorPos != text.size()) {
+        text.erase(text.begin()+cursorPos);
+        if (onTextChange) onTextChange(text);
+    }
     
     int codePoint = 0;
     if (codePoint = GetCharPressed(), codePoint) {
-        text = text.substr(0, cursorPos)+(char)codePoint+text.substr(cursorPos);
+        text.insert(text.begin()+cursorPos, (char)codePoint);
         if (onTextChange) onTextChange(text);
         
-        if (cursorPos != text.size())
-            ++cursorPos;
-        
-        float x = getRealCursorPos(cursorPos, font, text);
-        if (x-offsetX > rect.width)
-            offsetX = x-rect.width+1;
-    }
-    
-    if ((IsKeyPressedRepeat(KEY_BACKSPACE) || IsKeyPressed(KEY_BACKSPACE)) && text.size() != 0) {
-        text = text.substr(0, cursorPos-1)+text.substr(cursorPos);
-        if (onTextChange) onTextChange(text);
-
-        if (cursorPos != 0)
-            --cursorPos;
-        
-        float x = getRealCursorPos(cursorPos, font, text);
-        if (x-offsetX < 0) {
-            offsetX = x-rect.width;
-            if (offsetX < 0) offsetX = 0;
-        }
+        ++cursorPos;
     }
 
     if (onSend && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER)) && text.size() != 0) {
@@ -94,12 +145,11 @@ void Meatball::InputTextBox::update() {
         text.clear();
         cursorPos = text.size();
         offsetX = 0;
+    } else {
+        float x = getRealCursorPos(cursorPos, font, text);
+        if (x-offsetX > rect.width)
+            offsetX = x-rect.width+1;
+        else if (x-offsetX < 0)
+            offsetX = x-1;
     }
-
-    // TODO: mouse click detection
-
-    if ((IsKeyPressedRepeat(KEY_LEFT) || IsKeyPressed(KEY_LEFT)) && cursorPos != 0)
-        --cursorPos;
-    if ((IsKeyPressedRepeat(KEY_RIGHT) || IsKeyPressed(KEY_RIGHT)) && cursorPos != text.size())
-        ++cursorPos;
 }
