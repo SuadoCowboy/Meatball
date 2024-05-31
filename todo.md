@@ -1,5 +1,5 @@
 # WARNINGS:
-- Alot of objects might create alot of new colors in memory.
+- Alot of objects might create alot of new colors in memory. Not only that but probably other data types... What I want to come over with is yet another data handler that stores the data and all classes variables uses pointers.
 
 
 # TODOS (to actually do them right know):
