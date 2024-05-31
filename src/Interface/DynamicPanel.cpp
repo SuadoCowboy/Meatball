@@ -12,6 +12,14 @@ Meatball::DynamicPanel::DynamicPanel(float x, float y, float width, float height
  : rect({x,y,width,height}), minSize(minSize), grabHeight(2), offset({0,0}),
  dragging(false), resizing(false), resizingFromN(false), resizingFromW(false), wasHovered(false) {}
 
+static void fitXYInRenderScreen(Rectangle& rect, const Vector2& minPos, const Vector2& maxPos) {
+    if (rect.x < minPos.x) rect.x = minPos.x;
+    else if (rect.x > GetRenderWidth()-maxPos.x) rect.x = GetRenderWidth()-maxPos.x;
+    
+    if (rect.y < minPos.y) rect.y = minPos.y;
+    else if (rect.y > GetRenderHeight()-maxPos.y) rect.y = GetRenderHeight()-maxPos.y;
+}
+
 void Meatball::DynamicPanel::update() {
     Vector2 mousePos = GetMousePosition();
     if (!dragging && !resizing && !CheckCollisionPointRec(mousePos, {rect.x, rect.y, rect.width, rect.height})) {
@@ -27,7 +35,7 @@ void Meatball::DynamicPanel::update() {
     // Dragging and Resizing
     if (!resizing && !dragging) {
     SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    if (CheckCollisionPointRec(mousePos, {rect.x, rect.y+2, rect.width, grabHeight})) {
+    if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y+2, rect.width-4, grabHeight})) {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.y};
@@ -127,6 +135,8 @@ void Meatball::DynamicPanel::update() {
         rect.x = mousePos.x-offset.x;
         rect.y = mousePos.y-offset.y;
 
+        fitXYInRenderScreen(rect, {6-rect.width, 6-rect.height}, {6, 6});
+
         if (onMove && (rect.x != oldX || oldY != rect.y)) onMove();
     
     } else if (resizing) {
@@ -165,6 +175,8 @@ void Meatball::DynamicPanel::update() {
 
         if (rect.width < minSize.x) rect.width = minSize.x;
         if (rect.height < minSize.y) rect.height = minSize.y;
+
+        fitXYInRenderScreen(rect, {6-rect.width, 6-rect.height}, {6, 6});
 
         if (onResize && (oldWidth != rect.width || oldHeight != rect.height)) onResize(); // onResize should also call onMove
         else if (onMove && (oldX != rect.x || oldY != rect.y)) onMove();
