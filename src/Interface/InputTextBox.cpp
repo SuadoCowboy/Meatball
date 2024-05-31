@@ -67,9 +67,9 @@ void Meatball::InputTextBox::update() {
 
     if (!focused) return;
 
-    if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) { // Move
-        bool selectMode = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
+    bool selectMode = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
 
+    if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) { // Move
         if (cursorPos != 0) { // left logic
             if (IsKeyPressed(KEY_LEFT) || IsKeyPressedRepeat(KEY_LEFT)) {
                 // conditions are: shift key down;
@@ -118,7 +118,7 @@ void Meatball::InputTextBox::update() {
                 while (cursorPos != text.size() && text[cursorPos] != ' ') ++cursorPos;
                 
                 if (selectMode) {
-                    if (selectedTextEndIdx < cursorPos)
+                    if (selectedTextEndIdx < cursorPos || selectedTextEndIdx == std::string::npos)
                         selectedTextEndIdx = cursorPos;
                     else selectedTextBeginIdx = cursorPos;
                 } else {
@@ -147,10 +147,6 @@ void Meatball::InputTextBox::update() {
         Possibilities:
         A = SELECT ALL(todo select logic)
         */
-    
-    } else if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) { // Select
-
-    }
 
     else if (IsKeyPressed(KEY_LEFT) || IsKeyPressedRepeat(KEY_LEFT)) {
         if (cursorPos != 0) --cursorPos;
