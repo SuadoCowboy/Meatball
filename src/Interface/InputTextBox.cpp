@@ -148,7 +148,7 @@ void Meatball::InputTextBox::update() {
         A = SELECT ALL(todo select logic)
         */
 
-    else if (IsKeyPressed(KEY_LEFT) || IsKeyPressedRepeat(KEY_LEFT)) {
+    } else if (IsKeyPressed(KEY_LEFT) || IsKeyPressedRepeat(KEY_LEFT)) {
         if (cursorPos != 0) --cursorPos;
         selectedTextBeginIdx = std::string::npos;
         selectedTextEndIdx = std::string::npos;
