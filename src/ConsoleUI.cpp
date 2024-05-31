@@ -70,8 +70,8 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 	mainPanel.onResize();
 
 	mainPanel.minSize = {
-		outputBox.getScrollBar().getRect().width+margin*2+fh::MeasureTextWidth(labelFont, labelText),
-		outputBox.font->baseSize+inputBox.rect.height+margin*2};
+		(int)outputBox.getScrollBar().getRect().width+margin*2+fh::MeasureTextWidth(labelFont, labelText),
+		(int)outputBox.font->baseSize+inputBox.rect.height+margin*2};
 
 	// add auto completion
 	inputBox.onTextChange = [&](const std::string& text) {
