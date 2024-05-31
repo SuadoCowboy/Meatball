@@ -5,6 +5,7 @@
 # TODOS (to actually do them right know):
 - InputBox mouse select string
 - colors should use references, pointers OR (static) variables in another class.
+- handle the issue of copying data instead of referencing it or using a pointer(maybe every data is a pointer and whatever... I mean, DDNet uses lots of pointers right? Maybe It's reason is the same as mine: let there be no RAM usage :) )
 
 # FUTURE TODOS:
 - optimize code and use the right data structures. Also research const char* vs char[] vs std::string and look which is better and for what
