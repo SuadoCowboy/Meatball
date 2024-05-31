@@ -12,8 +12,6 @@
 
 namespace Config = Meatball::Config;
 
-static void emptyCommand(HayBCMD::Command*, const std::vector<std::string>&) {}
-
 int main(int, char**)
 {
     // 1st task: create a simple space invaders(2d game) copy using Meatball
@@ -37,10 +35,7 @@ int main(int, char**)
         if (backgroundColorData != nullptr)
             backgroundColor = backgroundColorData->colorV;
     }
-
-    for (unsigned char i = 0; i < 100; i++)
-        HayBCMD::Command(HayBCMD::formatString("this_is_a_big_fucking_command{}", (int)i), 0, 0, emptyCommand, "that's just a empty function frfr");
-
+    
     while (!WindowShouldClose()) {
         ClearBackground(backgroundColor);
         
