@@ -4,7 +4,6 @@
 
 # TODOS (to actually do them right know):
 - InputBox CTRL+A/LEFT/RIGHT/ (MAYBE)+SHIFT+LEFT/RIGHT
-- InputBox Mouse click moves cursor
 - InputBox mouse select string
 - colors should use references, pointers OR (static) variables in another class.
 
