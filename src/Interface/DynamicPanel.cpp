@@ -139,15 +139,13 @@ void Meatball::DynamicPanel::update() {
 
         if (offset.x != -1) {
             if (resizingFromW) {
-                float xBefore = rect.x;
                 rect.x = mousePos.x-offset.x;
                 
-                if (xBefore+rect.width > rect.x)
-                    rect.width -= rect.x-xBefore;
-                
+                if (rect.width-rect.x+oldX > minSize.x)
+                    rect.width -= rect.x-oldX;
                 else {
-                    rect.x = xBefore+rect.width-1;
-                    rect.width = 1;
+                    rect.x = oldX+rect.width-minSize.x;
+                    rect.width = minSize.x;
                 }
             
             } else rect.width = mousePos.x-offset.x;
@@ -155,15 +153,13 @@ void Meatball::DynamicPanel::update() {
         
         if (offset.y != -1) {
             if (resizingFromN) {
-                float yBefore = rect.y;
                 rect.y = mousePos.y-offset.y;
                 
-                if (yBefore+rect.height > rect.y)
-                    rect.height -= rect.y-yBefore;
-                
+                if (rect.height-rect.y+oldY > minSize.y)
+                    rect.height -= rect.y-oldY;
                 else {
-                    rect.y = yBefore+rect.height-1;
-                    rect.height = 1;
+                    rect.y = oldY+rect.height-minSize.y;
+                    rect.height = minSize.y;
                 }
             
             } else rect.height = mousePos.y-offset.y;
@@ -172,8 +168,8 @@ void Meatball::DynamicPanel::update() {
         if (rect.width < minSize.x) rect.width = minSize.x;
         if (rect.height < minSize.y) rect.height = minSize.y;
 
-        if (onMove && oldX != rect.x || oldY != rect.y) onMove();
-        if (onResize && oldWidth != rect.width || oldHeight != rect.height) onResize();
+        if (onResize && oldWidth != rect.width || oldHeight != rect.height) onResize(); // onResize should also call onMove
+        else if (onMove && oldX != rect.x || oldY != rect.y) onMove();
     }
 }
 
