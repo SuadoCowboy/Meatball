@@ -2,25 +2,32 @@
 - Alot of objects might create alot of new colors in memory. Not only that but probably other data types... What I want to come over with is yet another data handler that stores the data and all classes variables uses pointers.
 
 # TODOS:
+- colors that are equal in other classes can be pointers(ex: text color), so use a init.meatdata or something to set those values
 - change draw functions to let developer choose what he wants to draw
-- add functions related to drawing
-- create a .meatui(maybe delete .meatdata or use for another thing that .cfg can't do) file extension to make it possible to create a user interface. Should also include a meatUILoader.dll and meatUIViewer.exe in bin folder so that users can test their interfaces without joining the game everytime. Example: for Console, .meatui, the user have some options: mainPanel, closeButton, sendButton(optional), inputBox and OutputTextBox.
+- create a .meatui(maybe delete .meatdata or use for another thing that .cfg can't do) file extension to make it possible to create a user interface. Should also include a meatUILoader.dll and meatUIViewer.exe in bin folder so that users can test their interfaces without joining the game everytime. Example: for Console, .meatui, the user have some options: mainPanel, closeButton, sendButton(optional), inputBox and OutputTextBox. !!! Also set a macro to define its actual version because it could change alot in the future
 It would be something like this:
 ```py
 #      x y width height style   objectName
-Button x y width height STYLE_X "closeButton" # with limits to the numbers so that user won't crash its own game;
+Button x y width height STYLE_X "closeButton"
 
-#            x y width height style defaultText                  objectName
+#            x y width height borderRadius objectName
+DynamicPanel x y width height 0           "mainPanel"
+
+# Optional stuff: use Void objectName
+Void "sendButton"
+
+#            x y width height defaultText                        objectName
 InputTextBox x y width height "default text written in input box" "inputBox"
-#             x y width height scrollBarVisibleOnStart objectName
-ScrollTextBox x y width height 0                      "outputBox"
-# Optional stuff: just don't place anything related to it in the .meatui.
+
+#             x y width height objectName
+ScrollTextBox x y width height "outputBox"
 
 # TODOS:
 # if game does not recognize objectName: tell user
 # if objectName is already defined: warn user and use the already defined instead
 # if x y width height is wrong: warn user but still let it pass with default values
-# if type is not allowed for objectName: tell user and stop running(might be dangerous)
+# if type is not allowed for objectName: tell user and stop running(because it might be dangerous)
+# if a objectName is not defined in the end: tell user and stop running(because it might be dangerous)
 ```
 
 # FUTURE TODOS:
