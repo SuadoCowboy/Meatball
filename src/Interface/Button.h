@@ -30,20 +30,16 @@ namespace Meatball {
         /// @brief draws a X inside the rect bounds
         void drawX();
 
-        //bool isCollidedX/Rect(); // are those needed?
-
         bool isHovered();
 
-        VoidFunc onRelease, onHover;
-
-        Rectangle rect;
-        Color color, hoveredColor, textColor, textHoveredColor;
-        
         const std::string& getText();
 
         void setText(std::string newText);
-    
-        Font* font;
+
+        VoidFunc onRelease, onHover;
+        Rectangle rect;
+        Color *color, *hoveredColor, *textColor, *hoveredTextColor; // colors that are equal in other interfaces
+        Font *font;
 
     private:
         bool hovered;

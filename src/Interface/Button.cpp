@@ -2,17 +2,20 @@
 
 #include "Utils/Utils.h"
 #include "FontsHandler.h"
+#include "ColorsHandler.h"
 
 using fh = Meatball::FontsHandler;
+using ch = Meatball::ColorsHandler;
 
-static inline void setupButton(Meatball::Button* button) {
+static inline void setupButton(Meatball::Button *button) {
     button->onHover = nullptr;
+    button->onRelease = nullptr;
 
-    button->color = BLACK;
-    button->hoveredColor = WHITE;
+    button->color = ch::get("button");
+    button->hoveredColor = ch::get("buttonHovered");
 
     button->textColor = WHITE;
-    button->textHoveredColor = RAYWHITE;
+    button->hoveredTextColor = RAYWHITE;
 }
 
 Meatball::Button::Button() : rect{.x=0,.y=0,.width=0,.height=0} {
@@ -49,13 +52,13 @@ void Meatball::Button::setText(std::string newText) {
 
 void Meatball::Button::drawText()
 {   
-    fh::DrawText(font,text.c_str(), rect.x, rect.y, hovered? textHoveredColor : textColor);
+    fh::DrawText(font,text.c_str(), rect.x, rect.y, hovered? hoveredTextColor : textColor);
 }
 
 void Meatball::Button::drawTextCentered(bool centerX, bool centerY) {
     int textWidthHalf = fh::MeasureTextWidth(font, text.c_str())/2;
 
-    fh::DrawText(font, text.c_str(), centerX? rect.x+rect.width/2-textWidthHalf : rect.x, centerY? rect.y+rect.height/2-font->baseSize/2 : rect.y, hovered? textHoveredColor : textColor);
+    fh::DrawText(font, text.c_str(), centerX? rect.x+rect.width/2-textWidthHalf : rect.x, centerY? rect.y+rect.height/2-font->baseSize/2 : rect.y, hovered? hoveredTextColor : textColor);
 }
 
 void Meatball::Button::drawRect() {

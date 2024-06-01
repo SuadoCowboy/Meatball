@@ -14,7 +14,7 @@ namespace Meatball {
     class ScrollTextBox {
     public:
         ScrollTextBox();
-        ScrollTextBox(float x, float y, float width, float height, Font* font);
+        ScrollTextBox(float x, float y, float width, float height, Font *font);
 
         const Rectangle& getRect() const;
         const unsigned int& getContentHeight() const;
@@ -39,7 +39,7 @@ namespace Meatball {
         void setPosition(float x, float y);
         void setSize(float width, float height);
 
-        Font* font;
+        Font *font;
 
     private:
         std::list<std::string> text;

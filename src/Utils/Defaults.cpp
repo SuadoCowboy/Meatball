@@ -18,18 +18,18 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
     
     auto consoleData = Config::loadData(meatdataPath);
     
-    Config::ConfigData* data = Config::ifContainsGet(consoleData, "margin");
+    Config::ConfigData *data = Config::ifContainsGet(consoleData, "margin");
     Meatball::ConsoleUIScene::margin = data?
         data->unsignedCharV : Meatball::ConsoleUIScene::margin;
 
-    Config::ConfigData* fontSizeData = Config::ifContainsGet(consoleData, "fontSize");
-    Config::ConfigData* fontData = Config::ifContainsGet(consoleData, "font");
+    Config::ConfigData *fontSizeData = Config::ifContainsGet(consoleData, "fontSize");
+    Config::ConfigData *fontData = Config::ifContainsGet(consoleData, "font");
 
     // WARNING: if the developer does not use this function, he might need to define a default font
     FontsHandler::add(GetFontDefault(), "default");
 
-    Font* halfSizedFont = nullptr;
-    Font* font = nullptr;
+    Font *halfSizedFont = nullptr;
+    Font *font = nullptr;
     if (fontData) {
         std::filesystem::path fontPath = fontData->stringV;
         std::string fontName = fontPath.filename().string();

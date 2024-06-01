@@ -11,7 +11,7 @@ unsigned char Meatball::ConsoleUIScene::margin = 4;
 
 using fh = Meatball::FontsHandler;
 
-Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float height, Font* font, Font* _labelFont, bool visible)
+Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float height, Font *font, Font *_labelFont, bool visible)
 	: Scene(), visible(visible) {
 	mainPanel = {x, y, width, height};
 	
@@ -89,7 +89,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(float x, float y, float width, float he
 
 		size_t spaceIdx = text.find(' ');
 		std::string commandName = text.substr(0, spaceIdx);
-		HayBCMD::Command* pCommand = HayBCMD::Command::getCommand(commandName, false);
+		HayBCMD::Command *pCommand = HayBCMD::Command::getCommand(commandName, false);
 		if (pCommand) {
 			autoCompleteBox.pushText(pCommand->name+" "+pCommand->usage, autoCompleteTextColor);
 			return;

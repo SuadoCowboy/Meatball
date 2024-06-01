@@ -9,7 +9,7 @@ Meatball::ColoredTextBox::ColoredTextBox() : color(BLACK) {
     font = FontsHandler::get("default");
 }
 
-Meatball::ColoredTextBox::ColoredTextBox(float x, float y, float width, float height, Font* font)
+Meatball::ColoredTextBox::ColoredTextBox(float x, float y, float width, float height, Font *font)
     : font(font), color(BLACK) {
         rect = {x, y, width, height};
 }

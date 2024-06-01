@@ -12,13 +12,13 @@ Meatball::ScrollTextBox::ScrollTextBox()
         setPosition(0,0);
     }
 
-Meatball::ScrollTextBox::ScrollTextBox(float x, float y, float width, float height, Font* font)
+Meatball::ScrollTextBox::ScrollTextBox(float x, float y, float width, float height, Font *font)
     : color(BLACK), textColor(WHITE), font(font), contentHeight(0) {
         setSize(width, height);
         setPosition(x, y);
 }
 
-static inline void handleTextWrapping(std::list<std::string>& textList, const std::string& text, Font* font, float maxWidth) {
+static inline void handleTextWrapping(std::list<std::string>& textList, const std::string& text, Font *font, float maxWidth) {
     textList.push_back("");
     std::string newText = text;
 

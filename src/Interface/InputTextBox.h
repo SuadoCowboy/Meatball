@@ -11,12 +11,12 @@ namespace Meatball {
     class InputTextBox {
     public:
         InputTextBox();
-        InputTextBox(float x, float y, float width, float height, Font* font);
+        InputTextBox(float x, float y, float width, float height, Font *font);
 
         void draw();
         void update();
 
-        Font* font;
+        Font *font;
 
         Color color, textColor, cursorColor;
         

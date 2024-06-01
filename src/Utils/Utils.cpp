@@ -1,6 +1,6 @@
 #include "Utils.h"
 
-void Meatball::checkHovered(bool& hovered, const Rectangle& rect, VoidFunc* onHover, VoidFunc* onRelease) {
+void Meatball::checkHovered(bool& hovered, const Rectangle& rect, VoidFunc *onHover, VoidFunc *onRelease) {
     bool wasHovered = hovered;
     hovered = CheckCollisionPointRec(GetMousePosition(), rect);
     

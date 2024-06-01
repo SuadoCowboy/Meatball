@@ -18,7 +18,7 @@
 #define CONSOLEUI_INPUT_MAX_HISTORY 30 // [0-255]
 #endif
 
-static void handleInputHistoryPos(Meatball::InputTextBox& inputBox, std::string* inputHistory, const unsigned char& inputHistorySize, unsigned char& inputHistoryPos) {
+static void handleInputHistoryPos(Meatball::InputTextBox& inputBox, std::string *inputHistory, const unsigned char& inputHistorySize, unsigned char& inputHistoryPos) {
     if ((IsKeyPressed(KEY_UP) || IsKeyPressedRepeat(KEY_UP)) && inputHistoryPos != 0)
         --inputHistoryPos;
     
@@ -40,7 +40,7 @@ namespace Meatball {
         /// @param width mainPanel width
         /// @param height mainPanel height
         /// @param visible if scene is visible or not(only this class uses this)
-        ConsoleUIScene(float x, float y, float width, float height, Font* font, Font* labelFont, bool visible = true);
+        ConsoleUIScene(float x, float y, float width, float height, Font *font, Font *labelFont, bool visible = true);
 
         /// @brief appends text to outputTextbox
         void print(const std::string& message);
@@ -129,7 +129,7 @@ namespace Meatball {
         // by default labelText = "Local Console"
         char labelText[20];
         Color labelColor;
-        Font* labelFont;
+        Font *labelFont;
 
         Color autoCompleteHighlightedTextColor, autoCompleteTextColor, autoCompleteSelectedTextColor;
 

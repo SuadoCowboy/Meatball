@@ -22,7 +22,7 @@ static bool handleSpaceError(size_t spaceIdx, size_t spaceIdxBefore, size_t line
     return false;
 }
 
-Meatball::Config::ConfigData* Meatball::Config::ifContainsGet(std::unordered_map<std::string, ConfigData>& data, const std::string& what) {
+Meatball::Config::ConfigData *Meatball::Config::ifContainsGet(std::unordered_map<std::string, ConfigData>& data, const std::string& what) {
     return data.count(what)? &data[what] : nullptr;
 }
 

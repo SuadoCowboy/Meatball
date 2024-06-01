@@ -28,4 +28,12 @@ namespace Meatball {
     /// @note autoCompleteHightlightTextColor COLOR RRR,GGG,BBB,AAA
     /// @note autoCompleteSelectedTextColor COLOR RRR,GGG,BBB,AAA
     ConsoleUIScene initLocalConsole(Rectangle rect, const std::string& meatdataPath);
+
+    /// @brief loads all the needed data
+    /// @note init meatdata consists of:
+    /// @note buttonColor COLOR RRR,GGG,BBB,AAA
+    /// @note buttonTextColor COLOR RRR,GGG,BBB,AAA
+    /// @note buttonHoveredColor COLOR RRR,GGG,BBB,AAA
+    /// @note buttonHoveredTextColor COLOR RRR,GGG,BBB,AAA
+    void init(const std::string& meatdataPath);
 }

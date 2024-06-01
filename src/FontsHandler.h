@@ -16,7 +16,7 @@ namespace Meatball {
         /// @param codePoints is a variable needed for raylib function LoadFontEx
         /// @param codePointsCount is a variable needed for raylib function LoadFontEx
         /// @note see also load function
-        static bool loadEx(std::filesystem::path path, std::string name, unsigned char fontSize, int* codePoints, int codePointsCount); 
+        static bool loadEx(std::filesystem::path path, std::string name, unsigned char fontSize, int *codePoints, int codePointsCount); 
         
         /// @brief loads a new font and adds it to the fonts variable
         /// @param path path to the file that contains the font
@@ -28,17 +28,17 @@ namespace Meatball {
 
         static bool add(Font font, const std::string& name);
 
-        static Vector2 MeasureText(Font* font, const char* text, float spacing = 1);
-        static float MeasureTextWidth(Font* font, const char* text, float spacing = 1);
-        static float MeasureTextHeight(Font* font, const char* text, float spacing = 1);
+        static Vector2 MeasureText(Font *font, const char *text, float spacing = 1);
+        static float MeasureTextWidth(Font *font, const char *text, float spacing = 1);
+        static float MeasureTextHeight(Font *font, const char *text, float spacing = 1);
 
         /// @brief unloads all fonts
         static void clear();
         
         /// @return font pointer or nullptr if does not exist 
-        static Font* get(const std::string& name);
+        static Font *get(const std::string& name);
 
-        static void DrawText(Font* font, const char* text, float x, float y, Color textColor, float spacing = 1);
+        static void DrawText(Font *font, const char *text, float x, float y, Color textColor, float spacing = 1);
     private:
         static std::unordered_map<std::string, Font> fonts;
     };

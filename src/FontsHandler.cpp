@@ -2,7 +2,7 @@
 
 std::unordered_map<std::string, Font> Meatball::FontsHandler::fonts;
 
-static void use(Font* font) {
+static void use(Font *font) {
     SetTextLineSpacing(font->baseSize);
 }
 
@@ -15,7 +15,7 @@ bool Meatball::FontsHandler::load(std::filesystem::path path, std::string name) 
     return true;
 }
 
-bool Meatball::FontsHandler::loadEx(std::filesystem::path path, std::string name, unsigned char fontSize, int* codePoints, int codePointsCount) {
+bool Meatball::FontsHandler::loadEx(std::filesystem::path path, std::string name, unsigned char fontSize, int *codePoints, int codePointsCount) {
     if (fonts.count(name) != 0
         || !std::filesystem::exists(path)
         || std::filesystem::is_directory(path)) return false;
@@ -31,23 +31,23 @@ void Meatball::FontsHandler::unload(const std::string& name) {
     fonts.erase(name);
 }
 
-Font* Meatball::FontsHandler::get(const std::string& name) {
+Font *Meatball::FontsHandler::get(const std::string& name) {
     if (fonts.count(name) == 0) return nullptr;
 
     return &fonts[name];
 }
 
-Vector2 Meatball::FontsHandler::MeasureText(Font* font, const char* text, float spacing) {
+Vector2 Meatball::FontsHandler::MeasureText(Font *font, const char *text, float spacing) {
     use(font);
     return MeasureTextEx(*font, text, font->baseSize, spacing);
 }
 
-float Meatball::FontsHandler::MeasureTextWidth(Font* font, const char* text, float spacing) {
+float Meatball::FontsHandler::MeasureTextWidth(Font *font, const char *text, float spacing) {
     use(font);
     return MeasureTextEx(*font, text, font->baseSize, spacing).x;
 }
 
-float Meatball::FontsHandler::MeasureTextHeight(Font* font, const char* text, float spacing) {
+float Meatball::FontsHandler::MeasureTextHeight(Font *font, const char *text, float spacing) {
     use(font);
     return MeasureTextEx(*font, text, font->baseSize, spacing).y;
 }
@@ -59,7 +59,7 @@ bool Meatball::FontsHandler::add(Font font, const std::string& name) {
     return true;
 }
 
-void Meatball::FontsHandler::DrawText(Font* font, const char* text, float x, float y, Color textColor, float spacing) {
+void Meatball::FontsHandler::DrawText(Font *font, const char *text, float x, float y, Color textColor, float spacing) {
     //use(font); // is this required?
     DrawTextEx(*font, text, (Vector2){x, y}, font->baseSize, spacing, textColor);
 }

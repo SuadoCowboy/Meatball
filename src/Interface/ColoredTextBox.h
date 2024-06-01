@@ -13,7 +13,7 @@ namespace Meatball {
     class ColoredTextBox {
     public:
         ColoredTextBox();
-        ColoredTextBox(float x, float y, float width, float height, Font* font);
+        ColoredTextBox(float x, float y, float width, float height, Font *font);
     
         void pushText(const std::string& text, Color color);
 
@@ -23,7 +23,7 @@ namespace Meatball {
         
         Rectangle rect;
 
-        Font* font;
+        Font *font;
         Color color;
     };
 }

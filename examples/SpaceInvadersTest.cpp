@@ -5,6 +5,7 @@
 #include <HayBCMD.h>
 #include <ConsoleUI.h>
 #include <Utils/Defaults.h>
+#include <FontsHandler.h>
 #include <Config.h>
 
 #define WINDOW_WIDTH 1000
@@ -46,6 +47,8 @@ int main(int, char**)
 
         EndDrawing();
     }
+
+    Meatball::FontsHandler::clear();
 
     return 0;
 }

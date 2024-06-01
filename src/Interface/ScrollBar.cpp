@@ -4,7 +4,7 @@
 
 unsigned char Meatball::ScrollBar::scrollSpeed = 50;
 
-static void setupScrollBarColors(Meatball::ScrollBar* scrollBar) {
+static void setupScrollBarColors(Meatball::ScrollBar *scrollBar) {
     scrollBar->barColor = (Color){15,15,15,255};
     scrollBar->barHoveredColor = (Color){25,25,25,255};
 
@@ -48,7 +48,7 @@ void Meatball::ScrollBar::draw() {
 
     DrawRectangle(rect.x, rect.y, rect.width, rect.height, barHovered? barHoveredColor : barColor);
 
-    Color* actualScrollColor;
+    Color *actualScrollColor;
     if (barHovered) actualScrollColor = &thumbHoveredColor1;
     else actualScrollColor = &thumbColor;
     if (thumbHovered) actualScrollColor = &thumbHoveredColor2;
@@ -75,7 +75,7 @@ void Meatball::ScrollBar::update(const Rectangle& parentRect) {
     
     float mouseWheelMove = GetMouseWheelMove();
     if (mouseWheelMove != 0 && CheckCollisionPointRec(GetMousePosition(), parentRect)) {
-        thumbY -= mouseWheelMove * scrollSpeed * (thumbHeight/rect.height);
+        thumbY -= mouseWheelMove  *scrollSpeed  *(thumbHeight/rect.height);
     }
     
     if (dragging) {
@@ -97,6 +97,6 @@ const Rectangle& Meatball::ScrollBar::getRect() {
 void Meatball::ScrollBar::updateThumbHeight(float viewHeight, float contentHeight) {
     if (contentHeight < viewHeight) contentHeight = viewHeight;
     
-    thumbHeight = (viewHeight / contentHeight) * rect.height;
+    thumbHeight = (viewHeight / contentHeight)  *rect.height;
     if (thumbHeight < 1) thumbHeight = 1;
 }

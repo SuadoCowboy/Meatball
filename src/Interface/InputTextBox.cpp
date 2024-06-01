@@ -6,7 +6,7 @@
 
 using fh = Meatball::FontsHandler;
 
-static float getRealCursorPos(unsigned int cursorPos, Font* font, const std::string& text) {
+static float getRealCursorPos(unsigned int cursorPos, Font *font, const std::string& text) {
     return fh::MeasureTextWidth(font, text.substr(0, cursorPos).c_str())+1;
 }
 
@@ -17,7 +17,7 @@ Meatball::InputTextBox::InputTextBox()
     font = FontsHandler::get("default");
 }
 
-Meatball::InputTextBox::InputTextBox(float x, float y, float width, float height, Font* font)
+Meatball::InputTextBox::InputTextBox(float x, float y, float width, float height, Font *font)
  : font(font), color(BLACK), textColor(WHITE), cursorColor(WHITE), focused(false), cursorPos(0),
  offsetX(0), selectedTextStartIdx(std::string::npos), selectedTextFinalIdx(std::string::npos) {
     rect = {x, y, width, height};
@@ -113,7 +113,7 @@ void Meatball::InputTextBox::update() {
              : selectedTextStartIdx-selectedTextFinalIdx).c_str());
         
         else if (IsKeyPressed(KEY_V) || IsKeyPressedRepeat(KEY_V)) {
-            const char* clipboard = GetClipboardText();
+            const char *clipboard = GetClipboardText();
 
             size_t i = 0;
             if (selectedTextFinalIdx != std::string::npos) {
