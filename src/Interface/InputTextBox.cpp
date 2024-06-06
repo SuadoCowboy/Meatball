@@ -6,7 +6,7 @@
 
 using fh = Meatball::FontsHandler;
 
-static float getRealCursorPos(unsigned int cursorPos, Font *font, const std::string& text) {
+static float getRealCursorPos(unsigned int cursorPos, Font *font, const std::string &text) {
     return fh::MeasureTextWidth(font, text.substr(0, cursorPos).c_str())+1;
 }
 

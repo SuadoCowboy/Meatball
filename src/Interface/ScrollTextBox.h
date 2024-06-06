@@ -16,9 +16,9 @@ namespace Meatball {
         ScrollTextBox();
         ScrollTextBox(float x, float y, float width, float height, Font *font);
 
-        const Rectangle& getRect() const;
-        const unsigned int& getContentHeight() const;
-        ScrollBar& getScrollBar();
+        const Rectangle &getRect() const;
+        const unsigned int &getContentHeight() const;
+        ScrollBar &getScrollBar();
 
         void appendText(std::string text);
         void clearText();
@@ -29,7 +29,7 @@ namespace Meatball {
         /// @brief removes the text at index 0
         void popFront() noexcept;
 
-        const std::list<std::string>& getText() const;
+        const std::list<std::string> &getText() const;
 
         void draw();
         void update();

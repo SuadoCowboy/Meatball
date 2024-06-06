@@ -12,7 +12,7 @@ namespace Meatball {
         ScrollBar(Rectangle rect, bool visible = true);
         
         /// @param parentRect to check if the mouse is between parent's boundaries to use mouse wheel 
-        void update(const Rectangle& parentRect);
+        void update(const Rectangle &parentRect);
 
         void draw();
 
@@ -29,7 +29,7 @@ namespace Meatball {
         /// @warning should call updateThumbHeight and update after calling this function or else things might break
         void setSize(float width, float height);
         
-        const Rectangle& getRect();
+        const Rectangle &getRect();
 
         static unsigned char scrollSpeed;
     private:

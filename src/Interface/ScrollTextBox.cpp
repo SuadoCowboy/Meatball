@@ -18,7 +18,7 @@ Meatball::ScrollTextBox::ScrollTextBox(float x, float y, float width, float heig
         setPosition(x, y);
 }
 
-static inline void handleTextWrapping(std::list<std::string>& textList, const std::string& text, Font *font, float maxWidth) {
+static inline void handleTextWrapping(std::list<std::string> &textList, const std::string &text, Font *font, float maxWidth) {
     textList.push_back("");
     std::string newText = text;
 
@@ -38,13 +38,13 @@ static inline void handleTextWrapping(std::list<std::string>& textList, const st
 }
 
 void Meatball::ScrollTextBox::updateTextWrap() {
-    for (auto& currentText : text) {
+    for (auto &currentText : text) {
         std::string newText = "";
 
         if (currentText.find('\n') != std::string::npos) {
             bool foundNonNewLine = false;
             
-            for (auto& c : currentText) {
+            for (auto &c : currentText) {
                 if (c == '\n' && foundNonNewLine)
                     continue;
 
@@ -110,19 +110,19 @@ void Meatball::ScrollTextBox::popFront() noexcept {
     scrollBar.updateThumbHeight(rect.height, contentHeight);
 }
 
-const std::list<std::string>& Meatball::ScrollTextBox::getText() const {
+const std::list<std::string> &Meatball::ScrollTextBox::getText() const {
     return text;
 }
 
-const unsigned int& Meatball::ScrollTextBox::getContentHeight() const {
+const unsigned int &Meatball::ScrollTextBox::getContentHeight() const {
     return contentHeight;
 }
 
-const Rectangle& Meatball::ScrollTextBox::getRect() const {
+const Rectangle &Meatball::ScrollTextBox::getRect() const {
     return rect;
 }
 
-Meatball::ScrollBar& Meatball::ScrollTextBox::getScrollBar() {
+Meatball::ScrollBar &Meatball::ScrollTextBox::getScrollBar() {
     return scrollBar;
 }
 
@@ -146,7 +146,7 @@ void Meatball::ScrollTextBox::draw() {
     BeginScissorMode(rect.x, rect.y, rect.width-scrollBar.getRect().width, rect.height);
 
     size_t lineIdx = 0;
-    for (auto& line : text) {
+    for (auto &line : text) {
         size_t newLineIdx = 0;
         size_t newLineAmount = 0;
         while (newLineIdx != std::string::npos) {
