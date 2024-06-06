@@ -12,7 +12,7 @@ void Meatball::DynamicPanel::update() {
     Vector2 mousePos = GetMousePosition();
     if (!dragging && !resizing && !CheckCollisionPointRec(mousePos, {rect.x, rect.y, rect.width, rect.height})) {
         if (wasHovered) {
-            SetMouseCursor(MOUSE_CURSOR_DEFAULT); // what if two dynamic panels intersects?
+            SetMouseCursor(MOUSE_CURSOR_DEFAULT); // what if two dynamic panels intersects? TODO: test this case
             wasHovered = false;
         }
         return;
@@ -23,6 +23,7 @@ void Meatball::DynamicPanel::update() {
     // Dragging and Resizing
     if (!resizing && !dragging) {
     SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+    
     if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y+2, rect.width-4, config.grabHeight})) {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -32,7 +33,7 @@ void Meatball::DynamicPanel::update() {
     }
 
     // Resize North
-    if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y, rect.width-4, 2})) {
+    else if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y, rect.width-4, 2})) {
         SetMouseCursor(MOUSE_CURSOR_RESIZE_NS);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {-1, GetMouseY()-rect.y};
@@ -169,8 +170,4 @@ void Meatball::DynamicPanel::update() {
         if (onResize && (oldWidth != rect.width || oldHeight != rect.height)) onResize(); // onResize should also call onMove
         else if (onMove && (oldX != rect.x || oldY != rect.y)) onMove();
     }
-}
-
-void Meatball::DynamicPanel::draw() {
-    DrawRectangle(rect.x, rect.y, rect.width, rect.height, config.color);
 }

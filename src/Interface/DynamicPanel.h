@@ -14,7 +14,6 @@ namespace Meatball {
 
         /// @brief should only be updated if mouse is on it
         void update();
-        void draw();
 
         Config::DynamicPanel &config;
         Rectangle rect;
