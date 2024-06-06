@@ -31,6 +31,6 @@ namespace Meatball {
         // resizingFromN = 0b00100
         // resizingFromW = 0b01000
         // wasHovered = 0b10000
-        unsigned char conditions = 0b00000;
+        unsigned char conditions = 0;
     };
 }
