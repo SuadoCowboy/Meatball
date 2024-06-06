@@ -24,14 +24,14 @@ bool Meatball::FontsHandler::loadEx(std::filesystem::path path, std::string name
     return true;
 }
 
-void Meatball::FontsHandler::unload(const std::string& name) {
+void Meatball::FontsHandler::unload(const std::string &name) {
     if (fonts.count(name) == 0) return;
 
     UnloadFont(fonts[name]);
     fonts.erase(name);
 }
 
-Font *Meatball::FontsHandler::get(const std::string& name) {
+Font *Meatball::FontsHandler::get(const std::string &name) {
     if (fonts.count(name) == 0) return nullptr;
 
     return &fonts[name];
@@ -52,20 +52,15 @@ float Meatball::FontsHandler::MeasureTextHeight(Font *font, const char *text, fl
     return MeasureTextEx(*font, text, font->baseSize, spacing).y;
 }
 
-bool Meatball::FontsHandler::add(Font font, const std::string& name) {
+bool Meatball::FontsHandler::add(Font font, const std::string &name) {
     if (fonts.count(name) != 0) return false;
 
     fonts[name] = font;
     return true;
 }
 
-void Meatball::FontsHandler::DrawText(Font *font, const char *text, float x, float y, Color textColor, float spacing) {
-    //use(font); // is this required?
-    DrawTextEx(*font, text, (Vector2){x, y}, font->baseSize, spacing, textColor);
-}
-
 void Meatball::FontsHandler::clear() {
-    for (auto& font : fonts) {
+    for (auto &font : fonts) {
         UnloadFont(font.second);
     }
 

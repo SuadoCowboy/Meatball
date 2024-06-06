@@ -24,9 +24,9 @@ namespace Meatball {
         /// @note see also loadEx function
         static bool load(std::filesystem::path path, std::string name); 
         
-        static void unload(const std::string& name);
+        static void unload(const std::string &name);
 
-        static bool add(Font font, const std::string& name);
+        static bool add(Font font, const std::string &name);
 
         static Vector2 MeasureText(Font *font, const char *text, float spacing = 1);
         static float MeasureTextWidth(Font *font, const char *text, float spacing = 1);
@@ -36,9 +36,8 @@ namespace Meatball {
         static void clear();
         
         /// @return font pointer or nullptr if does not exist 
-        static Font *get(const std::string& name);
-
-        static void DrawText(Font *font, const char *text, float x, float y, Color textColor, float spacing = 1);
+        static Font *get(const std::string &name);
+    
     private:
         static std::unordered_map<std::string, Font> fonts;
     };
