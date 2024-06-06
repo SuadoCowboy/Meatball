@@ -2,6 +2,7 @@
 - Alot of objects might create alot of new colors in memory. Not only that but probably other data types... What I want to come over with is yet another data handler that stores the data and all classes variables uses pointers.
 
 # TODOS:
+- grabHeight proportional to screen size or window size
 - colors that are equal in other classes can be pointers(ex: text color), so use a init.meatdata or something to set those values
 - change draw functions to let developer choose what he wants to draw
 - create a .meatui(maybe delete .meatdata or use for another thing that .cfg can't do) file extension to make it possible to create a user interface. Should also include a meatUILoader.dll and meatUIViewer.exe in bin folder so that users can test their interfaces without joining the game everytime. Example: for Console, .meatui, the user have some options: mainPanel, closeButton, sendButton(optional), inputBox and OutputTextBox. !!! Also set a macro to define its actual version because it could change alot in the future
@@ -44,7 +45,7 @@ ScrollTextBox x y width height "outputBox"
 example:
 ```cpp
 // look for better name
-void borderfy(const Rectangle& rect, const Color& borderColor) {
+void borderfy(const Rectangle &rect, const Color &borderColor) {
     DrawLine(rect.x, rect.y, rect.x+rect.width, rect.y, borderColor);
     DrawLine(rect.x, rect.y+rect.height, rect.x+rect.width, rect.y+rect.height, borderColor);
     DrawLine(rect.x, rect.y, rect.x, rect.y+rect.height, borderColor);
@@ -54,7 +55,7 @@ void borderfy(const Rectangle& rect, const Color& borderColor) {
 - maybe even do that with the hoveredColors and stuff in update function, so that the dev can choose if he wants that functionality or not. It would be something like:
 ```cpp
 /// @brief can be used for everything that has a rect and uses color
-const Color* const updateHoverColor(const Rectangle& rect, const Color* const defaultColor, const Color* const hoverColor) {
+const Color* const updateHoverColor(const Rectangle &rect, const Color* const defaultColor, const Color* const hoverColor) {
     return CheckCollisionPointRec(GetMousePosition(), rect)? hoverColor : defaultColor;
 }
 
