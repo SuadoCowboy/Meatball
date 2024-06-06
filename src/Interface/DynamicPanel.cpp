@@ -1,24 +1,12 @@
 #include "DynamicPanel.h"
 
-Meatball::DynamicPanel::DynamicPanel()
- : color(BLACK), rect({0,0,0,0}), minSize({1,1}), grabHeight(2), offset({0,0}), dragging(false),
- resizing(false), resizingFromN(false), resizingFromW(false), wasHovered(false) {}
+#include "Utils/Utils.h"
 
-Meatball::DynamicPanel::DynamicPanel(Rectangle rect, Vector2 minSize)
- : rect(rect), minSize(minSize), grabHeight(2), offset({0,0}),
- dragging(false), resizing(false), resizingFromN(false), resizingFromW(false), wasHovered(false) {}
+Meatball::DynamicPanel::DynamicPanel(Config::DynamicPanel &config)
+ : config(config), rect({0,0,0,0}) {}
 
-Meatball::DynamicPanel::DynamicPanel(float x, float y, float width, float height, Vector2 minSize)
- : rect({x,y,width,height}), minSize(minSize), grabHeight(2), offset({0,0}),
- dragging(false), resizing(false), resizingFromN(false), resizingFromW(false), wasHovered(false) {}
-
-static void fitXYInRenderScreen(Rectangle& rect, const Vector2& minPos, const Vector2& maxPos) {
-    if (rect.x < minPos.x) rect.x = minPos.x;
-    else if (rect.x > GetRenderWidth()-maxPos.x) rect.x = GetRenderWidth()-maxPos.x;
-    
-    if (rect.y < minPos.y) rect.y = minPos.y;
-    else if (rect.y > GetRenderHeight()-maxPos.y) rect.y = GetRenderHeight()-maxPos.y;
-}
+Meatball::DynamicPanel::DynamicPanel(const Rectangle &rect, Config::DynamicPanel &config)
+ : config(config), rect(rect) {}
 
 void Meatball::DynamicPanel::update() {
     Vector2 mousePos = GetMousePosition();
@@ -35,7 +23,7 @@ void Meatball::DynamicPanel::update() {
     // Dragging and Resizing
     if (!resizing && !dragging) {
     SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y+2, rect.width-4, grabHeight})) {
+    if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y+2, rect.width-4, config.grabHeight})) {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.y};
@@ -149,11 +137,11 @@ void Meatball::DynamicPanel::update() {
             if (resizingFromW) {
                 rect.x = mousePos.x-offset.x;
                 
-                if (rect.width-rect.x+oldX > minSize.x)
+                if (rect.width-rect.x+oldX > config.minSize.x)
                     rect.width -= rect.x-oldX;
                 else {
-                    rect.x = oldX+rect.width-minSize.x;
-                    rect.width = minSize.x;
+                    rect.x = oldX+rect.width-config.minSize.x;
+                    rect.width = config.minSize.x;
                 }
             
             } else rect.width = mousePos.x-offset.x;
@@ -163,18 +151,18 @@ void Meatball::DynamicPanel::update() {
             if (resizingFromN) {
                 rect.y = mousePos.y-offset.y;
                 
-                if (rect.height-rect.y+oldY > minSize.y)
+                if (rect.height-rect.y+oldY > config.minSize.y)
                     rect.height -= rect.y-oldY;
                 else {
-                    rect.y = oldY+rect.height-minSize.y;
-                    rect.height = minSize.y;
+                    rect.y = oldY+rect.height-config.minSize.y;
+                    rect.height = config.minSize.y;
                 }
             
             } else rect.height = mousePos.y-offset.y;
         }
 
-        if (rect.width < minSize.x) rect.width = minSize.x;
-        if (rect.height < minSize.y) rect.height = minSize.y;
+        if (rect.width < config.minSize.x) rect.width = config.minSize.x;
+        if (rect.height < config.minSize.y) rect.height = config.minSize.y;
 
         fitXYInRenderScreen(rect, {6-rect.width, 6-rect.height}, {6, 6});
 
@@ -184,5 +172,5 @@ void Meatball::DynamicPanel::update() {
 }
 
 void Meatball::DynamicPanel::draw() {
-    DrawRectangle(rect.x, rect.y, rect.width, rect.height, color);
+    DrawRectangle(rect.x, rect.y, rect.width, rect.height, config.color);
 }
