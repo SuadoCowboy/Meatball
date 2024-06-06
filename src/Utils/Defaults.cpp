@@ -1,18 +1,26 @@
 #include "Defaults.h"
 
-#include <sstream>
-#include <functional>
 #include <filesystem>
+#include <cstring>
 
 #include <HayBCMD.h>
 
-#include "Config.h"
 #include "Console.h"
+
+#include "Config/Config.h"
+#include "Config/Interface.h"
 #include "FontsHandler.h"
 
-Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::string& meatdataPath) {
+void Meatball::init() {
+    //auto initData = Config::loadData(meatdataPath);
+    
+    // WARNING: if the developer does not use this function, he might need to define a default font
+    FontsHandler::add(GetFontDefault(), "default");
+}
+
+Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::string &meatdataPath) {
     std::vector<std::string> messages;
-    HayBCMD::Output::setPrintFunction([&](const std::string& message) {
+    HayBCMD::Output::setPrintFunction([&](const std::string &message) {
         messages.push_back(message);
     });
     
@@ -24,9 +32,6 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
 
     Config::ConfigData *fontSizeData = Config::ifContainsGet(consoleData, "fontSize");
     Config::ConfigData *fontData = Config::ifContainsGet(consoleData, "font");
-
-    // WARNING: if the developer does not use this function, he might need to define a default font
-    FontsHandler::add(GetFontDefault(), "default");
 
     Font *halfSizedFont = nullptr;
     Font *font = nullptr;
@@ -46,28 +51,54 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
         halfSizedFont = font = FontsHandler::get("default");
     }
     
-    auto consoleUI = Meatball::ConsoleUIScene(rect.x, rect.y, rect.width, rect.height, font, halfSizedFont);
+    Meatball::Config::Console consoleConfig;
+    Meatball::Config::Button closeButtonConfig;
+    Meatball::Config::DynamicPanel mainPanelConfig;
+    Meatball::Config::InputTextBox inputBoxConfig;
     
+    consoleConfig.labelFont = halfSizedFont;
+
     data = Config::ifContainsGet(consoleData, "autoCompleteColor");
-    if (data) consoleUI.autoCompleteBox.color = data->colorV;
+    if (data) consoleConfig.autoCompleteColor = data->colorV;
+    else consoleConfig.autoCompleteColor = BLACK;
 
     data = Config::ifContainsGet(consoleData, "autoCompleteTextColor");
-    if (data) consoleUI.autoCompleteTextColor = data->colorV;
+    if (data) consoleConfig.autoCompleteTextColor = data->colorV;
+    else consoleConfig.autoCompleteTextColor = WHITE;
 
     data = Config::ifContainsGet(consoleData, "autoCompleteHightlightedTextColor");
-    if (data) consoleUI.autoCompleteHighlightedTextColor = data->colorV;
+    if (data) consoleConfig.autoCompleteHighlightedTextColor = data->colorV;
+    else consoleConfig.autoCompleteHighlightedTextColor = YELLOW;
 
     data = Config::ifContainsGet(consoleData, "autoCompleteSelectedTextColor");
-    if (data) consoleUI.autoCompleteSelectedTextColor = data->colorV;
-
+    if (data) consoleConfig.autoCompleteSelectedTextColor = data->colorV;
+    else consoleConfig.autoCompleteSelectedTextColor = PURPLE;
+    
     data = Config::ifContainsGet(consoleData, "mainPanelColor");
-    if (data) consoleUI.mainPanel.color = data->colorV;
+    if (data) mainPanelConfig.color = data->colorV;
+    else mainPanelConfig.color = BLACK;
 
     data = Config::ifContainsGet(consoleData, "closeButtonColor");
-    if (data) consoleUI.closeButton.color = data->colorV;
+    if (data) closeButtonConfig.color = data->colorV;
 
     data = Config::ifContainsGet(consoleData, "closeButtonHoveredColor");
-    if (data) consoleUI.closeButton.hoveredColor = data->colorV;
+    if (data) closeButtonConfig.hoveredColor = data->colorV;
+
+    data = Config::ifContainsGet(consoleData, "inputBoxColor");
+    if (data) inputBoxConfig.color = data->colorV;
+
+    data = Config::ifContainsGet(consoleData, "inputBoxTextColor");
+    if (data) inputBoxConfig.textColor = data->colorV;
+
+    data = Config::ifContainsGet(consoleData, "inputBoxCursorColor");
+    if (data) inputBoxConfig.cursorColor = data->colorV;
+
+    data = Config::ifContainsGet(consoleData, "labelColor");
+    if (data) consoleConfig.labelColor = data->colorV;
+
+    strcpy(consoleConfig.labelText, "Local Console");
+
+    auto consoleUI = Meatball::ConsoleUIScene({rect.x, rect.y, rect.width, rect.height}, consoleConfig, mainPanelConfig, closeButtonConfig, inputBoxConfig);
 
     data = Config::ifContainsGet(consoleData, "outputBoxColor");
     if (data) consoleUI.outputBox.color = data->colorV;
@@ -75,19 +106,7 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
     data = Config::ifContainsGet(consoleData, "outputBoxTextColor");
     if (data) consoleUI.outputBox.textColor = data->colorV;
 
-    data = Config::ifContainsGet(consoleData, "inputBoxColor");
-    if (data) consoleUI.inputBox.color = data->colorV;
-
-    data = Config::ifContainsGet(consoleData, "inputBoxTextColor");
-    if (data) consoleUI.inputBox.textColor = data->colorV;
-
-    data = Config::ifContainsGet(consoleData, "inputBoxCursorColor");
-    if (data) consoleUI.inputBox.cursorColor = data->colorV;
-
-    data = Config::ifContainsGet(consoleData, "labelColor");
-    if (data) consoleUI.labelColor = data->colorV;
-
-    Console::init([&](const std::string& message) {
+    Console::init([&](const std::string &message) {
         size_t spaceIdxBefore = 0;
         size_t currentSpaceIdx = message.find('\n');
         
@@ -102,7 +121,7 @@ Meatball::ConsoleUIScene Meatball::initLocalConsole(Rectangle rect, const std::s
 
     Console::print("Console initialized");
 
-    for (auto& message : messages)
+    for (auto &message : messages)
         Console::print(message);
 
     HayBCMD::Command("clear", 0, 0,

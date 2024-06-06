@@ -1,40 +1,51 @@
 #pragma once
 
-#include <string>
 #include <functional>
+#include <cstring>
 
 #include <raylib.h>
 
 #include "Shared.h"
+#include "Config/Interface.h"
+
+#ifndef INPUT_TEXT_BOX_TEXT_BUFFER_SIZE // should be in unsigned short range
+#define INPUT_TEXT_BOX_TEXT_BUFFER_SIZE 1000
+#endif
 
 namespace Meatball {
     class InputTextBox {
     public:
-        InputTextBox();
-        InputTextBox(float x, float y, float width, float height, Font *font);
+        InputTextBox(Config::InputTextBox &config);
+        InputTextBox(const Rectangle &rect, Config::InputTextBox &config);
 
         void draw();
         void update();
-
-        Font *font;
-
-        Color color, textColor, cursorColor;
         
-        std::string text;
+        unsigned short getTextMaxSize() {
+            return INPUT_TEXT_BOX_TEXT_BUFFER_SIZE;
+        }
+        const char* getText();
+        void setText(const char newText[INPUT_TEXT_BOX_TEXT_BUFFER_SIZE]) {
+            strcpy(text, newText);
+        };
 
+        Config::InputTextBox &config;
+        
         // onSend by default runs when KEY_ENTER/KEY_KP_ENTER is pressed
-        std::function<void(const std::string&)> onSend, onTextChange;
-    
-        bool focused;
-        unsigned int cursorPos;
+        std::function<void(const char*)> onSend, onTextChange;
+        
+        bool focused = false;
+        size_t cursorPos = 0;
 
         Rectangle rect;
 
     private:
-        float offsetX;
+        float offsetX = 0;
 
         bool mousePressed;
 
-        size_t selectedTextStartIdx, selectedTextFinalIdx;
+        char text[INPUT_TEXT_BOX_TEXT_BUFFER_SIZE];
+        unsigned short selectedTextStartIdx = INPUT_TEXT_BOX_TEXT_BUFFER_SIZE;
+        unsigned short selectedTextFinalIdx = INPUT_TEXT_BOX_TEXT_BUFFER_SIZE;
     };
 }

@@ -6,7 +6,7 @@
 #include <ConsoleUI.h>
 #include <Utils/Defaults.h>
 #include <FontsHandler.h>
-#include <Config.h>
+#include <Config/Config.h>
 
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 700
@@ -24,19 +24,21 @@ int main(int, char**)
     SetWindowState(FLAG_VSYNC_HINT);
     SetExitKey(KEY_NULL); // disable exit key
     
+    Meatball::init(); // for now it is sort of useless
+
     // Utils/Defaults.h
     auto consoleUI = Meatball::initLocalConsole(
         {WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2},
-        "data/Console.meatdata");
+        "data/meatdata/Console.meatdata");
 
     Color backgroundColor = RAYWHITE;
     {
-        auto mainSceneData = Config::loadData("data/MainScene.meatdata");
+        auto mainSceneData = Config::loadData("data/meatdata/MainScene.meatdata");
         auto backgroundColorData = Config::ifContainsGet(mainSceneData, "backgroundColor");
         if (backgroundColorData != nullptr)
             backgroundColor = backgroundColorData->colorV;
     }
-    
+
     while (!WindowShouldClose()) {
         ClearBackground(backgroundColor);
         

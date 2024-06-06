@@ -32,6 +32,7 @@ namespace Meatball {
         const std::list<std::string> &getText() const;
 
         void draw();
+        void drawScrollbar();
         void update();
 
         Color color, textColor;

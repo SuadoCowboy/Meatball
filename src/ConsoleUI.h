@@ -6,9 +6,9 @@
 #include "Interface/DynamicPanel.h"
 #include "Interface/Button.h"
 #include "Interface/ScrollTextBox.h"
-#include "Interface/ColoredTextBox.h"
 #include "Interface/InputTextBox.h"
 #include "Utils/Utils.h"
+#include "Config/Interface.h"
 
 #ifndef CONSOLEUI_OUTPUT_MAX_LINES
 #define CONSOLEUI_OUTPUT_MAX_LINES (unsigned int)1000
@@ -18,7 +18,7 @@
 #define CONSOLEUI_INPUT_MAX_HISTORY 30 // [0-255]
 #endif
 
-static void handleInputHistoryPos(Meatball::InputTextBox& inputBox, std::string *inputHistory, const unsigned char& inputHistorySize, unsigned char& inputHistoryPos) {
+static void handleInputHistoryPos(Meatball::InputTextBox &inputBox, std::string *inputHistory, const unsigned char &inputHistorySize, unsigned char &inputHistoryPos) {
     if ((IsKeyPressed(KEY_UP) || IsKeyPressedRepeat(KEY_UP)) && inputHistoryPos != 0)
         --inputHistoryPos;
     
@@ -27,23 +27,19 @@ static void handleInputHistoryPos(Meatball::InputTextBox& inputBox, std::string 
     
     else return;
     
-    inputBox.text = inputHistory[inputHistoryPos];
-    inputBox.cursorPos = inputBox.text.size();
-    inputBox.onTextChange(inputBox.text);
+    inputBox.setText(inputHistory[inputHistoryPos].c_str());
+    inputBox.cursorPos = inputHistory[inputHistoryPos].size();
+    inputBox.onTextChange(inputBox.getText());
 }
 
 namespace Meatball {
     class ConsoleUIScene : public Scene {
     public:
-        /// @param x mainPanel x
-        /// @param y mainPanel y
-        /// @param width mainPanel width
-        /// @param height mainPanel height
         /// @param visible if scene is visible or not(only this class uses this)
-        ConsoleUIScene(float x, float y, float width, float height, Font *font, Font *labelFont, bool visible = true);
+        ConsoleUIScene(Rectangle rect, Config::Console &config, Config::DynamicPanel &mainPanelConfig, Config::Button &closeButtonConfig, Config::InputTextBox &inputBoxConfig, bool visible = true);
 
         /// @brief appends text to outputTextbox
-        void print(const std::string& message);
+        void print(const std::string &message);
 
         void draw();
         void update() {
@@ -52,51 +48,51 @@ namespace Meatball {
             inputBox.update();
             
             if (inputBox.focused) {
-                if ((IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB)) && autoCompleteBox.coloredText.size() != 0) {
+                if ((IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB)) && autoCompleteText.size() != 0) {
                     // -1
                     if (IsKeyDown(KEY_LEFT_SHIFT) && autoCompleteSelectedIdxBegin != 0) {
-                        inputBox.onTextChange(inputBoxOriginalText);
+                        inputBox.onTextChange(inputBoxOriginalText.c_str());
 
                         autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
                         
                         size_t idx = autoCompleteSelectedIdxEnd;
-                        autoCompleteBox.coloredText[idx].second = autoCompleteSelectedTextColor;
-                        std::string newText = autoCompleteBox.coloredText[idx].first;
+                        autoCompleteText[idx].second = config.autoCompleteSelectedTextColor;
+                        std::string newText = autoCompleteText[idx].first;
                         
                         --idx;
-                        while (autoCompleteBox.coloredText[idx].first.back() != ' ') {
-                            autoCompleteBox.coloredText[idx].second = autoCompleteSelectedTextColor;
-                            newText = autoCompleteBox.coloredText[idx].first+newText;
+                        while (autoCompleteText[idx].first.back() != ' ') {
+                            autoCompleteText[idx].second = config.autoCompleteSelectedTextColor;
+                            newText = autoCompleteText[idx].first+newText;
                             if (idx == 0) break;
                             --idx;
                         }
                         
                         newText.pop_back();
-                        inputBox.text = newText;
-                        inputBox.cursorPos = inputBox.text.size();
+                        inputBox.setText(newText.c_str());
+                        inputBox.cursorPos = newText.size();
                         autoCompleteSelectedIdxBegin = idx == 0? 0 : idx+1;
                     }
                     
                     // +1
-                    else if (autoCompleteSelectedIdxEnd != autoCompleteBox.coloredText.size()-1) {
-                        inputBox.onTextChange(inputBoxOriginalText);
+                    else if (autoCompleteSelectedIdxEnd != autoCompleteText.size()-1) {
+                        inputBox.onTextChange(inputBoxOriginalText.c_str());
                         
                         autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd+1;
                         if (autoCompleteSelectedIdxEnd == 0) autoCompleteSelectedIdxBegin = 0;
                         
                         size_t idx = autoCompleteSelectedIdxBegin;
-                        autoCompleteBox.coloredText[idx].second = autoCompleteSelectedTextColor;
-                        std::string newText = autoCompleteBox.coloredText[idx].first;
+                        autoCompleteText[idx].second = config.autoCompleteSelectedTextColor;
+                        std::string newText = autoCompleteText[idx].first;
                         
-                        while (autoCompleteBox.coloredText[idx].first.back() != ' ') {
+                        while (autoCompleteText[idx].first.back() != ' ') {
                             ++idx;
-                            autoCompleteBox.coloredText[idx].second = autoCompleteSelectedTextColor;
-                            newText += autoCompleteBox.coloredText[idx].first;
+                            autoCompleteText[idx].second = config.autoCompleteSelectedTextColor;
+                            newText += autoCompleteText[idx].first;
                         }
                         
                         newText.pop_back();
-                        inputBox.text = newText;
-                        inputBox.cursorPos = inputBox.text.size();
+                        inputBox.setText(newText.c_str());
+                        inputBox.cursorPos = newText.size();
                         autoCompleteSelectedIdxEnd = idx;
                     }
                 }
@@ -116,6 +112,8 @@ namespace Meatball {
             mainPanel.update();
         }
 
+        Config::Console &config;
+
         // Only console can appear in every scene so only it needs visible boolean.
         // The rest of the scenes will be handled by a class or something that says which one should be used.
         bool visible;
@@ -123,15 +121,9 @@ namespace Meatball {
         DynamicPanel mainPanel;
         Button closeButton;
         ScrollTextBox outputBox;
-        ColoredTextBox autoCompleteBox;
         InputTextBox inputBox;
-
-        // by default labelText = "Local Console"
-        char labelText[20];
-        Color labelColor;
-        Font *labelFont;
-
-        Color autoCompleteHighlightedTextColor, autoCompleteTextColor, autoCompleteSelectedTextColor;
+        
+        std::vector<std::pair<std::string, Color>> autoCompleteText;
 
         // margin - the space between mainPanel border and objects close to it
         static unsigned char margin;
@@ -144,7 +136,7 @@ namespace Meatball {
         unsigned char inputHistorySize;
         unsigned char inputHistoryPos; // the position the user is when using inputHistory
 
-        void addToInputHistory(const std::string& string) {
+        void addToInputHistory(const std::string &string) {
             if (inputHistorySize != 0 && inputHistory[inputHistorySize-1].compare(string) == 0) {
                 inputHistoryPos = inputHistorySize;
                 return;

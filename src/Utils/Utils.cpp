@@ -1,5 +1,7 @@
 #include "Utils.h"
 
+#include <cstring>
+
 void Meatball::checkHovered(bool &hovered, const Rectangle &rect, VoidFunc *onHover, VoidFunc *onRelease) {
     bool wasHovered = hovered;
     hovered = CheckCollisionPointRec(GetMousePosition(), rect);
@@ -25,7 +27,7 @@ float Meatball::getContentHeight(float fontSize, const std::list<std::string> &t
 }
 
 Vector2 Meatball::getRectCenter(const Rectangle &rect) {
-    return {rect.x+rect.width*0.5, rect.y+rect.height*0.5};
+    return {rect.x+rect.width*0.5f, rect.y+rect.height*0.5f};
 }
 
 float Meatball::getRectCenterX(const Rectangle &rect) {
@@ -42,6 +44,40 @@ void Meatball::fitXYInRenderScreen(Rectangle &rect, const Vector2 &minPos, const
     
     if (rect.y < minPos.y) rect.y = minPos.y;
     else if (rect.y > GetRenderHeight()+maxPos.y) rect.y = GetRenderHeight()-maxPos.y;
+}
+
+void Meatball::textErase(char* text, size_t index, size_t length) {
+    if (strlen(text) < index+length) return;
+    
+    while (true) {
+		text[index] = text[index+length];
+		if (text[index+length] == '\0') break;
+		++index;
+	}
+}
+
+size_t Meatball::textInsert(char* dest, size_t destMaxSize, size_t destIdx, const char* source) {
+    size_t sourceIdx = 0;
+    size_t destSize = strlen(dest);
+	
+	while (source[sourceIdx] != '\0' && destSize != destMaxSize) {
+		char charBefore = dest[destIdx];
+		dest[destIdx] = source[sourceIdx];
+		++destSize;
+	
+		for (size_t i = destIdx+1; i < destSize; ++i) {
+			char actualChar = dest[i];
+			dest[i] = charBefore;
+			charBefore = actualChar;
+		}
+
+		++destIdx;
+		++sourceIdx;
+	}
+
+	dest[destSize] = '\0';
+
+    return destIdx;
 }
 
 bool operator==(const Color &left, const Color &right) {

@@ -4,14 +4,14 @@
 
 #include "Console.h"
 
-config.ConfigData::ConfigData(int i) : intV(i) {}
-config.ConfigData::ConfigData(double d): doubleV(d) {}
-config.ConfigData::ConfigData(float f): floatV(f) {}
-config.ConfigData::ConfigData(bool b) : boolV(b) {}
-config.ConfigData::ConfigData(unsigned char uc) : unsignedCharV(uc) {}
-config.ConfigData::ConfigData(std::string s): stringV(s) {}
-config.ConfigData::ConfigData(Color color): colorV(color) {}
-config.ConfigData::ConfigData() {}
+Meatball::Config::ConfigData::ConfigData(int i) : intV(i) {}
+Meatball::Config::ConfigData::ConfigData(double d): doubleV(d) {}
+Meatball::Config::ConfigData::ConfigData(float f): floatV(f) {}
+Meatball::Config::ConfigData::ConfigData(bool b) : boolV(b) {}
+Meatball::Config::ConfigData::ConfigData(unsigned char uc) : unsignedCharV(uc) {}
+Meatball::Config::ConfigData::ConfigData(std::string s): stringV(s) {}
+Meatball::Config::ConfigData::ConfigData(Color color): colorV(color) {}
+Meatball::Config::ConfigData::ConfigData() {}
 
 static bool handleSpaceError(size_t spaceIdx, size_t spaceIdxBefore, size_t lineIdx) {
     if (spaceIdx == std::string::npos || spaceIdx == 0 || spaceIdx == spaceIdxBefore+1) {
@@ -22,11 +22,11 @@ static bool handleSpaceError(size_t spaceIdx, size_t spaceIdxBefore, size_t line
     return false;
 }
 
-config.ConfigData *config.ifContainsGet(std::unordered_map<std::string, ConfigData> &data, const std::string &what) {
+Meatball::Config::ConfigData *Meatball::Config::ifContainsGet(std::unordered_map<std::string, Meatball::Config::ConfigData> &data, const std::string &what) {
     return data.count(what)? &data[what] : nullptr;
 }
 
-std::unordered_map<std::string, config.ConfigData> config.loadData(std::filesystem::path path) {
+std::unordered_map<std::string, Meatball::Config::ConfigData> Meatball::Config::loadData(std::filesystem::path path) {
     if (!std::filesystem::exists(path) || std::filesystem::is_directory(path) || path.extension() != ".meatdata") {
         Console::printf("ERROR: Could not load data: \"{}\" is not compatible or does not exist\n", path.string());
         return {};
@@ -34,7 +34,7 @@ std::unordered_map<std::string, config.ConfigData> config.loadData(std::filesyst
 
     std::ifstream file(path);
 
-    std::unordered_map<std::string, config.ConfigData> data = {};
+    std::unordered_map<std::string, Config::ConfigData> data = {};
 
     // line example: "mainPanelColor COLOR 22,22,22,200"
     size_t lineIdx = 1;
@@ -55,17 +55,17 @@ std::unordered_map<std::string, config.ConfigData> config.loadData(std::filesyst
         std::string value = line.substr(secondSpaceIdx+1);
 
         if (type == "STRING")
-            data[name.c_str()] = ConfigData(value);
+            data[name.c_str()] = Config::ConfigData(value);
         else if (type == "INT")
-            data[name.c_str()] = ConfigData(std::stoi(value));
+            data[name.c_str()] = Config::ConfigData(std::stoi(value));
         else if (type == "FLOAT")
-            data[name.c_str()] = ConfigData(std::stof(value));
+            data[name.c_str()] = Config::ConfigData(std::stof(value));
         else if (type == "DOUBLE")
-            data[name.c_str()] = ConfigData(std::stod(value));
+            data[name.c_str()] = Config::ConfigData(std::stod(value));
         else if (type == "BOOL")
-            data[name.c_str()] = ConfigData((bool)std::stoi(value));
+            data[name.c_str()] = Config::ConfigData((bool)std::stoi(value));
         else if (type == "UNSIGNED_CHAR")
-            data[name.c_str()] = ConfigData((unsigned char)std::stoi(value));
+            data[name.c_str()] = Config::ConfigData((unsigned char)std::stoi(value));
         
         else if (type == "COLOR") {
             size_t firstCommaIdx = value.find(",");
@@ -80,7 +80,7 @@ std::unordered_map<std::string, config.ConfigData> config.loadData(std::filesyst
             if (thirdCommaIdx != std::string::npos)
                 color.a = std::stoi(value.substr(thirdCommaIdx+1));
 
-            data[name.c_str()] = ConfigData(color);
+            data[name.c_str()] = Config::ConfigData(color);
         }
 
         else {

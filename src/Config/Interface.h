@@ -30,6 +30,11 @@ namespace Meatball { namespace Config {
         Vector2 minSize;
         float grabHeight;
     };
+
+    struct InputTextBox {
+        Font *font;
+        Color color, textColor, cursorColor;
+    };
     
     struct Console {
         Color autoCompleteColor; // color of the rect

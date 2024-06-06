@@ -1,7 +1,8 @@
 #include "ScrollTextBox.h"
 
-#include "Utils/Utils.h"
 #include "FontsHandler.h"
+#include "Utils/Utils.h"
+#include "Utils/DrawFuncs.h"
 
 using fh = Meatball::FontsHandler;
 
@@ -159,14 +160,16 @@ void Meatball::ScrollTextBox::draw() {
         if (lineY > rect.height) break;
 
         if (lineY+font->baseSize*newLineAmount > 0)
-            fh::DrawText(font, line.c_str(), rect.x,
+            drawText(font, line.c_str(), rect.x,
             rect.y+lineY+1/*+1 because letters get stuck 1 pixel in the top*/, textColor);
         
         lineIdx += newLineAmount;
     }
     
     EndScissorMode();
-    
+}
+
+void Meatball::ScrollTextBox::drawScrollbar() {
     scrollBar.draw();
 }
 
