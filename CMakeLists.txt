@@ -9,7 +9,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-file(GLOB SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/src/Interface/*.cpp ${PROJECT_SOURCE_DIR}/src/Utils/*.cpp)
+file(GLOB SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/src/Interface/*.cpp ${PROJECT_SOURCE_DIR}/src/Utils/*.cpp ${PROJECT_SOURCE_DIR}/src/Config/*.cpp)
 
 add_library(Meatball SHARED ${SOURCES})
 set_target_properties(Meatball PROPERTIES
