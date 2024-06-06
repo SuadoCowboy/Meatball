@@ -13,7 +13,7 @@ namespace Meatball {
         static void init(std::function<void(const std::string&)> printFunction);
 
         /// @brief parses a string into HayBCMD
-        static void run(const std::string& input);
+        static void run(const std::string &input);
 
         static constexpr auto print = HayBCMD::Output::print;
 
