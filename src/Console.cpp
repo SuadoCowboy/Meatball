@@ -9,7 +9,7 @@ void Meatball::Console::init(std::function<void(const std::string&)> printFuncti
     HayBCMD::BaseCommands::init(&variables);
 }
 
-void Meatball::Console::run(const std::string& input) {
+void Meatball::Console::run(const std::string &input) {
     HayBCMD::Lexer *lexer = new HayBCMD::Lexer(input);
 
     HayBCMD::Parser parser{ lexer, variables };
