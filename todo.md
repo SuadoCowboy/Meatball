@@ -2,8 +2,9 @@
 - Alot of objects might create alot of new colors in memory. Not only that but probably other data types... What I want to come over with is yet another data handler that stores the data and all classes variables uses pointers.
 
 # TODOS:
+- If config being a reference is not considered a good practice then look how should it be
 - grabHeight proportional to screen size or window size
-- colors that are equal in other classes can be pointers(ex: text color), so use a init.meatdata or something to set those values
+- NEW IDEA: static colors in .meatdata. if the type is STATIC_COLOR, then it will be defined in a specific structure or class that creates maybe a new Color(pointer) and every other static color will use this variable and it's also a constant.
 - change draw functions to let developer choose what he wants to draw
 - create a .meatui(maybe delete .meatdata or use for another thing that .cfg can't do) file extension to make it possible to create a user interface. Should also include a meatUILoader.dll and meatUIViewer.exe in bin folder so that users can test their interfaces without joining the game everytime. Example: for Console, .meatui, the user have some options: mainPanel, closeButton, sendButton(optional), inputBox and OutputTextBox. !!! Also set a macro to define its actual version because it could change alot in the future
 It would be something like this:
