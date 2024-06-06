@@ -25,8 +25,12 @@ namespace Meatball {
     
     private:
         Vector2 offset = {0,0}; // this is used for dragging and resizing
-        bool wasHovered = false;
-        bool dragging = false;
-        bool resizing = false, resizingFromN = false, resizingFromW = false;
+
+        // dragging = 0b00001
+        // resizing = 0b00010
+        // resizingFromN = 0b00100
+        // resizingFromW = 0b01000
+        // wasHovered = 0b10000
+        unsigned char conditions = 0b00000;
     };
 }
