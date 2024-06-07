@@ -51,6 +51,4 @@ int main(int, char**)
     }
 
     Meatball::FontsHandler::clear();
-
-    return 0;
 }

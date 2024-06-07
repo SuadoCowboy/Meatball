@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include "Scene.h"
 #include "Interface/DynamicPanel.h"
@@ -36,7 +37,7 @@ namespace Meatball {
     class ConsoleUIScene : public Scene {
     public:
         /// @param visible if scene is visible or not(only this class uses this)
-        ConsoleUIScene(Rectangle rect, Config::Console &config, Config::DynamicPanel &mainPanelConfig, Config::Button &closeButtonConfig, Config::InputTextBox &inputBoxConfig, bool visible = true);
+        ConsoleUIScene(Rectangle rect, std::shared_ptr<Config::Console> config, std::shared_ptr<Config::DynamicPanel> mainPanelConfig, std::shared_ptr<Config::Button> closeButtonConfig, std::shared_ptr<Config::InputTextBox> inputBoxConfig, bool visible = true);
 
         /// @brief appends text to outputTextbox
         void print(const std::string &message);
@@ -56,12 +57,12 @@ namespace Meatball {
                         autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
                         
                         size_t idx = autoCompleteSelectedIdxEnd;
-                        autoCompleteText[idx].second = config.autoCompleteSelectedTextColor;
+                        autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
                         std::string newText = autoCompleteText[idx].first;
                         
                         --idx;
                         while (autoCompleteText[idx].first.back() != ' ') {
-                            autoCompleteText[idx].second = config.autoCompleteSelectedTextColor;
+                            autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
                             newText = autoCompleteText[idx].first+newText;
                             if (idx == 0) break;
                             --idx;
@@ -81,12 +82,12 @@ namespace Meatball {
                         if (autoCompleteSelectedIdxEnd == 0) autoCompleteSelectedIdxBegin = 0;
                         
                         size_t idx = autoCompleteSelectedIdxBegin;
-                        autoCompleteText[idx].second = config.autoCompleteSelectedTextColor;
+                        autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
                         std::string newText = autoCompleteText[idx].first;
                         
                         while (autoCompleteText[idx].first.back() != ' ') {
                             ++idx;
-                            autoCompleteText[idx].second = config.autoCompleteSelectedTextColor;
+                            autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
                             newText += autoCompleteText[idx].first;
                         }
                         
@@ -109,10 +110,13 @@ namespace Meatball {
                 outputBox.popFront();
             }
 
-            mainPanel.update();
+            bool s = secondPanelTest.isAnyConditionActive();
+            bool m = mainPanel.isAnyConditionActive();
+            if (!s || m) mainPanel.update();
+            if (s || !m) secondPanelTest.update();
         }
 
-        Config::Console &config;
+        std::shared_ptr<Config::Console> config;
 
         // Only console can appear in every scene so only it needs visible boolean.
         // The rest of the scenes will be handled by a class or something that says which one should be used.
@@ -122,6 +126,7 @@ namespace Meatball {
         Button closeButton;
         ScrollTextBox outputBox;
         InputTextBox inputBox;
+        DynamicPanel secondPanelTest;
         
         std::vector<std::pair<std::string, Color>> autoCompleteText;
 

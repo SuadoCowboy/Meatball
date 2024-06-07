@@ -3,42 +3,42 @@
 #include <HayBCMD.h>
 
 #include "Console.h"
-#include "FontsHandler.h"
 #include "Utils/DrawFuncs.h"
-
-unsigned char Meatball::ConsoleUIScene::margin = 4;
+#include "FontsHandler.h"
 
 using fh = Meatball::FontsHandler;
 
-Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, Config::Console &config, Config::DynamicPanel &mainPanelConfig, Config::Button &closeButtonConfig, Config::InputTextBox &inputBoxConfig, bool visible)
+unsigned char Meatball::ConsoleUIScene::margin = 4;
+
+Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config::Console> config, std::shared_ptr<Config::DynamicPanel> mainPanelConfig, std::shared_ptr<Config::Button> closeButtonConfig, std::shared_ptr<Config::InputTextBox> inputBoxConfig, bool visible)
  : Scene(), config(config), visible(visible), mainPanel(rect, mainPanelConfig),
- closeButton(closeButtonConfig), inputBox(inputBoxConfig) {
+ closeButton(closeButtonConfig), inputBox(inputBoxConfig), secondPanelTest({10,10,200,300}, mainPanelConfig) {
 	inputHistoryPos = 0;
 	inputHistorySize = 0;
 
 	autoCompleteSelectedIdxBegin = 0;
 	autoCompleteSelectedIdxEnd = 0;
 	
-	outputBox.font = config.mainFont;
-	inputBox.config.font = config.mainFont;
+	outputBox.font = config->mainFont;
+	inputBox.config->font = config->mainFont;
 
 	mainPanel.onMove = [&]() {
 		closeButton.rect.x = mainPanel.rect.x+mainPanel.rect.width-margin-margin*0.5;
 		closeButton.rect.y = mainPanel.rect.y+margin*0.5;
 
-		outputBox.setPosition(mainPanel.rect.x+margin, mainPanel.rect.y+config.labelFont->baseSize+margin);
+		outputBox.setPosition(mainPanel.rect.x+margin, mainPanel.rect.y+this->config->labelFont->baseSize+margin);
 
 		inputBox.rect.x = mainPanel.rect.x+margin;
 		inputBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin-21;
 	};
 	
-	mainPanel.config.grabHeight = config.labelFont->baseSize;
+	mainPanel.config->grabHeight = config->labelFont->baseSize;
 
 	mainPanel.onResize = [&]() {
 			closeButton.rect.width = margin; // is inside the margin
 			closeButton.rect.height = margin;
 
-			outputBox.setSize(mainPanel.rect.width-margin*2, mainPanel.rect.height-config.labelFont->baseSize-1-margin*2-21);
+			outputBox.setSize(mainPanel.rect.width-margin*2, mainPanel.rect.height-this->config->labelFont->baseSize-1-margin*2-21);
 			
 			inputBox.rect.width = outputBox.getRect().width;
 			inputBox.rect.height = 21;
@@ -52,9 +52,9 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, Config::Console &config
 
 	mainPanel.onResize();
 
-	mainPanel.config.minSize = {
+	mainPanel.config->minSize = {
 		// scrollBarWidth + (margin left + margin right) + labelText size
-		(int)outputBox.getScrollBar().getRect().width+margin*2+fh::MeasureTextWidth(config.labelFont, config.labelText),
+		(int)outputBox.getScrollBar().getRect().width+margin*2+fh::MeasureTextWidth(config->labelFont, config->labelText),
 		// outputBox minSize + inputBox minSize + (margin left + margin right)
 		(int)outputBox.font->baseSize+inputBox.rect.height+margin*2};
 
@@ -76,7 +76,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, Config::Console &config
 		std::string commandName = text.substr(0, spaceIdx);
 		HayBCMD::Command *pCommand = HayBCMD::Command::getCommand(commandName, false);
 		if (pCommand) {
-			autoCompleteText.push_back({pCommand->name+" "+pCommand->usage, config.autoCompleteTextColor});
+			autoCompleteText.push_back({pCommand->name+" "+pCommand->usage, config->autoCompleteTextColor});
 			return;
 		}
 
@@ -86,11 +86,11 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, Config::Console &config
 
 			std::string leftText = command.name.substr(0, idx);
 			if (leftText.size() != 0)
-				autoCompleteText.push_back({leftText, config.autoCompleteTextColor});
+				autoCompleteText.push_back({leftText, config->autoCompleteTextColor});
 			
-			autoCompleteText.push_back({command.name.substr(idx, text.size()), config.autoCompleteHighlightedTextColor}); // middleText
+			autoCompleteText.push_back({command.name.substr(idx, text.size()), config->autoCompleteHighlightedTextColor}); // middleText
 			
-			autoCompleteText.push_back({command.name.substr(idx+text.size())+" ", config.autoCompleteTextColor}); // rightText
+			autoCompleteText.push_back({command.name.substr(idx+text.size())+" ", config->autoCompleteTextColor}); // rightText
 		}
 	};
 
@@ -138,7 +138,10 @@ void Meatball::ConsoleUIScene::print(const std::string &message) {
 
 void Meatball::ConsoleUIScene::draw() {
 	if (!visible) return;
-	drawRect(mainPanel.rect, mainPanel.config.color);
+
+	drawRect(secondPanelTest.rect, secondPanelTest.config->color);
+
+	drawRect(mainPanel.rect, mainPanel.config->color);
 	
 	inputBox.draw();
 	outputBox.draw();
@@ -151,36 +154,36 @@ void Meatball::ConsoleUIScene::draw() {
 			bool passedThroughSelectedText = false;
 			
 			for (auto &pair : autoCompleteText) {
-				if (pair.second == config.autoCompleteSelectedTextColor) {
-					selectedTextWidth += fh::MeasureTextWidth(config.mainFont, pair.first.c_str());
+				if (pair.second == config->autoCompleteSelectedTextColor) {
+					selectedTextWidth += fh::MeasureTextWidth(config->mainFont, pair.first.c_str());
 					passedThroughSelectedText = true;
 					continue;
 				}
 
 				if (passedThroughSelectedText) break;
 				
-				offsetX += fh::MeasureTextWidth(config.mainFont, pair.first.c_str())+1;
+				offsetX += fh::MeasureTextWidth(config->mainFont, pair.first.c_str())+1;
 			}
 
-			if (offsetX+selectedTextWidth < config.mainFont->baseSize) offsetX = 0;
+			if (offsetX+selectedTextWidth < config->mainFont->baseSize) offsetX = 0;
 			
 			else offsetX -= (mainPanel.rect.width-selectedTextWidth)*0.5;
 		}
 
 		float autoCompleteY = mainPanel.rect.y+mainPanel.rect.height-margin;
-		DrawRectangle(mainPanel.rect.x, autoCompleteY, mainPanel.rect.width, config.mainFont->baseSize, config.autoCompleteColor);
-		BeginScissorMode(mainPanel.rect.x, autoCompleteY, mainPanel.rect.width,config.mainFont->baseSize);
+		DrawRectangle(mainPanel.rect.x, autoCompleteY, mainPanel.rect.width, config->mainFont->baseSize, config->autoCompleteColor);
+		BeginScissorMode(mainPanel.rect.x, autoCompleteY, mainPanel.rect.width,config->mainFont->baseSize);
 
 		float x = mainPanel.rect.x;
 		for (auto &pair : autoCompleteText) {
-			drawText(config.mainFont, pair.first.c_str(), x-offsetX, autoCompleteY+1, pair.second);
-			x += fh::MeasureTextWidth(config.mainFont, pair.first.c_str())+1;
+			drawText(config->mainFont, pair.first.c_str(), x-offsetX, autoCompleteY+1, pair.second);
+			x += fh::MeasureTextWidth(config->mainFont, pair.first.c_str())+1;
 		}
 
 		EndScissorMode();
 	}
 
-	drawText(config.labelFont, config.labelText, mainPanel.rect.x+margin, mainPanel.rect.y+margin, config.labelColor);
+	drawText(config->labelFont, config->labelText, mainPanel.rect.x+margin, mainPanel.rect.y+margin, config->labelTextColor);
 
-	drawX(closeButton.rect, closeButton.isHovered()? closeButton.config.hoveredColor : closeButton.config.color);
+	drawX(closeButton.rect, closeButton.isHovered()? closeButton.config->hoveredColor : closeButton.config->color);
 }
