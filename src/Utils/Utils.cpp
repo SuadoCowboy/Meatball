@@ -40,10 +40,10 @@ float Meatball::getRectCenterY(const Rectangle &rect) {
 
 void Meatball::fitXYInRenderScreen(Rectangle &rect, const Vector2 &minPos, const Vector2 &maxPos) {
     if (rect.x < minPos.x) rect.x = minPos.x;
-    else if (rect.x > GetRenderWidth()+maxPos.x) rect.x = GetRenderWidth()-maxPos.x;
+    else if (rect.x > GetRenderWidth()-maxPos.x) rect.x = GetRenderWidth()-maxPos.x;
     
     if (rect.y < minPos.y) rect.y = minPos.y;
-    else if (rect.y > GetRenderHeight()+maxPos.y) rect.y = GetRenderHeight()-maxPos.y;
+    else if (rect.y > GetRenderHeight()-maxPos.y) rect.y = GetRenderHeight()-maxPos.y;
 }
 
 void Meatball::textErase(char* text, size_t index, size_t length) {
