@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <cstring>
+#include <memory>
 
 #include <raylib.h>
 
@@ -15,8 +16,8 @@
 namespace Meatball {
     class InputTextBox {
     public:
-        InputTextBox(Config::InputTextBox &config);
-        InputTextBox(const Rectangle &rect, Config::InputTextBox &config);
+        InputTextBox(std::shared_ptr<Config::InputTextBox> config);
+        InputTextBox(const Rectangle &rect, std::shared_ptr<Config::InputTextBox> config);
 
         void draw();
         void update();
@@ -29,7 +30,7 @@ namespace Meatball {
             strcpy(text, newText);
         };
 
-        Config::InputTextBox &config;
+        std::shared_ptr<Config::InputTextBox> config;
         
         // onSend by default runs when KEY_ENTER/KEY_KP_ENTER is pressed
         std::function<void(const char*)> onSend, onTextChange;

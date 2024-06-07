@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include <raylib.h>
 
@@ -10,14 +11,14 @@
 namespace Meatball {
     class Button {
     public:
-        Button(Config::Button &config);
-        Button(Rectangle &rect, Config::Button &config);
+        Button(std::shared_ptr<Config::Button> config);
+        Button(Rectangle &rect, std::shared_ptr<Config::Button> config);
         
         void update();
         bool isHovered();
 
         VoidFunc onRelease, onHover;
-        Config::Button &config;
+        std::shared_ptr<Config::Button> config;
         Rectangle rect;
 
     private:

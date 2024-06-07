@@ -11,35 +11,35 @@ static float getRealCursorPos(unsigned int cursorPos, Font* font, const char *te
     return fh::MeasureTextWidth(font, TextSubtext(text, 0, cursorPos))+1;
 }
 
-Meatball::InputTextBox::InputTextBox(Config::InputTextBox &config)
+Meatball::InputTextBox::InputTextBox(std::shared_ptr<Config::InputTextBox> config)
  : config(config), rect({0,0,0,0}) {}
 
-Meatball::InputTextBox::InputTextBox(const Rectangle &rect, Config::InputTextBox& config)
+Meatball::InputTextBox::InputTextBox(const Rectangle &rect, std::shared_ptr<Config::InputTextBox> config)
  : config(config), rect(rect) {}
 
 void Meatball::InputTextBox::draw() {
-    DrawRectangle(rect.x, rect.y, rect.width, rect.height, config.color);
+    DrawRectangle(rect.x, rect.y, rect.width, rect.height, config->color);
     BeginScissorMode(rect.x-1, rect.y, rect.width, rect.height);
 
-    drawText(config.font, text,
+    drawText(config->font, text,
         rect.x-offsetX,
-        rect.y+rect.height/2-config.font->baseSize/2+1/*+1 because it sticks 1 pixel on top*/,
-        config.textColor);
+        rect.y+rect.height/2-config->font->baseSize/2+1/*+1 because it sticks 1 pixel on top*/,
+        config->textColor);
     
     // maybe cursor should be outside inputtextbox and be a function or class too like borders and stuff
     if (focused) {
-        float x = rect.x-offsetX+getRealCursorPos(cursorPos, config.font, text);
-        DrawLine(x, rect.y, x, rect.y+rect.height, config.cursorColor);
+        float x = rect.x-offsetX+getRealCursorPos(cursorPos, config->font, text);
+        DrawLine(x, rect.y, x, rect.y+rect.height, config->cursorColor);
         
         if (selectedTextStartIdx != getTextMaxSize() && selectedTextStartIdx != selectedTextFinalIdx) {
             float selectedX, selectedWidth;
             
             if (selectedTextFinalIdx > selectedTextStartIdx) {
-                selectedX = getRealCursorPos(selectedTextStartIdx, config.font, text);
-                selectedWidth = getRealCursorPos(selectedTextFinalIdx, config.font, text)-selectedX;
+                selectedX = getRealCursorPos(selectedTextStartIdx, config->font, text);
+                selectedWidth = getRealCursorPos(selectedTextFinalIdx, config->font, text)-selectedX;
             } else {
-                selectedX = getRealCursorPos(selectedTextFinalIdx, config.font, text);
-                selectedWidth = getRealCursorPos(selectedTextStartIdx, config.font, text)-selectedX;
+                selectedX = getRealCursorPos(selectedTextFinalIdx, config->font, text);
+                selectedWidth = getRealCursorPos(selectedTextStartIdx, config->font, text)-selectedX;
             }
             
             DrawRectangle(rect.x-offsetX+selectedX, rect.y, selectedWidth, rect.height, {100,100,100,50});
@@ -62,7 +62,7 @@ void Meatball::InputTextBox::update() {
             float textWidth = 0;
             
             while (newCursorPos < strlen(text) && textWidth < GetMouseX()-rect.x+offsetX) {
-                textWidth += fh::MeasureTextWidth(config.font, TextSubtext(text, newCursorPos, 1))+1;
+                textWidth += fh::MeasureTextWidth(config->font, TextSubtext(text, newCursorPos, 1))+1;
                 ++newCursorPos;
             }
             
@@ -81,7 +81,7 @@ void Meatball::InputTextBox::update() {
             float textWidth = 0;
             
             while (newCursorPos < strlen(text) && textWidth < GetMouseX()-rect.x+offsetX) {
-                textWidth += fh::MeasureTextWidth(config.font, TextSubtext(text, newCursorPos, 1))+1;
+                textWidth += fh::MeasureTextWidth(config->font, TextSubtext(text, newCursorPos, 1))+1;
                 ++newCursorPos;
             }
             
@@ -255,7 +255,7 @@ void Meatball::InputTextBox::update() {
         selectedTextStartIdx = selectedTextFinalIdx = textMaxSize;
     
     } else {
-        float x = getRealCursorPos(cursorPos, config.font, text);
+        float x = getRealCursorPos(cursorPos, config->font, text);
         if (x-offsetX > rect.width || x-offsetX < 0 || offsetX > rect.width) {
             offsetX = x-rect.width+1;
             if (offsetX < 0) offsetX = 0;

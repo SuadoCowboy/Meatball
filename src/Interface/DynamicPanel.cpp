@@ -2,10 +2,10 @@
 
 #include "Utils/Utils.h"
 
-Meatball::DynamicPanel::DynamicPanel(Config::DynamicPanel &config)
+Meatball::DynamicPanel::DynamicPanel(std::shared_ptr<Config::DynamicPanel> config)
  : config(config), rect({0,0,0,0}) {}
 
-Meatball::DynamicPanel::DynamicPanel(const Rectangle &rect, Config::DynamicPanel &config)
+Meatball::DynamicPanel::DynamicPanel(const Rectangle &rect, std::shared_ptr<Config::DynamicPanel> config)
  : config(config), rect(rect) {}
 
 void Meatball::DynamicPanel::update() {
@@ -17,9 +17,10 @@ void Meatball::DynamicPanel::update() {
     2 = resizing
     4 = resizingFromN
     8 = resizingFromW
-    16 = wasHovered
+    16 = hovered
     */
-    if (!(conditions & 1) && !(conditions & 2) && !CheckCollisionPointRec(mousePos, {rect.x, rect.y, rect.width, rect.height})) {
+
+    if ((!(conditions & 1) && !(conditions & 2) && !CheckCollisionPointRec(mousePos, {rect.x, rect.y, rect.width, rect.height})) || !IsWindowFocused()) {
         if (conditions & 16) {
             SetMouseCursor(MOUSE_CURSOR_DEFAULT); // what if two dynamic panels intersects? TODO: test this case
             conditions &= ~16;
@@ -32,7 +33,7 @@ void Meatball::DynamicPanel::update() {
     if (!(conditions & 1) && !(conditions & 2)) {
     SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     
-    if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y+2, rect.width-4, config.grabHeight})) {
+    if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y+2, rect.width-4, config->grabHeight})) {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.y};
@@ -132,7 +133,7 @@ void Meatball::DynamicPanel::update() {
         rect.x = mousePos.x-offset.x;
         rect.y = mousePos.y-offset.y;
 
-        fitXYInRenderScreen(rect, {6-rect.width, 6-rect.height}, {6, 6});
+        fitXYInRenderScreen(rect, {6-rect.width, 0}, {6, 6});
 
         if (onMove && (rect.x != oldX || oldY != rect.y)) onMove();
     
@@ -146,11 +147,11 @@ void Meatball::DynamicPanel::update() {
             if (conditions & 8) {
                 rect.x = mousePos.x-offset.x;
                 
-                if (rect.width-rect.x+oldX > config.minSize.x)
+                if (rect.width-rect.x+oldX > config->minSize.x)
                     rect.width -= rect.x-oldX;
                 else {
-                    rect.x = oldX+rect.width-config.minSize.x;
-                    rect.width = config.minSize.x;
+                    rect.x = oldX+rect.width-config->minSize.x;
+                    rect.width = config->minSize.x;
                 }
             
             } else rect.width = mousePos.x-offset.x;
@@ -160,22 +161,26 @@ void Meatball::DynamicPanel::update() {
             if (conditions & 4) {
                 rect.y = mousePos.y-offset.y;
                 
-                if (rect.height-rect.y+oldY > config.minSize.y)
+                if (rect.height-rect.y+oldY > config->minSize.y)
                     rect.height -= rect.y-oldY;
                 else {
-                    rect.y = oldY+rect.height-config.minSize.y;
-                    rect.height = config.minSize.y;
+                    rect.y = oldY+rect.height-config->minSize.y;
+                    rect.height = config->minSize.y;
                 }
             
             } else rect.height = mousePos.y-offset.y;
         }
 
-        if (rect.width < config.minSize.x) rect.width = config.minSize.x;
-        if (rect.height < config.minSize.y) rect.height = config.minSize.y;
+        if (rect.width < config->minSize.x) rect.width = config->minSize.x;
+        if (rect.height < config->minSize.y) rect.height = config->minSize.y;
 
-        fitXYInRenderScreen(rect, {6-rect.width, 6-rect.height}, {6, 6});
+        fitXYInRenderScreen(rect, {6-rect.width, 6}, {6, 6});
 
         if (onResize && (oldWidth != rect.width || oldHeight != rect.height)) onResize(); // onResize should also call onMove
         else if (onMove && (oldX != rect.x || oldY != rect.y)) onMove();
     }
+}
+
+bool Meatball::DynamicPanel::isAnyConditionActive() {
+    return conditions == 0? false : true;
 }
