@@ -32,5 +32,5 @@ namespace Meatball {
     /// @note autoCompleteTextColor COLOR RRR,GGG,BBB,AAA
     /// @note autoCompleteHightlightTextColor COLOR RRR,GGG,BBB,AAA
     /// @note autoCompleteSelectedTextColor COLOR RRR,GGG,BBB,AAA
-    ConsoleUIScene initLocalConsole(Rectangle rect, const std::string &meatdataPath);
+    ConsoleUIScene initLocalConsole(const Rectangle& rect, const std::string &meatdataPath);
 }
