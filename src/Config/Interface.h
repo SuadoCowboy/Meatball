@@ -6,16 +6,15 @@
 
 namespace Meatball { namespace Config {
     struct Button {
-        Color color;
-        Color textColor;
-        
-        Color hoveredColor;
-        Color hoveredTextColor;
+        Button();
 
-        Font* font;
+        Color color;
+        Color hoveredColor;
     };
 
     struct TextButton {
+        TextButton();
+
         Color color;
         Color textColor;
 
@@ -26,23 +25,29 @@ namespace Meatball { namespace Config {
     };
 
     struct DynamicPanel {
+        DynamicPanel();
+
         Color color;
         Vector2 minSize;
         float grabHeight;
     };
 
     struct InputTextBox {
-        Font *font;
+        InputTextBox();
+
         Color color, textColor, cursorColor;
+        Font *font;
     };
     
     struct Console {
+        Console();
+
         Color autoCompleteColor; // color of the rect
         Color autoCompleteTextColor;
         Color autoCompleteHighlightedTextColor;
         Color autoCompleteSelectedTextColor;
 
-        Color labelColor;
+        Color labelTextColor;
 
         Font *mainFont; // used for input/output and (if exists)send button
         Font *labelFont; // used only for label
