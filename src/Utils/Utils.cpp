@@ -47,13 +47,15 @@ void Meatball::fitXYInRenderScreen(Rectangle &rect, const Vector2 &minPos, const
 }
 
 void Meatball::textErase(char* text, size_t index, size_t length) {
-    if (strlen(text) < index+length) return;
+    if (strlen(text) < index+length || strlen(text) == 0) return;
     
     while (true) {
 		text[index] = text[index+length];
 		if (text[index+length] == '\0') break;
 		++index;
 	}
+
+    text[index] = '\0';
 }
 
 size_t Meatball::textInsert(char* dest, size_t destMaxSize, size_t destIdx, const char* source) {
