@@ -9,7 +9,6 @@
 #include "Interface/ScrollTextBox.h"
 #include "Interface/InputTextBox.h"
 #include "Utils/Utils.h"
-#include "Config/Interface.h"
 
 #ifndef CONSOLEUI_OUTPUT_MAX_LINES
 #define CONSOLEUI_OUTPUT_MAX_LINES (unsigned int)1000
@@ -34,10 +33,28 @@ static void handleInputHistoryPos(Meatball::InputTextBox &inputBox, std::string 
 }
 
 namespace Meatball {
+    namespace Config {
+        struct ConsoleUI {
+            ConsoleUI();
+            
+            Font *mainFont; // used for input/output and (if exists)send button
+            Font *labelFont; // used only for label
+
+            Color autoCompleteColor; // color of the rect
+            Color autoCompleteTextColor;
+            Color autoCompleteHighlightedTextColor;
+            Color autoCompleteSelectedTextColor;
+
+            Color labelTextColor;
+
+            char labelText[20];
+        };
+    }
+
     class ConsoleUIScene : public Scene {
     public:
         /// @param visible if scene is visible or not(only this class uses this)
-        ConsoleUIScene(Rectangle rect, std::shared_ptr<Config::Console> config, std::shared_ptr<Config::DynamicPanel> mainPanelConfig, std::shared_ptr<Config::Button> closeButtonConfig, std::shared_ptr<Config::InputTextBox> inputBoxConfig, bool visible = true);
+        ConsoleUIScene(Rectangle rect, std::shared_ptr<Config::ConsoleUI> config, bool visible = true);
 
         /// @brief appends text to outputTextbox
         void print(const std::string &message);
@@ -105,18 +122,15 @@ namespace Meatball {
             outputBox.update();
             closeButton.update();
 
-            while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*outputBox.font->baseSize) {
+            while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*outputBox.config->font->baseSize) {
                 if (outputBox.getText().size() == 0) break;
                 outputBox.popFront();
             }
 
-            bool s = secondPanelTest.isAnyConditionActive();
-            bool m = mainPanel.isAnyConditionActive();
-            if (!s || m) mainPanel.update();
-            if (s || !m) secondPanelTest.update();
+            mainPanel.update();
         }
 
-        std::shared_ptr<Config::Console> config;
+        std::shared_ptr<Config::ConsoleUI> config;
 
         // Only console can appear in every scene so only it needs visible boolean.
         // The rest of the scenes will be handled by a class or something that says which one should be used.
@@ -126,7 +140,6 @@ namespace Meatball {
         Button closeButton;
         ScrollTextBox outputBox;
         InputTextBox inputBox;
-        DynamicPanel secondPanelTest;
         
         std::vector<std::pair<std::string, Color>> autoCompleteText;
 

@@ -10,16 +10,22 @@ using fh = Meatball::FontsHandler;
 
 unsigned char Meatball::ConsoleUIScene::margin = 4;
 
-Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config::Console> config, std::shared_ptr<Config::DynamicPanel> mainPanelConfig, std::shared_ptr<Config::Button> closeButtonConfig, std::shared_ptr<Config::InputTextBox> inputBoxConfig, bool visible)
- : Scene(), config(config), visible(visible), mainPanel(rect, mainPanelConfig),
- closeButton(closeButtonConfig), inputBox(inputBoxConfig), secondPanelTest({10,10,200,300}, mainPanelConfig) {
+Meatball::Config::ConsoleUI::ConsoleUI()
+ : autoCompleteColor(BLACK), autoCompleteTextColor(WHITE),
+ autoCompleteHighlightedTextColor(YELLOW), autoCompleteSelectedTextColor(PURPLE),
+ labelTextColor(WHITE), labelText("") {
+	mainFont = labelFont = fh::get("default");
+}
+
+Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config::ConsoleUI> config, bool visible)
+ : Scene(), config(config), visible(visible), mainPanel(rect) {
 	inputHistoryPos = 0;
 	inputHistorySize = 0;
 
 	autoCompleteSelectedIdxBegin = 0;
 	autoCompleteSelectedIdxEnd = 0;
 	
-	outputBox.font = config->mainFont;
+	outputBox.config->font = config->mainFont;
 	inputBox.config->font = config->mainFont;
 
 	mainPanel.onMove = [&]() {
@@ -56,7 +62,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 		// scrollBarWidth + (margin left + margin right) + labelText size
 		(int)outputBox.getScrollBar().getRect().width+margin*2+fh::MeasureTextWidth(config->labelFont, config->labelText),
 		// outputBox minSize + inputBox minSize + (margin left + margin right)
-		(int)outputBox.font->baseSize+inputBox.rect.height+margin*2};
+		(int)outputBox.config->font->baseSize+inputBox.rect.height+margin*2};
 
 	// add auto completion
 	inputBox.onTextChange = [&](const std::string &text) {
@@ -129,7 +135,6 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 }
 
 void Meatball::ConsoleUIScene::print(const std::string &message) {
-	// if you want a newline you will need to put "\n\n"
 	if (message[message.size()-1] == '\n')
 		outputBox.appendText(message.substr(0,message.size()-1));
 	else
@@ -139,12 +144,13 @@ void Meatball::ConsoleUIScene::print(const std::string &message) {
 void Meatball::ConsoleUIScene::draw() {
 	if (!visible) return;
 
-	drawRect(secondPanelTest.rect, secondPanelTest.config->color);
-
 	drawRect(mainPanel.rect, mainPanel.config->color);
 	
+	DrawRectangle(inputBox.rect.x, inputBox.rect.y, inputBox.rect.width, inputBox.rect.height, inputBox.config->color);
 	inputBox.draw();
+
 	outputBox.draw();
+	outputBox.drawScrollbar();
 
 	if (autoCompleteText.size() != 0) {
 		// I can't use draw method since I'm using offsetX
