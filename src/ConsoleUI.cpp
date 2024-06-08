@@ -17,8 +17,8 @@ Meatball::Config::ConsoleUI::ConsoleUI()
 	mainFont = labelFont = fh::get("default");
 }
 
-Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config::ConsoleUI> config, bool visible)
- : Scene(), config(config), visible(visible), mainPanel(rect) {
+Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config::ConsoleUI> _config, bool visible)
+ : Scene(), config(_config), visible(visible), mainPanel(rect) {
 	inputHistoryPos = 0;
 	inputHistorySize = 0;
 
@@ -32,7 +32,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 		closeButton.rect.x = mainPanel.rect.x+mainPanel.rect.width-margin-margin*0.5;
 		closeButton.rect.y = mainPanel.rect.y+margin*0.5;
 
-		outputBox.setPosition(mainPanel.rect.x+margin, mainPanel.rect.y+this->config->labelFont->baseSize+margin);
+		outputBox.setPosition(mainPanel.rect.x+margin, mainPanel.rect.y+config->labelFont->baseSize+margin);
 
 		inputBox.rect.x = mainPanel.rect.x+margin;
 		inputBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin-21;
@@ -44,7 +44,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 			closeButton.rect.width = margin; // is inside the margin
 			closeButton.rect.height = margin;
 
-			outputBox.setSize(mainPanel.rect.width-margin*2, mainPanel.rect.height-this->config->labelFont->baseSize-1-margin*2-21);
+			outputBox.setSize(mainPanel.rect.width-margin*2, mainPanel.rect.height-config->labelFont->baseSize-1-margin*2-21);
 			
 			inputBox.rect.width = outputBox.getRect().width;
 			inputBox.rect.height = 21;
