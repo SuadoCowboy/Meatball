@@ -3,7 +3,8 @@
 #include <raylib.h>
 
 namespace Meatball {
-    void drawRect(Rectangle &rect, Color &color);
+    void drawRect(const Rectangle &rect, const Color &color);
+
     /// @brief draws a X inside the rect bounds
     void drawX(Rectangle &rect, Color &color);
 

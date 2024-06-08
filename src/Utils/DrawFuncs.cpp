@@ -1,6 +1,6 @@
 #include "DrawFuncs.h"
 
-void Meatball::drawRect(Rectangle &rect, Color &color) {
+void Meatball::drawRect(const Rectangle &rect, const Color &color) {
     DrawRectangle(rect.x, rect.y, rect.width, rect.height, color);
 }
 
