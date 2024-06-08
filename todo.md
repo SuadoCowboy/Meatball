@@ -3,6 +3,7 @@
 
 # TODOS:
 - make FontsHandler use shared pointers to unload unreferenced fonts or something idk
+- try to fix input box. If it gets too hard then maybe go back to std::string
 - test if defined value on InputTextBox.h is changing correctly in the .cpp version that is using function calls instead of the defined variable
 - grabHeight proportional to screen size or window size
 - NEW IDEA: static colors in .meatdata. if the type is STATIC_COLOR, then it will be defined in a specific structure or class that creates maybe a const color and every other static color that is the same color will use this reference
