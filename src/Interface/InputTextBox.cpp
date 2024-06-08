@@ -7,18 +7,24 @@
 
 using fh = Meatball::FontsHandler;
 
+std::shared_ptr<Meatball::Config::InputTextBox> inputTextBoxConfig;
+
+Meatball::Config::InputTextBox::InputTextBox()
+  : color({40,40,40,255}), textColor(WHITE), cursorColor(WHITE), selectionColor({100,100,100,50}) {
+    font = FontsHandler::get("default");
+}
+
 static float getRealCursorPos(unsigned int cursorPos, Font* font, const char *text) {
     return fh::MeasureTextWidth(font, TextSubtext(text, 0, cursorPos))+1;
 }
 
-Meatball::InputTextBox::InputTextBox(std::shared_ptr<Config::InputTextBox> config)
- : config(config), rect({0,0,0,0}) {}
+Meatball::InputTextBox::InputTextBox()
+ : rect({0,0,0,0}) {}
 
-Meatball::InputTextBox::InputTextBox(const Rectangle &rect, std::shared_ptr<Config::InputTextBox> config)
- : config(config), rect(rect) {}
+Meatball::InputTextBox::InputTextBox(const Rectangle &rect)
+ : rect(rect) {}
 
 void Meatball::InputTextBox::draw() {
-    DrawRectangle(rect.x, rect.y, rect.width, rect.height, config->color);
     BeginScissorMode(rect.x-1, rect.y, rect.width, rect.height);
 
     drawText(config->font, text,
@@ -42,7 +48,7 @@ void Meatball::InputTextBox::draw() {
                 selectedWidth = getRealCursorPos(selectedTextStartIdx, config->font, text)-selectedX;
             }
             
-            DrawRectangle(rect.x-offsetX+selectedX, rect.y, selectedWidth, rect.height, {100,100,100,50});
+            DrawRectangle(rect.x-offsetX+selectedX, rect.y, selectedWidth, rect.height, config->selectionColor);
         }
     }
 

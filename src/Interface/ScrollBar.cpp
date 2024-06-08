@@ -4,27 +4,19 @@
 
 unsigned char Meatball::ScrollBar::scrollSpeed = 50;
 
-static void setupScrollBarColors(Meatball::ScrollBar *scrollBar) {
-    scrollBar->barColor = (Color){15,15,15,255};
-    scrollBar->barHoveredColor = (Color){25,25,25,255};
+std::shared_ptr<Meatball::Config::ScrollBar> Meatball::Defaults::scrollBarConfig;
 
-    scrollBar->thumbColor = (Color){30,30,30,255};
-    scrollBar->thumbHoveredColor1 = (Color){60,60,60,255};
-    scrollBar->thumbHoveredColor2 = (Color){90,90,90,255};
-}
+Meatball::Config::ScrollBar::ScrollBar()
+ : barColor({15,15,15,255}), barHoveredColor({25,25,25,255}),
+ thumbColor({30,30,30,255}), thumbHoveredColor1({60,60,60,255}), thumbHoveredColor2({90,90,90,255}) {}
 
-Meatball::ScrollBar::ScrollBar() : visible(false), rect({0,0,0,0}),
- barHovered(false), thumbHovered(false), thumbY(0), thumbHeight(rect.height),
- scrollValue(0), dragging(false), dragOffsetY(0) {
-    setupScrollBarColors(this);
-}
+static void setupScrollBarColors(std::shared_ptr<Meatball::Config::ScrollBar>& config) {}
 
-Meatball::ScrollBar::ScrollBar(Rectangle rect, bool visible)
-    : visible(visible), rect(rect), barHovered(false),
-    thumbHovered(false), thumbY(0), thumbHeight(rect.height),
-    scrollValue(0), dragging(false), dragOffsetY(0) {
-        setupScrollBarColors(this);
-    }
+Meatball::ScrollBar::ScrollBar()
+ : visible(false), rect({0,0,0,0}), thumbHeight(rect.height) {}
+
+Meatball::ScrollBar::ScrollBar(const Rectangle& rect, bool visible)
+ : visible(visible), rect(rect), thumbHeight(rect.height) {}
 
 void Meatball::ScrollBar::setPosition(float x, float y) {
     rect.x = x;
@@ -46,12 +38,12 @@ float Meatball::ScrollBar::getScrollValue() const {
 void Meatball::ScrollBar::draw() {
     if (!visible) return;
 
-    DrawRectangle(rect.x, rect.y, rect.width, rect.height, barHovered? barHoveredColor : barColor);
+    DrawRectangle(rect.x, rect.y, rect.width, rect.height, barHovered? config->barHoveredColor : config->barColor);
 
     Color *actualScrollColor;
-    if (barHovered) actualScrollColor = &thumbHoveredColor1;
-    else actualScrollColor = &thumbColor;
-    if (thumbHovered) actualScrollColor = &thumbHoveredColor2;
+    if (barHovered) actualScrollColor = &config->thumbHoveredColor1;
+    else actualScrollColor = &config->thumbColor;
+    if (thumbHovered) actualScrollColor = &config->thumbHoveredColor2;
 
     DrawRectangle(rect.x, rect.y+thumbY, rect.width, thumbHeight, *actualScrollColor);
 }

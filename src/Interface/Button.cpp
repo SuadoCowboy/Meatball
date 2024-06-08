@@ -2,11 +2,16 @@
 
 #include "Utils/Utils.h"
 
-Meatball::Button::Button(std::shared_ptr<Config::Button> config)
- : config(config), rect({0,0,0,0}) {}
+std::shared_ptr<Meatball::Config::Button> Meatball::Defaults::buttonConfig;
 
-Meatball::Button::Button(Rectangle &rect, std::shared_ptr<Config::Button> config)
- : config(config), rect(rect) {}
+Meatball::Config::Button::Button()
+ : color(BLACK), hoveredColor(WHITE) {}
+
+Meatball::Button::Button()
+ : rect({0,0,0,0}) {}
+
+Meatball::Button::Button(Rectangle &rect)
+ : rect(rect) {}
 
 void Meatball::Button::update() {
     checkHovered(hovered, rect, &onHover, &onRelease);

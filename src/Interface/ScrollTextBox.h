@@ -2,19 +2,34 @@
 
 #include <string>
 #include <list>
+#include <memory>
 
 #include <raylib.h>
 
 #include "ScrollBar.h"
 
 namespace Meatball {
+    namespace Config {
+        struct ScrollTextBox {
+            ScrollTextBox();
+
+            Font *font;
+
+            Color color, textColor;
+        };
+    }
+
+    namespace Defaults {
+        static std::shared_ptr<Config::ScrollTextBox> scrollTextBoxConfig;
+    }
+    
     /// @brief basically, a rect being used to draw text but with scrolling
     /// @note it also have a scrollable bar when text is higher than rect.height
     /// @note if you're looking for text input see TextInputBox instead
     class ScrollTextBox {
     public:
         ScrollTextBox();
-        ScrollTextBox(float x, float y, float width, float height, Font *font);
+        ScrollTextBox(const Rectangle& rect);
 
         const Rectangle &getRect() const;
         const unsigned int &getContentHeight() const;
@@ -35,16 +50,14 @@ namespace Meatball {
         void drawScrollbar();
         void update();
 
-        Color color, textColor;
-
         void setPosition(float x, float y);
         void setSize(float width, float height);
 
-        Font *font;
+        std::shared_ptr<Config::ScrollTextBox> config = Defaults::scrollTextBoxConfig;
 
     private:
         std::list<std::string> text;
-        unsigned int contentHeight;
+        unsigned int contentHeight = 0;
         
         ScrollBar scrollBar; // it appears when text is higher than rect.height
 

@@ -3,15 +3,23 @@
 #include "Button.h"
 
 #include "Utils/Utils.h"
+#include "Utils/DrawFuncs.h"
 #include "FontsHandler.h"
 
 using fh = Meatball::FontsHandler;
 
-Meatball::TextButton::TextButton(Config::TextButton &config)
- : config(config), rect({0,0,0,0}) {}
+std::shared_ptr<Meatball::Config::TextButton> textButtonConfig;
 
-Meatball::TextButton::TextButton(Rectangle rect, Config::TextButton &config)
- : config(config), rect(rect) {}
+Meatball::Config::TextButton::TextButton()
+ : color(BLACK), textColor(WHITE), hoveredColor(WHITE), hoveredTextColor(BLACK) {
+    font = FontsHandler::get("default");
+}
+
+Meatball::TextButton::TextButton()
+ : rect({0,0,0,0}) {}
+
+Meatball::TextButton::TextButton(Rectangle rect)
+ : rect(rect) {}
 
 bool Meatball::TextButton::isHovered() {
     return hovered;
@@ -21,17 +29,29 @@ void Meatball::TextButton::update() {
     checkHovered(hovered, rect, &onHover, &onRelease);
 }
 
+void Meatball::TextButton::drawRect() {
+    DrawRectangle(rect.x, rect.y, rect.width, rect.height, hovered? config->hoveredColor : config->color);
+}
+
+void Meatball::TextButton::drawText() {
+    BeginScissorMode(rect.x, rect.y, rect.width, rect.height);
+    
+    Meatball::drawText(config->font, text.c_str(), rect.x+rect.width*0.5, rect.y+rect.height*0.5, hovered? config->hoveredTextColor : config->textColor);
+
+    EndScissorMode();
+}
+
 const std::string &Meatball::TextButton::getText() {
     return text;
 }
 
-void Meatball::TextButton::setText(std::string &newText) {
-    int textWidth = fh::MeasureTextWidth(config.font, newText.c_str());
+void Meatball::TextButton::setText(const std::string &_newText) {
+    text = _newText;
+
+    int textWidth = fh::MeasureTextWidth(config->font, text.c_str());
 
     while (textWidth > rect.width) {
-        newText = newText.substr(0, newText.size()-1);
-        textWidth = fh::MeasureTextWidth(config.font, newText.c_str());
+        text.erase(text.end());
+        textWidth = fh::MeasureTextWidth(config->font, text.c_str());
     }
-
-    text = newText;
 }

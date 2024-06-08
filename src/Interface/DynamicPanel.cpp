@@ -2,11 +2,16 @@
 
 #include "Utils/Utils.h"
 
-Meatball::DynamicPanel::DynamicPanel(std::shared_ptr<Config::DynamicPanel> config)
- : config(config), rect({0,0,0,0}) {}
+std::shared_ptr<Meatball::Config::DynamicPanel> Meatball::Defaults::dynamicPanelConfig;
 
-Meatball::DynamicPanel::DynamicPanel(const Rectangle &rect, std::shared_ptr<Config::DynamicPanel> config)
- : config(config), rect(rect) {}
+Meatball::Config::DynamicPanel::DynamicPanel()
+ : color(BLACK), minSize({8,10}), grabHeight(2) {}
+
+Meatball::DynamicPanel::DynamicPanel()
+ : rect({0,0,0,0}) {}
+
+Meatball::DynamicPanel::DynamicPanel(const Rectangle &rect)
+ : rect(rect) {}
 
 void Meatball::DynamicPanel::update() {
     Vector2 mousePos = GetMousePosition();

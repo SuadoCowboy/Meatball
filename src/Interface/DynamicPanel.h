@@ -5,21 +5,34 @@
 #include <raylib.h>
 
 #include "Shared.h"
-#include "Config/Interface.h"
 
 namespace Meatball {
+    namespace Config {
+        struct DynamicPanel {
+            DynamicPanel();
+
+            Color color;
+            Vector2 minSize;
+            float grabHeight;
+        };
+    }
+
+    namespace Defaults {
+        static std::shared_ptr<Config::DynamicPanel> dynamicPanelConfig;
+    }
+
     /// @brief a panel that can be resized and moved
     class DynamicPanel {
     public:
-        DynamicPanel(std::shared_ptr<Config::DynamicPanel> config);
-        DynamicPanel(const Rectangle &rect, std::shared_ptr<Config::DynamicPanel> config);
+        DynamicPanel();
+        DynamicPanel(const Rectangle &rect);
 
         void update();
 
         /// @brief whether is dragging/resizing/hovered
         bool isAnyConditionActive();
 
-        std::shared_ptr<Config::DynamicPanel> config;
+        std::shared_ptr<Config::DynamicPanel> config = Defaults::dynamicPanelConfig;
         Rectangle rect;
 
         // TODO: grabHeight proportional to screen size or window size

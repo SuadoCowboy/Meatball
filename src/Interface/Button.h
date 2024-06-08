@@ -6,19 +6,32 @@
 #include <raylib.h>
 
 #include "Shared.h"
-#include "Config/Interface.h"
 
 namespace Meatball {
+    namespace Config {
+        struct Button {
+            Button();
+
+            Color color;
+            Color hoveredColor;
+        };
+    }
+
+    namespace Defaults {
+        static std::shared_ptr<Config::Button> buttonConfig;
+    }
+
     class Button {
     public:
-        Button(std::shared_ptr<Config::Button> config);
-        Button(Rectangle &rect, std::shared_ptr<Config::Button> config);
+        Button();
+        Button(Rectangle &rect);
         
         void update();
         bool isHovered();
 
+        std::shared_ptr<Config::Button> config = Defaults::buttonConfig;
+        
         VoidFunc onRelease, onHover;
-        std::shared_ptr<Config::Button> config;
         Rectangle rect;
 
     private:
