@@ -20,7 +20,7 @@ namespace Meatball {
     }
 
     namespace Defaults {
-        static std::shared_ptr<Config::ScrollTextBox> scrollTextBoxConfig;
+        extern std::shared_ptr<Config::ScrollTextBox> scrollTextBoxConfig;
     }
     
     /// @brief basically, a rect being used to draw text but with scrolling

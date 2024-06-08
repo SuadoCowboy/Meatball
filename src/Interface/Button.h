@@ -18,7 +18,7 @@ namespace Meatball {
     }
 
     namespace Defaults {
-        static std::shared_ptr<Config::Button> buttonConfig;
+        extern std::shared_ptr<Config::Button> buttonConfig;
     }
 
     class Button {

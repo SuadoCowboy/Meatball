@@ -23,7 +23,7 @@ namespace Meatball {
     }
 
     namespace Defaults {
-        static std::shared_ptr<Config::InputTextBox> inputTextBoxConfig;
+        extern std::shared_ptr<Config::InputTextBox> inputTextBoxConfig;
     }
 
     class InputTextBox {

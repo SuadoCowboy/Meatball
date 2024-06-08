@@ -7,7 +7,7 @@
 
 using fh = Meatball::FontsHandler;
 
-std::shared_ptr<Meatball::Config::InputTextBox> inputTextBoxConfig;
+std::shared_ptr<Meatball::Config::InputTextBox> Meatball::Defaults::inputTextBoxConfig;
 
 Meatball::Config::InputTextBox::InputTextBox()
   : color({40,40,40,255}), textColor(WHITE), cursorColor(WHITE), selectionColor({100,100,100,50}) {

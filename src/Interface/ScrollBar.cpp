@@ -10,8 +10,6 @@ Meatball::Config::ScrollBar::ScrollBar()
  : barColor({15,15,15,255}), barHoveredColor({25,25,25,255}),
  thumbColor({30,30,30,255}), thumbHoveredColor1({60,60,60,255}), thumbHoveredColor2({90,90,90,255}) {}
 
-static void setupScrollBarColors(std::shared_ptr<Meatball::Config::ScrollBar>& config) {}
-
 Meatball::ScrollBar::ScrollBar()
  : visible(false), rect({0,0,0,0}), thumbHeight(rect.height) {}
 

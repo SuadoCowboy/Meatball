@@ -6,21 +6,23 @@ static void use(Font *font) {
     SetTextLineSpacing(font->baseSize);
 }
 
-bool Meatball::FontsHandler::load(std::filesystem::path path, std::string name) {
-    if (fonts.count(name) != 0
-        || !std::filesystem::exists(path)
-        || std::filesystem::is_directory(path)) return false;
+bool Meatball::FontsHandler::loadEx(std::filesystem::path path, std::string name, unsigned char fontSize, int *codePoints, int codePointsCount) {
+    if (!std::filesystem::exists(path) || std::filesystem::is_directory(path))
+        return false;
+
+    if (fonts.count(name) == 0)
+        fonts[name] = LoadFontEx(path.string().c_str(), fontSize, codePoints, codePointsCount);
     
-    fonts[name] = LoadFont(path.string().c_str());
     return true;
 }
 
-bool Meatball::FontsHandler::loadEx(std::filesystem::path path, std::string name, unsigned char fontSize, int *codePoints, int codePointsCount) {
-    if (fonts.count(name) != 0
-        || !std::filesystem::exists(path)
-        || std::filesystem::is_directory(path)) return false;
-
-    fonts[name] = LoadFontEx(path.string().c_str(), fontSize, codePoints, codePointsCount);
+bool Meatball::FontsHandler::load(std::filesystem::path path, std::string name) {
+    if (!std::filesystem::exists(path) || std::filesystem::is_directory(path))
+        return false;
+    
+    if (fonts.count(name) == 0)
+        fonts[name] = LoadFont(path.string().c_str());
+    
     return true;
 }
 

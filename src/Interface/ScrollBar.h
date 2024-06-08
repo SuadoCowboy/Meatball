@@ -20,7 +20,7 @@ namespace Meatball {
     }
 
     namespace Defaults {
-        static std::shared_ptr<Config::ScrollBar> scrollBarConfig;
+        extern std::shared_ptr<Config::ScrollBar> scrollBarConfig;
     }
 
     class ScrollBar {

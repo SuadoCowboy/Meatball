@@ -1,14 +1,12 @@
 #include "TextButton.h"
 
-#include "Button.h"
-
 #include "Utils/Utils.h"
 #include "Utils/DrawFuncs.h"
 #include "FontsHandler.h"
 
 using fh = Meatball::FontsHandler;
 
-std::shared_ptr<Meatball::Config::TextButton> textButtonConfig;
+std::shared_ptr<Meatball::Config::TextButton> Meatball::Defaults::textButtonConfig;
 
 Meatball::Config::TextButton::TextButton()
  : color(BLACK), textColor(WHITE), hoveredColor(WHITE), hoveredTextColor(BLACK) {

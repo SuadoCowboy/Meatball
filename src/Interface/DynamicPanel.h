@@ -18,7 +18,7 @@ namespace Meatball {
     }
 
     namespace Defaults {
-        static std::shared_ptr<Config::DynamicPanel> dynamicPanelConfig;
+        extern std::shared_ptr<Config::DynamicPanel> dynamicPanelConfig;
     }
 
     /// @brief a panel that can be resized and moved

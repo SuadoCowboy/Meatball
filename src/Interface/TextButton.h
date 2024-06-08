@@ -23,7 +23,7 @@ namespace Meatball {
     }
 
     namespace Defaults {
-        static std::shared_ptr<Meatball::Config::TextButton> textButtonConfig;
+        extern std::shared_ptr<Meatball::Config::TextButton> textButtonConfig;
     }
 
     class TextButton {
@@ -41,7 +41,7 @@ namespace Meatball {
         const std::string &getText();
         void setText(const std::string &newText);
 
-        std::shared_ptr<Config::TextButton> config = textButtonConfig;
+        std::shared_ptr<Config::TextButton> config = Defaults::textButtonConfig;
         VoidFunc onRelease, onHover;
         Rectangle rect;
 
