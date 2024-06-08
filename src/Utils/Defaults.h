@@ -6,11 +6,11 @@
 
 #include "ConsoleUI.h"
 
-namespace Meatball {
+namespace Meatball { namespace Defaults {
     /// @brief loads all the needed data
     /// @param meatdataPath the path to the .meatdata file
     /// @warning for now it's sort of useless function but it's a work in progress
-    void init();
+    void init(const std::string& meatdataPath);
 
     /// @brief does the boring part for you.
     /// @param rect position and size of the console
@@ -33,4 +33,4 @@ namespace Meatball {
     /// @note autoCompleteHightlightTextColor COLOR RRR,GGG,BBB,AAA
     /// @note autoCompleteSelectedTextColor COLOR RRR,GGG,BBB,AAA
     ConsoleUIScene initLocalConsole(const Rectangle& rect, const std::string &meatdataPath);
-}
+}}
