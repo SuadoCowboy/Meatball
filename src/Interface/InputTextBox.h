@@ -56,9 +56,9 @@ namespace Meatball {
     private:
         float offsetX = 0;
 
-        bool mousePressed;
+        bool mousePressed = false;
 
-        char text[INPUT_TEXT_BOX_TEXT_BUFFER_SIZE];
+        char text[INPUT_TEXT_BOX_TEXT_BUFFER_SIZE] = "\0";
         unsigned short selectedTextStartIdx = INPUT_TEXT_BOX_TEXT_BUFFER_SIZE;
         unsigned short selectedTextFinalIdx = INPUT_TEXT_BOX_TEXT_BUFFER_SIZE;
     };

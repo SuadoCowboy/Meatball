@@ -37,7 +37,7 @@ void Meatball::InputTextBox::draw() {
         float x = rect.x-offsetX+getRealCursorPos(cursorPos, config->font, text);
         DrawLine(x, rect.y, x, rect.y+rect.height, config->cursorColor);
         
-        if (selectedTextStartIdx != getTextMaxSize() && selectedTextStartIdx != selectedTextFinalIdx) {
+        if (selectedTextStartIdx != getTextMaxSize() && selectedTextFinalIdx != getTextMaxSize()) {
             float selectedX, selectedWidth;
             
             if (selectedTextFinalIdx > selectedTextStartIdx) {
@@ -244,8 +244,11 @@ void Meatball::InputTextBox::update() {
             textSize = strlen(text);
         }
 
-        const char* c = (const char*)&codePoint;
-        textInsert(text, textMaxSize, cursorPos, c);
+        char buf[2] = " ";
+        buf[0] = (char)codePoint;
+        buf[1] = '\0';
+
+        textInsert(text, textMaxSize, cursorPos, buf);
         if (onTextChange) onTextChange(text);
         
         ++cursorPos;
