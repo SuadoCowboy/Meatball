@@ -28,13 +28,6 @@ void Meatball::Defaults::init(const std::string& meatdataPath) {
     {
         data = Config::ifContainsGet(initData, "mainPanelColor");
         if (data) dynamicPanelConfig->color = data->colorV;
-
-        /*
-        minSize is (4,4+grabHeight) because:
-        x: it's because of the space to resize the sides
-        y: it's the same thing but counting grabHeight
-        */
-        if (data) dynamicPanelConfig->minSize = {4,4+dynamicPanelConfig->grabHeight};
     }
 
     buttonConfig = std::make_shared<Config::Button>();
