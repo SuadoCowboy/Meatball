@@ -65,7 +65,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 		(int)outputBox.config->font->baseSize+inputBox.rect.height+margin*2};
 
 	// add auto completion
-	inputBox.onTextChange = [&](const std::string &text) {
+	inputBox.onTextChange = [&](const char *text) {
 		autoCompleteText.clear();
 
 		if (inputBoxOriginalText != text) {
@@ -74,12 +74,13 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 			inputBoxOriginalText = text;
 		}
 		
-		if (text.size() == 0) {
+		size_t textSize = strlen(text);
+		if (textSize == 0) {
 			return;
 		}
 
-		size_t spaceIdx = text.find(' ');
-		std::string commandName = text.substr(0, spaceIdx);
+		size_t spaceIdx = TextFindIndex(text, " ");
+		std::string commandName = TextSubtext(text, 0, spaceIdx);
 		HayBCMD::Command *pCommand = HayBCMD::Command::getCommand(commandName, false);
 		if (pCommand) {
 			autoCompleteText.push_back({pCommand->name+" "+pCommand->usage, config->autoCompleteTextColor});
@@ -94,13 +95,13 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 			if (leftText.size() != 0)
 				autoCompleteText.push_back({leftText, config->autoCompleteTextColor});
 			
-			autoCompleteText.push_back({command.name.substr(idx, text.size()), config->autoCompleteHighlightedTextColor}); // middleText
+			autoCompleteText.push_back({command.name.substr(idx, textSize), config->autoCompleteHighlightedTextColor}); // middleText
 			
-			autoCompleteText.push_back({command.name.substr(idx+text.size())+" ", config->autoCompleteTextColor}); // rightText
+			autoCompleteText.push_back({command.name.substr(idx+textSize)+" ", config->autoCompleteTextColor}); // rightText
 		}
 	};
 
-	inputBox.onSend = [&](const std::string &text) {
+	inputBox.onSend = [&](const char *text) {
 		autoCompleteText.clear();
 		print(text);
 		Console::run(text);
