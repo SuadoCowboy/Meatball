@@ -6,7 +6,7 @@
 #include <ConsoleUI.h>
 #include <Utils/Defaults.h>
 #include <FontsHandler.h>
-#include <Config/Config.h>
+#include <Config.h>
 
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 700
@@ -24,10 +24,10 @@ int main(int, char**)
     SetWindowState(FLAG_VSYNC_HINT);
     SetExitKey(KEY_NULL); // disable exit key
     
-    Meatball::init(); // for now it is sort of useless
+    Meatball::Defaults::init("data/meatdata/Init.meatdata"); // for now it is sort of useless
 
     // Utils/Defaults.h
-    auto consoleUI = Meatball::initLocalConsole(
+    auto consoleUI = Meatball::Defaults::initLocalConsole(
         {WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2},
         "data/meatdata/Console.meatdata");
 
