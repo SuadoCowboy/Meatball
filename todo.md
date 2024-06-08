@@ -2,8 +2,8 @@
 - Alot of objects might create alot of new colors in memory. Not only that but probably other data types... What I want to come over with is yet another data handler that stores the data and all classes variables uses pointers.
 
 # TODOS:
+- make FontsHandler use shared pointers to unload unreferenced fonts or something idk
 - test if defined value on InputTextBox.h is changing correctly in the .cpp version that is using function calls instead of the defined variable
-- if config being a reference is not considered a good practice then look how should it be
 - grabHeight proportional to screen size or window size
 - NEW IDEA: static colors in .meatdata. if the type is STATIC_COLOR, then it will be defined in a specific structure or class that creates maybe a const color and every other static color that is the same color will use this reference
 - change draw functions to let developer choose what he wants to draw
