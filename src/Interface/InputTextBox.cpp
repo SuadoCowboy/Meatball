@@ -243,7 +243,7 @@ void Meatball::InputTextBox::update() {
     }
     
     int codePoint = 0;
-    if (codePoint = GetCharPressed(), codePoint && textSize < textMaxSize) {
+    if (codePoint = GetCharPressed(), codePoint) {
         if (selectedTextFinalIdx != textMaxSize+1) {
             cursorPos = selectedTextFinalIdx > selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx;
             unsigned short delta = selectedTextFinalIdx > selectedTextStartIdx? selectedTextFinalIdx-selectedTextStartIdx
@@ -255,7 +255,8 @@ void Meatball::InputTextBox::update() {
             textSize = text.size();
         }
 
-        text.insert(text.begin()+cursorPos, (char)codePoint);
+        if (textSize < textMaxSize)
+            text.insert(text.begin()+cursorPos, (char)codePoint);
         if (onTextChange) onTextChange(text);
         
         textSize = text.size();
