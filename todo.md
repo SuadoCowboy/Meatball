@@ -2,7 +2,8 @@
 - Alot of objects might create alot of new colors in memory. Not only that but probably other data types... What I want to come over with is yet another data handler that stores the data and all classes variables uses pointers.
 
 # TODOS:
-- BUG: ScrollBar is not scrolling correctly. Use this input to test: "help; echo oh no; echo oh no; echo oh no; echo oh no; help; help; help; help; help; help". if the oh no keeps appearing then it means it's looping there for some reason. remember that now scrollValue is a unsigned char with range 0-100. Also it's not possible to reach the end of the outputBox, this means basically, that the whole scrollBar might be broken.
+- BUG: ScrollBar is not scrolling correctly. Use this input to test: "help; echo oh no; echo oh no; echo oh no; echo oh no; help; help; help; help; help; help". if the oh no keeps appearing then it means it's looping there for some reason. remember that now scrollValue is a unsigned char with range 0-100. Also it's not possible to reach the end of the outputBox and scrollValue is going higher than 100(that's probably the issue).
+- if outputBox's scrollValue is at the end and text is being appended, scrollValue follow to the end together or else just fix the scrollValue at where it is, by that I mean the ratio so scrollValue would change correctly with the contentHeight
 
 - make FontsHandler use shared pointers to unload unreferenced fonts or something idk
 

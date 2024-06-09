@@ -53,11 +53,12 @@ namespace Meatball {
         bool visible;
 
         static unsigned char scrollSpeed;
+    
     private:
         Rectangle rect;
 
         bool barHovered = false, thumbHovered = false;
-        float thumbY = 0, thumbHeight;
+        float thumbY = 0, thumbHeight = 1;
         unsigned char scrollValue = 0; // (0 - 100) it's %
         bool dragging = false; // Whether the thumb is currently being dragged
         float dragOffsetY = 0;
