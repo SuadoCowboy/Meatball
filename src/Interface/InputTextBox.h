@@ -8,8 +8,8 @@
 
 #include "Shared.h"
 
-#ifndef INPUT_TEXT_BOX_TEXT_BUFFER_SIZE
-#define INPUT_TEXT_BOX_TEXT_BUFFER_SIZE 10 // unsigned short range but the max number is itself-1 TODO: change this to a good value lol
+#ifndef INPUT_TEXT_BOX_TEXT_MAX_SIZE
+#define INPUT_TEXT_BOX_TEXT_MAX_SIZE 1000 // unsigned short range but the max number is itself-1 TODO: change this to a good value lol
 #endif
 
 namespace Meatball {
@@ -35,7 +35,7 @@ namespace Meatball {
         void update();
         
         static constexpr unsigned short getTextMaxSize() {
-            return INPUT_TEXT_BOX_TEXT_BUFFER_SIZE;
+            return INPUT_TEXT_BOX_TEXT_MAX_SIZE;
         }
 
         std::shared_ptr<Config::InputTextBox> config = Defaults::inputTextBoxConfig;
