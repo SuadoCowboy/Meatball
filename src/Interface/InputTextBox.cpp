@@ -148,8 +148,8 @@ void Meatball::InputTextBox::update() {
         if (moveMode) {
             while (cursorPos != 0 && text[cursorPos-1] == ' ') --cursorPos;
             while (cursorPos != 0 && text[cursorPos-1] != ' ') --cursorPos;
-        } else if (!selectMode && selectedTextFinalIdx != textMaxSize+1) {
-            cursorPos = selectedTextFinalIdx > selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx;
+        } else if (!selectMode && selectedTextFinalIdx != textMaxSize+1 && selectedTextStartIdx != selectedTextFinalIdx) {
+            cursorPos = selectedTextFinalIdx >= selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx;
 
         } else if (cursorPos != 0) --cursorPos;
         
@@ -165,8 +165,8 @@ void Meatball::InputTextBox::update() {
         if (moveMode) {
             while (cursorPos != textSize && text[cursorPos] == ' ') ++cursorPos;
             while (cursorPos != textSize && text[cursorPos] != ' ') ++cursorPos;
-        } else if (!selectMode && selectedTextFinalIdx != textMaxSize+1) {
-            cursorPos = selectedTextFinalIdx > selectedTextStartIdx? selectedTextFinalIdx : selectedTextStartIdx;
+        } else if (!selectMode && selectedTextFinalIdx != textMaxSize+1 && selectedTextStartIdx != selectedTextFinalIdx) {
+            cursorPos = selectedTextFinalIdx >= selectedTextStartIdx? selectedTextFinalIdx : selectedTextStartIdx;
 
         } else if (cursorPos != textSize) ++cursorPos;
         
