@@ -155,7 +155,7 @@ void Meatball::ScrollTextBox::setSize(float width, float height) {
     rect.width = width;
     rect.height = height;
 
-    scrollBar.setSize(width*0.04, height);
+    scrollBar.setSize(width*0.02, height);
 }
 
 void Meatball::ScrollTextBox::draw() {
