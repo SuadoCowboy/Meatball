@@ -106,10 +106,11 @@ void Meatball::ScrollTextBox::appendText(std::string newText, const std::shared_
         text.push_back({newText, color});
     } else
         handleTextWrapping(text, newText, color, config->font, rect.width-scrollBar.getRect().width);
-    
+
     contentHeight = _getContentHeight(text, config->font->baseSize);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
     if (contentHeight > rect.height) scrollBar.visible = true;
+
 }
 
 void Meatball::ScrollTextBox::clearText() {
@@ -172,7 +173,7 @@ void Meatball::ScrollTextBox::draw() {
             ++newLineAmount;
         }
 
-        int lineY = lineIdx*config->font->baseSize-scrollBar.getScrollValue()*rect.height;
+        int lineY = lineIdx*config->font->baseSize-((float)scrollBar.getScrollValue())/100*rect.height;
 
         if (lineY > rect.height) break;
 

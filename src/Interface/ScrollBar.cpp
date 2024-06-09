@@ -29,8 +29,12 @@ void Meatball::ScrollBar::setSize(float width, float height) {
     rect.height = height;
 }
 
-float Meatball::ScrollBar::getScrollValue() const {
+unsigned char Meatball::ScrollBar::getScrollValue() const {
     return scrollValue;
+}
+
+void Meatball::ScrollBar::setScrollValue(unsigned char value) {
+    scrollValue = value;
 }
 
 void Meatball::ScrollBar::draw() {
@@ -65,7 +69,7 @@ void Meatball::ScrollBar::update(const Rectangle &parentRect) {
     
     float mouseWheelMove = GetMouseWheelMove();
     if (mouseWheelMove != 0 && CheckCollisionPointRec(GetMousePosition(), parentRect)) {
-        thumbY -= mouseWheelMove  *scrollSpeed  *(thumbHeight/rect.height);
+        thumbY -= mouseWheelMove * scrollSpeed * (thumbHeight/rect.height);
     }
     
     if (dragging) {
@@ -77,7 +81,7 @@ void Meatball::ScrollBar::update(const Rectangle &parentRect) {
     // if down limit
     if (thumbY+thumbHeight > rect.height) thumbY = rect.height-thumbHeight;
     
-    scrollValue = thumbY / thumbHeight;
+    scrollValue = (thumbY / thumbHeight)*100;
 }
 
 const Rectangle &Meatball::ScrollBar::getRect() {
@@ -87,6 +91,6 @@ const Rectangle &Meatball::ScrollBar::getRect() {
 void Meatball::ScrollBar::updateThumbHeight(float viewHeight, float contentHeight) {
     if (contentHeight < viewHeight) contentHeight = viewHeight;
     
-    thumbHeight = (viewHeight / contentHeight)  *rect.height;
+    thumbHeight = (viewHeight / contentHeight) * rect.height;
     if (thumbHeight < 1) thumbHeight = 1;
 }

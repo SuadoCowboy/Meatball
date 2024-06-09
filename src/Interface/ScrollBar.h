@@ -34,7 +34,9 @@ namespace Meatball {
 
         void draw();
 
-        float getScrollValue() const;
+        unsigned char getScrollValue() const;
+        /// @param value should be between [0,100]
+        void setScrollValue(unsigned char value);
 
         /// @param viewHeight basically, the height of the parent
         /// @param contentHeight the maximum height that could be reached
@@ -56,7 +58,7 @@ namespace Meatball {
 
         bool barHovered = false, thumbHovered = false;
         float thumbY = 0, thumbHeight;
-        float scrollValue = 0; // (0.0 - 1.0) it's %
+        unsigned char scrollValue = 0; // (0 - 100) it's %
         bool dragging = false; // Whether the thumb is currently being dragged
         float dragOffsetY = 0;
     };
