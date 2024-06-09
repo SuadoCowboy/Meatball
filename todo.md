@@ -2,6 +2,8 @@
 - Alot of objects might create alot of new colors in memory. Not only that but probably other data types... What I want to come over with is yet another data handler that stores the data and all classes variables uses pointers.
 
 # TODOS:
+- BUG: ScrollBar is not scrolling correctly. Use this input to test: "help; echo oh no; echo oh no; echo oh no; echo oh no; help; help; help; help; help; help". if the oh no keeps appearing then it means it's looping there for some reason. remember that now scrollValue is a unsigned char with range 0-100. Also it's not possible to reach the end of the outputBox, this means basically, that the whole scrollBar might be broken.
+
 - make FontsHandler use shared pointers to unload unreferenced fonts or something idk
 
 - BUG: if tab is pressed when autoComplete has something in it, the selected one goes to the center(this should only happen if it passes through offsetX)
