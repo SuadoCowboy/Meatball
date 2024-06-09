@@ -135,10 +135,22 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
     
     auto consoleData = Config::loadData(meatdataPath);
     auto consoleConfig = std::make_shared<Config::ConsoleUI>();
+
     Config::ConfigData *data = Config::ifContainsGet(consoleData, "margin");
-    
     Meatball::ConsoleUIScene::margin = data?
         data->unsignedCharV : Meatball::ConsoleUIScene::margin;
+
+    data = Config::ifContainsGet(consoleData, "OutputDefaultColor");
+    if (data) *Config::OutputColors::defaultColor = data->colorV;
+
+    data = Config::ifContainsGet(consoleData, "OutputEchoColor");
+    if (data) *Config::OutputColors::echoColor = data->colorV;
+    
+    data = Config::ifContainsGet(consoleData, "OutputWarningColor");
+    if (data) *Config::OutputColors::warningColor = data->colorV;
+
+    data = Config::ifContainsGet(consoleData, "OutputErrorColor");
+    if (data) *Config::OutputColors::errorColor = data->colorV;
 
     Config::ConfigData *fontSizeData = Config::ifContainsGet(consoleData, "fontSize");
     data = Config::ifContainsGet(consoleData, "font");
