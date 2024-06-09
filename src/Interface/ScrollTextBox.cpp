@@ -173,7 +173,7 @@ void Meatball::ScrollTextBox::draw() {
             ++newLineAmount;
         }
 
-        int lineY = lineIdx*config->font->baseSize-(float)scrollBar.getScrollValue()/100*rect.height;
+        int lineY = lineIdx*config->font->baseSize-scrollBar.getScrollValue()*rect.height;
 
         if (lineY > rect.height) break;
 
