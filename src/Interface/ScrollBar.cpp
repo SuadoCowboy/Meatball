@@ -29,11 +29,11 @@ void Meatball::ScrollBar::setSize(float width, float height) {
     rect.height = height;
 }
 
-unsigned char Meatball::ScrollBar::getScrollValue() const {
+const float& Meatball::ScrollBar::getScrollValue() const {
     return scrollValue;
 }
 
-void Meatball::ScrollBar::setScrollValue(unsigned char value) {
+void Meatball::ScrollBar::setScrollValue(float value) {
     scrollValue = value;
 }
 
@@ -81,7 +81,7 @@ void Meatball::ScrollBar::update(const Rectangle &parentRect) {
     // if down limit
     if (thumbY+thumbHeight > rect.height) thumbY = rect.height-thumbHeight;
     
-    scrollValue = (thumbY / thumbHeight)*100;
+    scrollValue = thumbY / thumbHeight;
 }
 
 const Rectangle &Meatball::ScrollBar::getRect() {
