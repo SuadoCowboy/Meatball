@@ -1,7 +1,7 @@
 #include "Defaults.h"
 
 #include <filesystem>
-#include <cstring>
+#include <memory>
 
 #include <HayBCMD.h>
 
@@ -16,6 +16,7 @@
 #include "Interface/InputTextBox.h"
 #include "Interface/ScrollBar.h"
 #include "Interface/ScrollTextBox.h"
+#include "OutputColors.h"
 
 #define DEFAULT_FONT_SIZE 16
 
@@ -123,16 +124,13 @@ void Meatball::Defaults::init(const std::string& meatdataPath) {
 
         data = Config::ifContainsGet(initData, "color");
         if (data) scrollTextBoxConfig->color = data->colorV;
-
-        data = Config::ifContainsGet(initData, "textColor");
-        if (data) scrollTextBoxConfig->textColor = data->colorV;
     }
 }
 
 Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& rect, const std::string &meatdataPath) {
-    std::vector<std::string> messages;
-    HayBCMD::Output::setPrintFunction([&](const std::string &message) {
-        messages.push_back(message);
+    std::vector<std::pair<std::string, HayBCMD::OutputLevel>> texts;
+    HayBCMD::Output::setPrintFunction([&](const HayBCMD::OutputLevel &level, const std::string &text) {
+        texts.push_back({text, level});
     });
     
     auto consoleData = Config::loadData(meatdataPath);
@@ -169,7 +167,7 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
     data = Config::ifContainsGet(consoleData, "labelColor");
     if (data) consoleConfig->labelTextColor = data->colorV;
 
-    strcpy(consoleConfig->labelText, "Local Console");
+    consoleConfig->labelText = "Local Console";
 
     auto consoleUI = Meatball::ConsoleUIScene({rect.x, rect.y, rect.width, rect.height}, std::move(consoleConfig));
 
@@ -181,23 +179,23 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
     //data = Config::ifContainsGet(consoleData, "outputBoxTextColor");
     //if (data) consoleUI.outputBox.config->textColor = data->colorV;
 
-    Console::init([&](const std::string &message) {
+    Console::init([&](const HayBCMD::OutputLevel &level, const std::string &text) {
         size_t spaceIdxBefore = 0;
-        size_t currentSpaceIdx = message.find('\n');
+        size_t currentSpaceIdx = text.find('\n');
         
         while (currentSpaceIdx != std::string::npos) {
-            consoleUI.print(message.substr(spaceIdxBefore, currentSpaceIdx-spaceIdxBefore));
+            consoleUI.print(level, text.substr(spaceIdxBefore, currentSpaceIdx-spaceIdxBefore));
             spaceIdxBefore = currentSpaceIdx+1;
-            currentSpaceIdx = message.find('\n', spaceIdxBefore);
+            currentSpaceIdx = text.find('\n', spaceIdxBefore);
         }
 
-        consoleUI.print(message.substr(spaceIdxBefore));
+        consoleUI.print(level, text.substr(spaceIdxBefore));
     });
 
-    Console::print("Console initialized");
+    Console::print(HayBCMD::OutputLevel::ECHO, "Console initialized");
 
-    for (auto &message : messages)
-        Console::print(message);
+    for (auto &text : texts)
+        Console::print(text.second, text.first);
 
     HayBCMD::Command("clear", 0, 0,
         [&](HayBCMD::Command*, const std::vector<std::string>&) {
