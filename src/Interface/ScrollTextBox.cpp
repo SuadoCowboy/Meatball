@@ -3,12 +3,13 @@
 #include "FontsHandler.h"
 #include "Utils/Utils.h"
 #include "Utils/DrawFuncs.h"
+#include "OutputColors.h"
 
 using fh = Meatball::FontsHandler;
 
 std::shared_ptr<Meatball::Config::ScrollTextBox> Meatball::Defaults::scrollTextBoxConfig;
 
-Meatball::Config::ScrollTextBox::ScrollTextBox() : color(BLACK), textColor(WHITE) {
+Meatball::Config::ScrollTextBox::ScrollTextBox() : color(BLACK) {
     font = fh::get("default");
 }
 
@@ -22,8 +23,21 @@ Meatball::ScrollTextBox::ScrollTextBox(const Rectangle& rect) {
     setPosition(rect.x, rect.y);
 }
 
-static inline void handleTextWrapping(std::list<std::string> &textList, const std::string &text, Font *font, float maxWidth) {
-    textList.push_back("");
+static float _getContentHeight(const std::list<std::pair<std::string, const std::shared_ptr<Color>>> &text, float fontSize) {
+    size_t lineIdx = 0;
+    for (auto &line : text) {
+        size_t newLineIdx = 0;
+        while (newLineIdx != std::string::npos) {
+            newLineIdx = line.first.find('\n', newLineIdx+1);
+            lineIdx++;
+        }
+    }
+
+    return lineIdx*fontSize; // contentHeight
+}
+
+static inline void handleTextWrapping(std::list<std::pair<std::string, const std::shared_ptr<Color>>> &textList, const std::string &text, const std::shared_ptr<Color>& color, Font *font, float maxWidth) {
+    textList.push_back({"", color});
     std::string newText = text;
 
     while (fh::MeasureTextWidth(font, newText.c_str()) >= maxWidth) {
@@ -34,21 +48,21 @@ static inline void handleTextWrapping(std::list<std::string> &textList, const st
         
         --columnIdx;
 
-        textList.back() += newText.substr(0, columnIdx)+"\n";
+        textList.back().first += newText.substr(0, columnIdx)+"\n";
         newText = newText.substr(columnIdx);
     }
 
-    textList.back() += newText;
+    textList.back().first += newText;
 }
 
 void Meatball::ScrollTextBox::updateTextWrap() {
     for (auto &currentText : text) {
         std::string newText = "";
 
-        if (currentText.find('\n') != std::string::npos) {
+        if (currentText.first.find('\n') != std::string::npos) {
             bool foundNonNewLine = false;
             
-            for (auto &c : currentText) {
+            for (auto &c : currentText.first) {
                 if (c == '\n' && foundNonNewLine)
                     continue;
 
@@ -58,42 +72,42 @@ void Meatball::ScrollTextBox::updateTextWrap() {
                 }
             }
 
-            currentText = newText;
+            currentText.first = newText;
         }
 
         newText.clear();
-        while (fh::MeasureTextWidth(config->font, currentText.c_str()) >= rect.width-scrollBar.getRect().width) {
+        while (fh::MeasureTextWidth(config->font, currentText.first.c_str()) >= rect.width-scrollBar.getRect().width) {
             size_t columnIdx = 1;
 
-            while (fh::MeasureTextWidth(config->font, currentText.substr(0, columnIdx).c_str()) < rect.width-scrollBar.getRect().width)
+            while (fh::MeasureTextWidth(config->font, currentText.first.substr(0, columnIdx).c_str()) < rect.width-scrollBar.getRect().width)
                 ++columnIdx;
             
             --columnIdx;
             if (columnIdx == 0) break;
 
-            newText += currentText.substr(0, columnIdx)+"\n";
-            currentText = currentText.substr(columnIdx);
+            newText += currentText.first.substr(0, columnIdx)+"\n";
+            currentText.first = currentText.first.substr(columnIdx);
         }
 
-        newText += currentText;
-        currentText = newText;
+        newText += currentText.first;
+        currentText.first = newText;
     }
 
-    contentHeight = Meatball::getContentHeight(config->font->baseSize, text);
+    contentHeight = _getContentHeight(text, config->font->baseSize);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
     scrollBar.update(rect);
     scrollBar.visible = contentHeight > rect.height;
 }
 
-void Meatball::ScrollTextBox::appendText(std::string newText) {
+void Meatball::ScrollTextBox::appendText(std::string newText, const std::shared_ptr<Color>& color) {
     if (newText.size() == 0) return;
     
     if (fh::MeasureTextWidth(config->font, newText.c_str()) < rect.width-scrollBar.getRect().width) {
-        text.push_back(newText);
+        text.push_back({newText, color});
     } else
-        handleTextWrapping(text, newText, config->font, rect.width-scrollBar.getRect().width);
+        handleTextWrapping(text, newText, color, config->font, rect.width-scrollBar.getRect().width);
     
-    contentHeight = Meatball::getContentHeight(config->font->baseSize, text);
+    contentHeight = _getContentHeight(text, config->font->baseSize);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
     if (contentHeight > rect.height) scrollBar.visible = true;
 }
@@ -103,18 +117,18 @@ void Meatball::ScrollTextBox::clearText() {
     scrollBar.visible = false;
     
     // to fix view
-    contentHeight = Meatball::getContentHeight(config->font->baseSize, text);
+    contentHeight = _getContentHeight(text, config->font->baseSize);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
     scrollBar.update(rect);
 }
 
 void Meatball::ScrollTextBox::popFront() noexcept {
     text.pop_front();
-    contentHeight = Meatball::getContentHeight(config->font->baseSize, text);
+    contentHeight = _getContentHeight(text, config->font->baseSize);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
 }
 
-const std::list<std::string> &Meatball::ScrollTextBox::getText() const {
+const std::list<std::pair<std::string, const std::shared_ptr<Color>>> &Meatball::ScrollTextBox::getText() const {
     return text;
 }
 
@@ -154,7 +168,7 @@ void Meatball::ScrollTextBox::draw() {
         size_t newLineIdx = 0;
         size_t newLineAmount = 0;
         while (newLineIdx != std::string::npos) {
-            newLineIdx = line.find('\n', newLineIdx+1);
+            newLineIdx = line.first.find('\n', newLineIdx+1);
             ++newLineAmount;
         }
 
@@ -163,8 +177,8 @@ void Meatball::ScrollTextBox::draw() {
         if (lineY > rect.height) break;
 
         if (lineY+config->font->baseSize*newLineAmount > 0)
-            drawText(config->font, line.c_str(), rect.x,
-            rect.y+lineY+1/*+1 because letters get stuck 1 pixel in the top*/, config->textColor);
+            drawText(config->font, line.first.c_str(), rect.x,
+            rect.y+lineY+1/*+1 because letters get stuck 1 pixel in the top*/, *line.second);
         
         lineIdx += newLineAmount;
     }
