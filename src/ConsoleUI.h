@@ -3,6 +3,8 @@
 #include <string>
 #include <memory>
 
+#include <HayBCMD.h>
+
 #include "Scene.h"
 #include "Interface/DynamicPanel.h"
 #include "Interface/Button.h"
@@ -27,9 +29,9 @@ static void handleInputHistoryPos(Meatball::InputTextBox &inputBox, std::string 
     
     else return;
     
-    inputBox.setText(inputHistory[inputHistoryPos].c_str());
+    inputBox.text = inputHistory[inputHistoryPos];
     inputBox.cursorPos = inputHistory[inputHistoryPos].size();
-    inputBox.onTextChange(inputBox.getText());
+    inputBox.onTextChange(inputBox.text);
 }
 
 namespace Meatball {
@@ -47,7 +49,7 @@ namespace Meatball {
 
             Color labelTextColor;
 
-            char labelText[20];
+            const char* labelText;
         };
     }
 
@@ -57,7 +59,7 @@ namespace Meatball {
         ConsoleUIScene(Rectangle rect, std::shared_ptr<Config::ConsoleUI> config, bool visible = true);
 
         /// @brief appends text to outputTextbox
-        void print(const std::string &message);
+        void print(const HayBCMD::OutputLevel &level, const std::string &text);
 
         void draw();
         void update() {
@@ -69,7 +71,7 @@ namespace Meatball {
                 if ((IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB)) && autoCompleteText.size() != 0) {
                     // -1
                     if (IsKeyDown(KEY_LEFT_SHIFT) && autoCompleteSelectedIdxBegin != 0) {
-                        inputBox.onTextChange(inputBoxOriginalText.c_str());
+                        inputBox.onTextChange(inputBoxOriginalText);
 
                         autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
                         
@@ -86,14 +88,14 @@ namespace Meatball {
                         }
                         
                         newText.pop_back();
-                        inputBox.setText(newText.c_str());
+                        inputBox.text = newText;
                         inputBox.cursorPos = newText.size();
                         autoCompleteSelectedIdxBegin = idx == 0? 0 : idx+1;
                     }
                     
                     // +1
                     else if (autoCompleteSelectedIdxEnd != autoCompleteText.size()-1) {
-                        inputBox.onTextChange(inputBoxOriginalText.c_str());
+                        inputBox.onTextChange(inputBoxOriginalText);
                         
                         autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd+1;
                         if (autoCompleteSelectedIdxEnd == 0) autoCompleteSelectedIdxBegin = 0;
@@ -109,7 +111,7 @@ namespace Meatball {
                         }
                         
                         newText.pop_back();
-                        inputBox.setText(newText.c_str());
+                        inputBox.text = newText;
                         inputBox.cursorPos = newText.size();
                         autoCompleteSelectedIdxEnd = idx;
                     }

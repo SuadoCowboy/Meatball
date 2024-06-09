@@ -1,10 +1,9 @@
 #include "ConsoleUI.h"
 
-#include <HayBCMD.h>
-
 #include "Console.h"
 #include "Utils/DrawFuncs.h"
 #include "FontsHandler.h"
+#include "OutputColors.h"
 
 using fh = Meatball::FontsHandler;
 
@@ -13,7 +12,7 @@ unsigned char Meatball::ConsoleUIScene::margin = 4;
 Meatball::Config::ConsoleUI::ConsoleUI()
  : autoCompleteColor(BLACK), autoCompleteTextColor(WHITE),
  autoCompleteHighlightedTextColor(YELLOW), autoCompleteSelectedTextColor(PURPLE),
- labelTextColor(WHITE), labelText("") {
+ labelTextColor(WHITE) {
 	mainFont = labelFont = fh::get("default");
 }
 
@@ -65,7 +64,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 		(int)outputBox.config->font->baseSize+inputBox.rect.height+margin*2};
 
 	// add auto completion
-	inputBox.onTextChange = [&](const char *text) {
+	inputBox.onTextChange = [&](std::string& text) {
 		autoCompleteText.clear();
 
 		if (inputBoxOriginalText != text) {
@@ -74,13 +73,13 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 			inputBoxOriginalText = text;
 		}
 		
-		size_t textSize = strlen(text);
+		size_t textSize = text.size();
 		if (textSize == 0) {
 			return;
 		}
 
-		size_t spaceIdx = TextFindIndex(text, " ");
-		std::string commandName = TextSubtext(text, 0, spaceIdx);
+		size_t spaceIdx = text.find(" ");
+		std::string commandName = text.substr(0, spaceIdx);
 		HayBCMD::Command *pCommand = HayBCMD::Command::getCommand(commandName, false);
 		if (pCommand) {
 			autoCompleteText.push_back({pCommand->name+" "+pCommand->usage, config->autoCompleteTextColor});
@@ -101,9 +100,9 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 		}
 	};
 
-	inputBox.onSend = [&](const char *text) {
+	inputBox.onSend = [&](std::string& text) {
 		autoCompleteText.clear();
-		print(text);
+		print(HayBCMD::OutputLevel::DEFAULT, text);
 		Console::run(text);
 		addToInputHistory(text);
 	};
@@ -135,11 +134,11 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 	*/
 }
 
-void Meatball::ConsoleUIScene::print(const std::string &message) {
-	if (message[message.size()-1] == '\n')
-		outputBox.appendText(message.substr(0,message.size()-1));
+void Meatball::ConsoleUIScene::print(const HayBCMD::OutputLevel &level, const std::string &text) {
+	if (text[text.size()-1] == '\n')
+		outputBox.appendText(text.substr(0,text.size()-1), outputLevelToOutputColor(level));
 	else
-		outputBox.appendText(message);
+		outputBox.appendText(text, outputLevelToOutputColor(level));
 }
 
 void Meatball::ConsoleUIScene::draw() {
