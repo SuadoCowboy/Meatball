@@ -255,9 +255,10 @@ void Meatball::InputTextBox::update() {
             textSize = text.size();
         }
 
-        text.insert(text.end(), (char)codePoint);
+        text.insert(text.begin()+cursorPos, (char)codePoint);
         if (onTextChange) onTextChange(text);
         
+        textSize = text.size();
         ++cursorPos;
 
         selectedTextStartIdx = selectedTextFinalIdx = textMaxSize+1;
@@ -265,8 +266,8 @@ void Meatball::InputTextBox::update() {
 
     if (onSend && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER)) && textSize != 0) {
         onSend(text);
-        text[0] = '\0';
-        cursorPos = textSize;
+        text.clear();
+        cursorPos = textSize = 0;
         offsetX = 0;
         selectedTextStartIdx = selectedTextFinalIdx = textMaxSize+1;
     
