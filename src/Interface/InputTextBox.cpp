@@ -273,7 +273,7 @@ void Meatball::InputTextBox::update() {
     
     } else {
         float x = getRealCursorPos(cursorPos, config->font, text);
-        if (x-offsetX > rect.width || x-offsetX < 0 || offsetX > rect.width) {
+        if (x-offsetX > rect.width || x-offsetX < 0) {
             offsetX = x-rect.width+1;
             if (offsetX < 0) offsetX = 0;
         }
