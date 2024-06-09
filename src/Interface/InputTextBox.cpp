@@ -133,7 +133,7 @@ void Meatball::InputTextBox::update() {
 
             const char *clipboard = GetClipboardText();
             for (size_t i = 0; clipboard[i] != '\0'; ++i) {
-                if (textSize+1 > textMaxSize) break;
+                if (textSize >= textMaxSize) break;
                 
                 text.insert(text.begin()+cursorPos, clipboard[i]);
                 ++cursorPos;
