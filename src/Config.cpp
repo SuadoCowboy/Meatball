@@ -15,7 +15,7 @@ Meatball::Config::ConfigData::ConfigData() {}
 
 static bool handleSpaceError(size_t spaceIdx, size_t spaceIdxBefore, size_t lineIdx) {
     if (spaceIdx == std::string::npos || spaceIdx == 0 || spaceIdx == spaceIdxBefore+1) {
-        Meatball::Console::printf("ERROR: Could not load data: space error in line {}", lineIdx);
+        Meatball::Console::printf(HayBCMD::OutputLevel::ERROR, "could not load data: space error in line {}", lineIdx);
         return true;
     }
 
@@ -28,7 +28,7 @@ Meatball::Config::ConfigData *Meatball::Config::ifContainsGet(std::unordered_map
 
 std::unordered_map<std::string, Meatball::Config::ConfigData> Meatball::Config::loadData(std::filesystem::path path) {
     if (!std::filesystem::exists(path) || std::filesystem::is_directory(path) || path.extension() != ".meatdata") {
-        Console::printf("ERROR: Could not load data: \"{}\" is not compatible or does not exist\n", path.string());
+        Console::printf(HayBCMD::OutputLevel::ERROR, "could not load data: \"{}\" is not compatible or does not exist\n", path.string());
         return {};
     }
 
@@ -84,7 +84,7 @@ std::unordered_map<std::string, Meatball::Config::ConfigData> Meatball::Config::
         }
 
         else {
-            Meatball::Console::printf("ERROR: Could not load data: missing TYPE in line {}\n", lineIdx);
+            Meatball::Console::printf(HayBCMD::OutputLevel::ERROR, "could not load data: missing TYPE in line {}\n", lineIdx);
             return {};
         }
         

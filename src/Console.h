@@ -10,7 +10,7 @@ namespace Meatball {
     class Console {
     public:
         /// @brief initializes static functionalities of HayBCMD
-        static void init(std::function<void(const std::string&)> printFunction);
+        static void init(const HayBCMD::PrintFunction &printFunction);
 
         /// @brief parses a string into HayBCMD
         static void run(const std::string &input);
@@ -18,8 +18,8 @@ namespace Meatball {
         static constexpr auto print = HayBCMD::Output::print;
 
         template<typename ...Args>
-        static void printf(const std::string &format, Args ...args) {
-            HayBCMD::Output::printf(format, args...);
+        static void printf(const HayBCMD::OutputLevel &level, const std::string &format, Args ...args) {
+            HayBCMD::Output::printf(level, format, args...);
         }
 
     private:

@@ -1,10 +1,8 @@
 #include "Console.h"
 
-#include <HayBCMD.h>
-
 std::unordered_map<std::string, std::string> Meatball::Console::variables = {};
 
-void Meatball::Console::init(std::function<void(const std::string&)> printFunction) {
+void Meatball::Console::init(const HayBCMD::PrintFunction &printFunction) {
     HayBCMD::Output::setPrintFunction(printFunction);
     HayBCMD::BaseCommands::init(&variables);
 }
