@@ -46,7 +46,7 @@ namespace Meatball {
         
         const Rectangle &getRect();
 
-        std::shared_ptr<Config::ScrollBar> config;
+        std::shared_ptr<Config::ScrollBar> config = Defaults::scrollBarConfig;
         
         bool visible;
 
