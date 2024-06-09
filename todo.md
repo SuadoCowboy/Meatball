@@ -4,9 +4,7 @@
 # TODOS:
 - make FontsHandler use shared pointers to unload unreferenced fonts or something idk
 
-CURRENT BUGS:
-if resizes mainPanel height to half of the text size it crashes;
-if tab is pressed when autoComplete has something in it, the selected one goes to the center(this should only happen if it passes through offsetX)
+- BUG: if tab is pressed when autoComplete has something in it, the selected one goes to the center(this should only happen if it passes through offsetX)
 
 - test if defined value on InputTextBox.h is changing correctly in the .cpp version that is using function calls instead of the defined variable
 - grabHeight proportional to screen size or window size
