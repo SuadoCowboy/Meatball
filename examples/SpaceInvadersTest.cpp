@@ -8,10 +8,23 @@
 #include <FontsHandler.h>
 #include <Config.h>
 
-#define WINDOW_WIDTH 1000
-#define WINDOW_HEIGHT 700
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 
 namespace Config = Meatball::Config;
+
+static Meatball::ConsoleUIScene initConsole() {
+    Rectangle consoleUIRect = {0, 0, WINDOW_WIDTH*0.5f, WINDOW_HEIGHT*0.75f};
+    consoleUIRect.x = WINDOW_WIDTH*0.5f-consoleUIRect.width*0.5;
+    consoleUIRect.y = WINDOW_HEIGHT*0.5f-consoleUIRect.height*0.5;
+
+    // Utils/Defaults.h
+    auto consoleUI = Meatball::Defaults::initLocalConsole(
+        consoleUIRect,
+        "data/meatdata/Console.meatdata");
+    
+    return consoleUI;
+}
 
 int main(int, char**)
 {
@@ -25,11 +38,8 @@ int main(int, char**)
     SetExitKey(KEY_NULL); // disable exit key
     
     Meatball::Defaults::init("data/meatdata/Init.meatdata"); // for now it is sort of useless
-
-    // Utils/Defaults.h
-    auto consoleUI = Meatball::Defaults::initLocalConsole(
-        {WINDOW_WIDTH/4, WINDOW_HEIGHT/4, WINDOW_WIDTH/2, WINDOW_HEIGHT/2},
-        "data/meatdata/Console.meatdata");
+    
+    auto consoleUI = initConsole();
 
     Color backgroundColor = RAYWHITE;
     {
