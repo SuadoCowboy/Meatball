@@ -27,10 +27,6 @@ void Meatball::TextButton::update() {
     checkHovered(hovered, rect, &onHover, &onRelease);
 }
 
-void Meatball::TextButton::drawRect() {
-    DrawRectangle(rect.x, rect.y, rect.width, rect.height, hovered? config->hoveredColor : config->color);
-}
-
 void Meatball::TextButton::drawText() {
     BeginScissorMode(rect.x, rect.y, rect.width, rect.height);
     

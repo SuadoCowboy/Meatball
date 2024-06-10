@@ -33,11 +33,11 @@ namespace Meatball {
 
         void update();
 
-        void drawRect();
         /// @brief draws text centered on the button
         void drawText();
 
         bool isHovered();
+        
         const std::string &getText();
         void setText(const std::string &newText);
 
