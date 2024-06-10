@@ -8,10 +8,6 @@
 
 #include "Shared.h"
 
-#ifndef INPUT_TEXT_BOX_TEXT_MAX_SIZE
-#define INPUT_TEXT_BOX_TEXT_MAX_SIZE 1000 // unsigned short range but the max number is itself-1 TODO: change this to a good value lol
-#endif
-
 namespace Meatball {
     namespace Config {
         struct InputTextBox {
@@ -33,24 +29,26 @@ namespace Meatball {
 
         void draw();
         void update();
-        
-        static constexpr unsigned short getTextMaxSize() {
-            return INPUT_TEXT_BOX_TEXT_MAX_SIZE;
-        }
 
         std::shared_ptr<Config::InputTextBox> config = Defaults::inputTextBoxConfig;
         
         // onSend by default runs when KEY_ENTER/KEY_KP_ENTER is pressed
-        std::function<void(std::string&)> onSend, onTextChange;
+        std::function<void(const std::string&)> onSend, onTextChange;
         
         bool focused = false;
         size_t cursorPos = 0;
 
         Rectangle rect;
 
+        const std::string& getText() const;
+        /// @return false if text size is higher than allowed
+        bool setText(const std::string& text);
+
+        // textMaxSize range is the unsigned short range from 0 to max unsigned short MINUS ONE;
+        unsigned short textMaxSize = 1000;
+    private:
         std::string text = "";
 
-    private:
         float offsetX = 0;
 
         bool mousePressed = false;

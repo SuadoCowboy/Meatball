@@ -36,7 +36,7 @@ void Meatball::InputTextBox::draw() {
         float x = rect.x-offsetX+getRealCursorPos(cursorPos, config->font, text);
         DrawLine(x, rect.y, x, rect.y+rect.height, config->cursorColor);
         
-        if (selectedTextStartIdx != getTextMaxSize()+1 && selectedTextFinalIdx != getTextMaxSize()+1) {
+        if (selectedTextStartIdx != textMaxSize+1 && selectedTextFinalIdx != textMaxSize+1) {
             float selectedX, selectedWidth;
             
             if (selectedTextFinalIdx > selectedTextStartIdx) {
@@ -54,9 +54,19 @@ void Meatball::InputTextBox::draw() {
     EndScissorMode();
 }
 
+bool Meatball::InputTextBox::setText(const std::string& newText) {
+    if (newText.size() > textMaxSize) return false;
+
+    text = newText;
+    return true;
+}
+
+const std::string& Meatball::InputTextBox::getText() const {
+    return text;
+}
+
 void Meatball::InputTextBox::update() {
     unsigned short textSize = text.size();
-    unsigned short textMaxSize = getTextMaxSize();
     
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         bool wasFocusedBefore = focused;
