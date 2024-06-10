@@ -155,7 +155,8 @@ void Meatball::ConsoleUIScene::update() {
 	if (inputBox.focused) {
 		if ((IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB)) && autoCompleteText.size() != 0) {
 			// -1
-			if (IsKeyDown(KEY_LEFT_SHIFT) && autoCompleteSelectedIdxBegin != 0) {
+			bool isLeftShiftDown = IsKeyDown(KEY_LEFT_SHIFT);
+			if (isLeftShiftDown && autoCompleteSelectedIdxBegin != 0) {
 				inputBox.onTextChange(inputBoxOriginalText);
 
 				autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
@@ -179,7 +180,7 @@ void Meatball::ConsoleUIScene::update() {
 			}
 			
 			// +1
-			else if (autoCompleteSelectedIdxEnd != autoCompleteText.size()-1) {
+			if (!isLeftShiftDown && autoCompleteSelectedIdxEnd != autoCompleteText.size()-1) {
 				inputBox.onTextChange(inputBoxOriginalText);
 				
 				autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd+1;
