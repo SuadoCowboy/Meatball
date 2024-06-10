@@ -241,7 +241,7 @@ void Meatball::ConsoleUIScene::draw() {
 				offsetX += fh::MeasureTextWidth(config->mainFont, pair.first.c_str())+1;
 			}
 
-			if (offsetX+selectedTextWidth < config->mainFont->baseSize) offsetX = 0;
+			if (offsetX+selectedTextWidth < mainPanel.rect.width) offsetX = 0;
 			
 			else offsetX -= (mainPanel.rect.width-selectedTextWidth)*0.5;
 		}
