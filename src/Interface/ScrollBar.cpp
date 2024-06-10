@@ -91,6 +91,11 @@ const Rectangle &Meatball::ScrollBar::getRect() {
 void Meatball::ScrollBar::updateThumbHeight(float viewHeight, float contentHeight) {
     if (contentHeight < viewHeight) contentHeight = viewHeight;
     
-    thumbHeight = (viewHeight / contentHeight) * rect.height;
-    if (thumbHeight < 1) thumbHeight = 1;
+    float newThumbHeight = (viewHeight / contentHeight) * rect.height;
+    if (newThumbHeight < 1) newThumbHeight = 1;
+
+    if (thumbY+thumbHeight == rect.height) thumbY = rect.height-newThumbHeight;
+    else thumbY = scrollValue*newThumbHeight;
+
+    thumbHeight = newThumbHeight;
 }
