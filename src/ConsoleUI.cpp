@@ -17,9 +17,10 @@ static void handleInputHistoryPos(Meatball::InputTextBox &inputBox, std::string 
     
     else return;
     
-    inputBox.text = inputHistory[inputHistoryPos];
-    inputBox.cursorPos = inputHistory[inputHistoryPos].size();
-    inputBox.onTextChange(inputBox.text);
+    if (inputBox.setText(inputHistory[inputHistoryPos])) {
+		inputBox.cursorPos = inputHistory[inputHistoryPos].size();
+		inputBox.onTextChange(inputBox.getText());
+	}
 }
 
 Meatball::Config::ConsoleUI::ConsoleUI()
@@ -77,7 +78,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 		(int)outputBox.config->font->baseSize+inputBox.rect.height+margin*2};
 
 	// add auto completion
-	inputBox.onTextChange = [&](std::string& text) {
+	inputBox.onTextChange = [&](const std::string& text) {
 		autoCompleteText.clear();
 
 		if (inputBoxOriginalText != text) {
@@ -113,7 +114,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 		}
 	};
 
-	inputBox.onSend = [&](std::string& text) {
+	inputBox.onSend = [&](const std::string& text) {
 		autoCompleteText.clear();
 		print(HayBCMD::OutputLevel::DEFAULT, text);
 		Console::run(text);
@@ -174,9 +175,10 @@ void Meatball::ConsoleUIScene::update() {
 				}
 				
 				newText.pop_back();
-				inputBox.text = newText;
-				inputBox.cursorPos = newText.size();
-				autoCompleteSelectedIdxBegin = idx == 0? 0 : idx+1;
+				if (inputBox.setText(newText)) {
+					inputBox.cursorPos = newText.size();
+					autoCompleteSelectedIdxBegin = idx == 0? 0 : idx+1;
+				}
 			}
 			
 			// +1
@@ -197,9 +199,10 @@ void Meatball::ConsoleUIScene::update() {
 				}
 				
 				newText.pop_back();
-				inputBox.text = newText;
-				inputBox.cursorPos = newText.size();
-				autoCompleteSelectedIdxEnd = idx;
+				if (inputBox.setText(newText)) {
+					inputBox.cursorPos = newText.size();
+					autoCompleteSelectedIdxEnd = idx;
+				}
 			}
 		}
 
