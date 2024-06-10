@@ -11,28 +11,15 @@
 #include "Interface/ScrollTextBox.h"
 #include "Interface/InputTextBox.h"
 #include "Utils/Utils.h"
+#include "OutputColors.h"
 
 #ifndef CONSOLEUI_OUTPUT_MAX_LINES
-#define CONSOLEUI_OUTPUT_MAX_LINES (unsigned int)500
+#define CONSOLEUI_OUTPUT_MAX_LINES 200
 #endif
 
 #ifndef CONSOLEUI_INPUT_MAX_HISTORY
 #define CONSOLEUI_INPUT_MAX_HISTORY 30 // [0-255]
 #endif
-
-static void handleInputHistoryPos(Meatball::InputTextBox &inputBox, std::string *inputHistory, const unsigned char &inputHistorySize, unsigned char &inputHistoryPos) {
-    if ((IsKeyPressed(KEY_UP) || IsKeyPressedRepeat(KEY_UP)) && inputHistoryPos != 0)
-        --inputHistoryPos;
-    
-    else if ((IsKeyPressed(KEY_DOWN) || IsKeyPressedRepeat(KEY_DOWN)) && inputHistoryPos != inputHistorySize-1)
-        ++inputHistoryPos;
-    
-    else return;
-    
-    inputBox.text = inputHistory[inputHistoryPos];
-    inputBox.cursorPos = inputHistory[inputHistoryPos].size();
-    inputBox.onTextChange(inputBox.text);
-}
 
 namespace Meatball {
     namespace Config {
@@ -55,82 +42,27 @@ namespace Meatball {
 
     class ConsoleUIScene : public Scene {
     public:
+
         /// @param visible if scene is visible or not(only this class uses this)
         ConsoleUIScene(Rectangle rect, std::shared_ptr<Config::ConsoleUI> config, bool visible = true);
 
         /// @brief appends text to outputTextbox
-        void print(const HayBCMD::OutputLevel &level, const std::string &text);
-
-        void draw();
-        void update() {
-            if (!visible) return;
-
-            inputBox.update();
+        void print(const HayBCMD::OutputLevel &level, const std::string &text) {
+            size_t length = text.size()-1;
+            while (text[length] == '\n' && length != 0)
+                --length;
             
-            if (inputBox.focused) {
-                if ((IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB)) && autoCompleteText.size() != 0) {
-                    // -1
-                    if (IsKeyDown(KEY_LEFT_SHIFT) && autoCompleteSelectedIdxBegin != 0) {
-                        inputBox.onTextChange(inputBoxOriginalText);
-
-                        autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
-                        
-                        size_t idx = autoCompleteSelectedIdxEnd;
-                        autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
-                        std::string newText = autoCompleteText[idx].first;
-                        
-                        --idx;
-                        while (autoCompleteText[idx].first.back() != ' ') {
-                            autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
-                            newText = autoCompleteText[idx].first+newText;
-                            if (idx == 0) break;
-                            --idx;
-                        }
-                        
-                        newText.pop_back();
-                        inputBox.text = newText;
-                        inputBox.cursorPos = newText.size();
-                        autoCompleteSelectedIdxBegin = idx == 0? 0 : idx+1;
-                    }
-                    
-                    // +1
-                    else if (autoCompleteSelectedIdxEnd != autoCompleteText.size()-1) {
-                        inputBox.onTextChange(inputBoxOriginalText);
-                        
-                        autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd+1;
-                        if (autoCompleteSelectedIdxEnd == 0) autoCompleteSelectedIdxBegin = 0;
-                        
-                        size_t idx = autoCompleteSelectedIdxBegin;
-                        autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
-                        std::string newText = autoCompleteText[idx].first;
-                        
-                        while (autoCompleteText[idx].first.back() != ' ') {
-                            ++idx;
-                            autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
-                            newText += autoCompleteText[idx].first;
-                        }
-                        
-                        newText.pop_back();
-                        inputBox.text = newText;
-                        inputBox.cursorPos = newText.size();
-                        autoCompleteSelectedIdxEnd = idx;
-                    }
-                }
-
-                else if (inputHistorySize != 0)
-                    handleInputHistoryPos(inputBox, inputHistory, inputHistorySize, inputHistoryPos);
-            }
-
-            outputBox.update();
-            closeButton.update();
-
-            while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*outputBox.config->font->baseSize) {
+            if (length != 0)
+                outputBox.appendText(text.substr(0, length+1), outputLevelToOutputColor(level));
+            
+            while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*(unsigned int)outputBox.config->font->baseSize) {
                 if (outputBox.getText().size() == 0) break;
                 outputBox.popFront();
             }
-
-            mainPanel.update();
         }
+
+        void draw();
+        void update();
 
         std::shared_ptr<Config::ConsoleUI> config;
 

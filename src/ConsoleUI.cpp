@@ -3,11 +3,24 @@
 #include "Console.h"
 #include "Utils/DrawFuncs.h"
 #include "FontsHandler.h"
-#include "OutputColors.h"
 
 using fh = Meatball::FontsHandler;
 
 unsigned char Meatball::ConsoleUIScene::margin = 4;
+
+static void handleInputHistoryPos(Meatball::InputTextBox &inputBox, std::string *inputHistory, const unsigned char &inputHistorySize, unsigned char &inputHistoryPos) {
+    if ((IsKeyPressed(KEY_UP) || IsKeyPressedRepeat(KEY_UP)) && inputHistoryPos != 0)
+        --inputHistoryPos;
+    
+    else if ((IsKeyPressed(KEY_DOWN) || IsKeyPressedRepeat(KEY_DOWN)) && inputHistoryPos != inputHistorySize-1)
+        ++inputHistoryPos;
+    
+    else return;
+    
+    inputBox.text = inputHistory[inputHistoryPos];
+    inputBox.cursorPos = inputHistory[inputHistoryPos].size();
+    inputBox.onTextChange(inputBox.text);
+}
 
 Meatball::Config::ConsoleUI::ConsoleUI()
  : autoCompleteColor(BLACK), autoCompleteTextColor(WHITE),
@@ -134,11 +147,68 @@ Meatball::ConsoleUIScene::ConsoleUIScene(Rectangle rect, std::shared_ptr<Config:
 	*/
 }
 
-void Meatball::ConsoleUIScene::print(const HayBCMD::OutputLevel &level, const std::string &text) {
-	if (text[text.size()-1] == '\n')
-		outputBox.appendText(text.substr(0,text.size()-1), outputLevelToOutputColor(level));
-	else
-		outputBox.appendText(text, outputLevelToOutputColor(level));
+void Meatball::ConsoleUIScene::update() {
+	if (!visible) return;
+
+	inputBox.update();
+	
+	if (inputBox.focused) {
+		if ((IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB)) && autoCompleteText.size() != 0) {
+			// -1
+			if (IsKeyDown(KEY_LEFT_SHIFT) && autoCompleteSelectedIdxBegin != 0) {
+				inputBox.onTextChange(inputBoxOriginalText);
+
+				autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
+				
+				size_t idx = autoCompleteSelectedIdxEnd;
+				autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
+				std::string newText = autoCompleteText[idx].first;
+				
+				--idx;
+				while (autoCompleteText[idx].first.back() != ' ') {
+					autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
+					newText = autoCompleteText[idx].first+newText;
+					if (idx == 0) break;
+					--idx;
+				}
+				
+				newText.pop_back();
+				inputBox.text = newText;
+				inputBox.cursorPos = newText.size();
+				autoCompleteSelectedIdxBegin = idx == 0? 0 : idx+1;
+			}
+			
+			// +1
+			else if (autoCompleteSelectedIdxEnd != autoCompleteText.size()-1) {
+				inputBox.onTextChange(inputBoxOriginalText);
+				
+				autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd+1;
+				if (autoCompleteSelectedIdxEnd == 0) autoCompleteSelectedIdxBegin = 0;
+				
+				size_t idx = autoCompleteSelectedIdxBegin;
+				autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
+				std::string newText = autoCompleteText[idx].first;
+				
+				while (autoCompleteText[idx].first.back() != ' ') {
+					++idx;
+					autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
+					newText += autoCompleteText[idx].first;
+				}
+				
+				newText.pop_back();
+				inputBox.text = newText;
+				inputBox.cursorPos = newText.size();
+				autoCompleteSelectedIdxEnd = idx;
+			}
+		}
+
+		else if (inputHistorySize != 0)
+			handleInputHistoryPos(inputBox, inputHistory, inputHistorySize, inputHistoryPos);
+	}
+
+	outputBox.update();
+	closeButton.update();
+	mainPanel.update();
 }
 
 void Meatball::ConsoleUIScene::draw() {
