@@ -2,11 +2,7 @@
 - Alot of objects might create alot of new colors in memory. Not only that but probably other data types... What I want to come over with is yet another data handler that stores the data and all classes variables uses pointers.
 
 # TODOS:
-- if outputBox's scrollValue is at the end and text is being appended, scrollValue follow to the end together or else just fix the scrollValue at where it is, by that I mean the ratio so scrollValue would change correctly with the contentHeight
-
 - make FontsHandler use shared pointers to unload unreferenced fonts or something idk
-
-- BUG: if tab is pressed when autoComplete has something in it, the selected one goes to the center(this should only happen if it passes through offsetX)
 
 - test if defined value on InputTextBox.h is changing correctly in the .cpp version that is using function calls instead of the defined variable
 - grabHeight proportional to screen size or window size
