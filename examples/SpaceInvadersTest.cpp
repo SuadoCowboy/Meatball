@@ -8,7 +8,7 @@
 #include <Config.h>
 
 #define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
+#define WINDOW_HEIGHT 700
 
 namespace Config = Meatball::Config;
 
@@ -48,7 +48,17 @@ int main(int, char**)
             backgroundColor = backgroundColorData->colorV;
     }
 
+    int screenWidth = GetRenderWidth(), screenHeight = GetRenderHeight();
+
     while (!WindowShouldClose()) {
+        if (IsWindowResized()) {
+            int newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
+            consoleUI.onResize((float)newScreenWidth/screenWidth, (float)newScreenHeight/screenHeight);
+
+            screenWidth = newScreenWidth;
+            screenHeight = newScreenHeight;
+        }
+
         ClearBackground(backgroundColor);
         
         consoleUI.update();
