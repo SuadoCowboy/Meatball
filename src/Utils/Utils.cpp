@@ -1,5 +1,9 @@
 #include "Utils.h"
 
+#include "FontsHandler.h"
+
+float Meatball::textSpacing = 1.0f;
+
 void Meatball::checkHovered(bool &hovered, const Rectangle &rect, VoidFunc *onHover, VoidFunc *onRelease) {
     bool wasHovered = hovered;
     hovered = CheckCollisionPointRec(GetMousePosition(), rect);
@@ -29,6 +33,29 @@ void Meatball::fitXYInRenderScreen(Rectangle &rect, const Vector2 &minPos, const
     
     if (rect.y < minPos.y) rect.y = minPos.y;
     else if (rect.y > GetRenderHeight()-maxPos.y) rect.y = GetRenderHeight()-maxPos.y;
+}
+
+bool Meatball::loadFont(const std::filesystem::path& path, unsigned short fontsHandlerId, int size, int *codepoints, int codepointCount) {
+    if (!std::filesystem::exists(path) || std::filesystem::is_directory(path))
+        return false;
+    
+    Font font = LoadFontEx(path.string().c_str(), size, codepoints, codepointCount);
+    FontsHandler::add(fontsHandlerId, font);
+    return true;
+}
+
+Vector2 Meatball::measureText(const Font &font, const char *text) {
+    return MeasureTextEx(font, text, font.baseSize, textSpacing);
+}
+    
+float Meatball::measureTextWidth(const Font &font, const char *text) {
+    Vector2 textSize = MeasureTextEx(font, text, font.baseSize, textSpacing);
+    return textSize.x;
+}
+    
+float Meatball::measureTextHeight(const Font &font, const char *text) {
+    Vector2 textSize = MeasureTextEx(font, text, font.baseSize, textSpacing);
+    return textSize.y;
 }
 
 bool operator==(const Color &left, const Color &right) {
