@@ -19,8 +19,6 @@
 #include "OutputColors.h"
 #include "Utils/Utils.h"
 
-#include <iostream>
-
 void Meatball::Defaults::init(const std::string& meatdataPath) {
     auto initData = Config::loadData(meatdataPath);
     
