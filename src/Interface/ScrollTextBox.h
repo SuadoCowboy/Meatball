@@ -13,7 +13,7 @@ namespace Meatball {
         struct ScrollTextBox {
             ScrollTextBox();
 
-            std::shared_ptr<Font>font;
+            std::shared_ptr<Font> font;
 
             Color color;
         };
