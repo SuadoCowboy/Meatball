@@ -26,8 +26,7 @@ namespace Meatball {
         struct ConsoleUI {
             ConsoleUI();
             
-            Font *mainFont; // used for input/output and (if exists)send button
-            Font *labelFont; // used only for label
+            std::shared_ptr<Font> labelFont; // used only for label
 
             Color autoCompleteColor; // color of the rect
             Color autoCompleteTextColor;
@@ -36,7 +35,7 @@ namespace Meatball {
 
             Color labelTextColor;
 
-            const char* labelText;
+            const char *labelText;
         };
     }
 
@@ -44,7 +43,7 @@ namespace Meatball {
     public:
 
         /// @param visible if scene is visible or not(only this class uses this)
-        ConsoleUIScene(Rectangle rect, std::shared_ptr<Config::ConsoleUI> config, bool visible = true);
+        ConsoleUIScene(const Rectangle &rect, const std::shared_ptr<Config::ConsoleUI> &config, bool visible = true);
 
         /// @brief appends text to outputTextbox
         void print(const HayBCMD::OutputLevel &level, const std::string &text) {
@@ -64,6 +63,9 @@ namespace Meatball {
         void draw();
         void update();
 
+        /// @brief should be used when window is resized or render screen or even font size
+        void onResize();
+
         std::shared_ptr<Config::ConsoleUI> config;
 
         // Only console can appear in every scene so only it needs visible boolean.
@@ -75,18 +77,18 @@ namespace Meatball {
         ScrollTextBox outputBox;
         InputTextBox inputBox;
         
-        std::vector<std::pair<std::string, Color>> autoCompleteText;
 
         // margin - the space between mainPanel border and objects close to it
         static unsigned char margin;
 
     private:
-        size_t autoCompleteSelectedIdxBegin, autoCompleteSelectedIdxEnd;
+        std::vector<std::pair<std::string, Color>> autoCompleteText;
+        size_t autoCompleteSelectedIdxBegin = 0, autoCompleteSelectedIdxEnd = 0;
         std::string inputBoxOriginalText; // the inputBox text that was used before selecting in auto complete
 
         std::string inputHistory[CONSOLEUI_INPUT_MAX_HISTORY];
-        unsigned char inputHistorySize;
-        unsigned char inputHistoryPos; // the position the user is when using inputHistory
+        unsigned char inputHistorySize = 0;
+        unsigned char inputHistoryPos = 0; // the position the user is when using inputHistory
 
         void addToInputHistory(const std::string &string) {
             if (inputHistorySize != 0 && inputHistory[inputHistorySize-1].compare(string) == 0) {
