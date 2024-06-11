@@ -13,14 +13,14 @@ namespace Meatball {
         struct ScrollTextBox {
             ScrollTextBox();
 
-            Font *font;
+            std::shared_ptr<Font>font;
 
             Color color;
         };
     }
 
     namespace Defaults {
-        extern std::shared_ptr<Config::ScrollTextBox> scrollTextBoxConfig;
+        extern Config::ScrollTextBox scrollTextBoxConfig;
     }
     
     /// @brief basically, a rect being used to draw text but with scrolling
@@ -53,7 +53,7 @@ namespace Meatball {
         void setPosition(float x, float y);
         void setSize(float width, float height);
 
-        std::shared_ptr<Config::ScrollTextBox> config = Defaults::scrollTextBoxConfig;
+        std::shared_ptr<Config::ScrollTextBox> config;
 
     private:
         std::list<std::pair<std::string, const std::shared_ptr<Color>>> text;

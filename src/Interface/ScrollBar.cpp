@@ -4,7 +4,7 @@
 
 unsigned char Meatball::ScrollBar::scrollSpeed = 50;
 
-std::shared_ptr<Meatball::Config::ScrollBar> Meatball::Defaults::scrollBarConfig;
+Meatball::Config::ScrollBar Meatball::Defaults::scrollBarConfig;
 
 Meatball::Config::ScrollBar::ScrollBar()
  : barColor({15,15,15,255}), barHoveredColor({25,25,25,255}),

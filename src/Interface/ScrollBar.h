@@ -20,7 +20,7 @@ namespace Meatball {
     }
 
     namespace Defaults {
-        extern std::shared_ptr<Config::ScrollBar> scrollBarConfig;
+        extern Config::ScrollBar scrollBarConfig;
     }
 
     class ScrollBar {
@@ -47,7 +47,7 @@ namespace Meatball {
         
         const Rectangle &getRect();
 
-        std::shared_ptr<Config::ScrollBar> config = Defaults::scrollBarConfig;
+        std::shared_ptr<Config::ScrollBar> config;
         
         bool visible;
 

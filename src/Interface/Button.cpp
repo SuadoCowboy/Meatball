@@ -2,7 +2,7 @@
 
 #include "Utils/Utils.h"
 
-std::shared_ptr<Meatball::Config::Button> Meatball::Defaults::buttonConfig;
+Meatball::Config::Button Meatball::Defaults::buttonConfig;
 
 Meatball::Config::Button::Button()
  : color(BLACK), hoveredColor(WHITE) {}

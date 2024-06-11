@@ -18,7 +18,7 @@ namespace Meatball {
     }
 
     namespace Defaults {
-        extern std::shared_ptr<Config::DynamicPanel> dynamicPanelConfig;
+        extern Config::DynamicPanel dynamicPanelConfig;
     }
 
     /// @brief a panel that can be resized and moved
@@ -32,7 +32,7 @@ namespace Meatball {
         /// @brief whether is dragging/resizing/hovered
         bool isAnyConditionActive();
 
-        std::shared_ptr<Config::DynamicPanel> config = Defaults::dynamicPanelConfig;
+        std::shared_ptr<Config::DynamicPanel> config;
         Rectangle rect;
 
         // TODO: grabHeight proportional to screen size or window size

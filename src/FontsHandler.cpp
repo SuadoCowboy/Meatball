@@ -1,70 +1,32 @@
 #include "FontsHandler.h"
 
-std::unordered_map<std::string, Font> Meatball::FontsHandler::fonts;
+std::unordered_map<unsigned short, std::vector<std::shared_ptr<Font>>> Meatball::FontsHandler::fonts = {};
 
-static void use(Font *font) {
-    SetTextLineSpacing(font->baseSize);
-}
+void Meatball::FontsHandler::add(unsigned short id, const Font &font) {
+    if (fonts.count(id) == 0)
+        fonts.emplace(id, std::vector<std::shared_ptr<Font>>());
 
-bool Meatball::FontsHandler::loadEx(std::filesystem::path path, std::string name, unsigned char fontSize, int *codePoints, int codePointsCount) {
-    if (!std::filesystem::exists(path) || std::filesystem::is_directory(path))
-        return false;
-
-    if (fonts.count(name) == 0)
-        fonts[name] = LoadFontEx(path.string().c_str(), fontSize, codePoints, codePointsCount);
-    
-    return true;
-}
-
-bool Meatball::FontsHandler::load(std::filesystem::path path, std::string name) {
-    if (!std::filesystem::exists(path) || std::filesystem::is_directory(path))
-        return false;
-    
-    if (fonts.count(name) == 0)
-        fonts[name] = LoadFont(path.string().c_str());
-    
-    return true;
-}
-
-void Meatball::FontsHandler::unload(const std::string &name) {
-    if (fonts.count(name) == 0) return;
-
-    UnloadFont(fonts[name]);
-    fonts.erase(name);
-}
-
-Font *Meatball::FontsHandler::get(const std::string &name) {
-    if (fonts.count(name) == 0) return nullptr;
-
-    return &fonts[name];
-}
-
-Vector2 Meatball::FontsHandler::MeasureText(Font *font, const char *text, float spacing) {
-    use(font);
-    return MeasureTextEx(*font, text, font->baseSize, spacing);
-}
-
-float Meatball::FontsHandler::MeasureTextWidth(Font *font, const char *text, float spacing) {
-    use(font);
-    return MeasureTextEx(*font, text, font->baseSize, spacing).x;
-}
-
-float Meatball::FontsHandler::MeasureTextHeight(Font *font, const char *text, float spacing) {
-    use(font);
-    return MeasureTextEx(*font, text, font->baseSize, spacing).y;
-}
-
-bool Meatball::FontsHandler::add(Font font, const std::string &name) {
-    if (fonts.count(name) != 0) return false;
-
-    fonts[name] = font;
-    return true;
+    if (id != 0 || fonts[id].size() == 0)
+        fonts[id].push_back(std::make_shared<Font>(font));
 }
 
 void Meatball::FontsHandler::clear() {
-    for (auto &font : fonts) {
-        UnloadFont(font.second);
-    }
+    fonts.erase(0);
 
+    for (auto& enumeratedFonts : fonts) {
+        for (auto& font : enumeratedFonts.second)
+            UnloadFont(*font);
+    }
+    
     fonts.clear();
+}
+
+std::shared_ptr<Font> Meatball::FontsHandler::get(unsigned short id, int size) {
+    if (size != 0)
+        for (auto font : fonts[id])
+            if (font->baseSize == size) {
+                return font;
+            }
+    
+    return fonts[0][0];
 }

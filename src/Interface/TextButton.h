@@ -12,7 +12,7 @@ namespace Meatball {
         struct TextButton {
             TextButton();
 
-            Font* font;
+            std::shared_ptr<Font> font;
 
             Color color;
             Color textColor;
@@ -23,7 +23,7 @@ namespace Meatball {
     }
 
     namespace Defaults {
-        extern std::shared_ptr<Meatball::Config::TextButton> textButtonConfig;
+        extern Meatball::Config::TextButton textButtonConfig;
     }
 
     class TextButton {
@@ -41,7 +41,7 @@ namespace Meatball {
         const std::string &getText();
         void setText(const std::string &newText);
 
-        std::shared_ptr<Config::TextButton> config = Defaults::textButtonConfig;
+        std::shared_ptr<Config::TextButton> config;
         VoidFunc onRelease, onHover;
         Rectangle rect;
 

@@ -13,13 +13,13 @@ namespace Meatball {
         struct InputTextBox {
             InputTextBox();
 
-            Font *font;
+            std::shared_ptr<Font> font;
             Color color, textColor, cursorColor, selectionColor;
         };
     }
 
     namespace Defaults {
-        extern std::shared_ptr<Config::InputTextBox> inputTextBoxConfig;
+        extern Config::InputTextBox inputTextBoxConfig;
     }
 
     class InputTextBox {
@@ -30,7 +30,7 @@ namespace Meatball {
         void draw();
         void update();
 
-        std::shared_ptr<Config::InputTextBox> config = Defaults::inputTextBoxConfig;
+        std::shared_ptr<Config::InputTextBox> config;
         
         // onSend by default runs when KEY_ENTER/KEY_KP_ENTER is pressed
         std::function<void(const std::string&)> onSend, onTextChange;

@@ -2,7 +2,7 @@
 
 #include "Utils/Utils.h"
 
-std::shared_ptr<Meatball::Config::DynamicPanel> Meatball::Defaults::dynamicPanelConfig;
+Meatball::Config::DynamicPanel Meatball::Defaults::dynamicPanelConfig;
 
 Meatball::Config::DynamicPanel::DynamicPanel()
  : color(BLACK), minSize({8,10}), grabHeight(2) {}

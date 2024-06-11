@@ -18,7 +18,7 @@ namespace Meatball {
     }
 
     namespace Defaults {
-        extern std::shared_ptr<Config::Button> buttonConfig;
+        extern Config::Button buttonConfig;
     }
 
     class Button {
@@ -29,7 +29,7 @@ namespace Meatball {
         void update();
         bool isHovered();
 
-        std::shared_ptr<Config::Button> config = Defaults::buttonConfig;
+        std::shared_ptr<Config::Button> config;
         
         VoidFunc onRelease, onHover;
         Rectangle rect;

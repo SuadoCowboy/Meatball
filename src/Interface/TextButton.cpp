@@ -2,16 +2,12 @@
 
 #include "Utils/Utils.h"
 #include "Utils/DrawFuncs.h"
-#include "FontsHandler.h"
 
-using fh = Meatball::FontsHandler;
-
-std::shared_ptr<Meatball::Config::TextButton> Meatball::Defaults::textButtonConfig;
+Meatball::Config::TextButton Meatball::Defaults::textButtonConfig;
 
 Meatball::Config::TextButton::TextButton()
- : color(BLACK), textColor(WHITE), hoveredColor(WHITE), hoveredTextColor(BLACK) {
-    font = FontsHandler::get("default");
-}
+ : font(nullptr), color(BLACK), textColor(WHITE), hoveredColor(WHITE),
+   hoveredTextColor(BLACK) {}
 
 Meatball::TextButton::TextButton()
  : rect({0,0,0,0}) {}
@@ -30,7 +26,7 @@ void Meatball::TextButton::update() {
 void Meatball::TextButton::drawText() {
     BeginScissorMode(rect.x, rect.y, rect.width, rect.height);
     
-    Meatball::drawText(config->font, text.c_str(), rect.x+rect.width*0.5, rect.y+rect.height*0.5, hovered? config->hoveredTextColor : config->textColor);
+    Meatball::drawText(*config->font, text.c_str(), rect.x+rect.width*0.5, rect.y+rect.height*0.5, hovered? config->hoveredTextColor : config->textColor);
 
     EndScissorMode();
 }
@@ -42,10 +38,10 @@ const std::string &Meatball::TextButton::getText() {
 void Meatball::TextButton::setText(const std::string &_newText) {
     text = _newText;
 
-    int textWidth = fh::MeasureTextWidth(config->font, text.c_str());
+    int textWidth = Meatball::measureTextWidth(*config->font, text.c_str());
 
     while (textWidth > rect.width) {
         text.erase(text.end());
-        textWidth = fh::MeasureTextWidth(config->font, text.c_str());
+        textWidth = Meatball::measureTextWidth(*config->font, text.c_str());
     }
 }

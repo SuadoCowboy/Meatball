@@ -17,113 +17,86 @@
 #include "Interface/ScrollBar.h"
 #include "Interface/ScrollTextBox.h"
 #include "OutputColors.h"
+#include "Utils/Utils.h"
 
-#define DEFAULT_FONT_SIZE 16
+#include <iostream>
 
 void Meatball::Defaults::init(const std::string& meatdataPath) {
     auto initData = Config::loadData(meatdataPath);
-    FontsHandler::add(GetFontDefault(), "default");
     
-    Meatball::Config::ConfigData* data;
-    dynamicPanelConfig = std::make_shared<Config::DynamicPanel>();
+    FontsHandler::add(0, GetFontDefault());
+
+    Meatball::Config::ConfigData *data;
+    dynamicPanelConfig = Config::DynamicPanel();
     {
         data = Config::ifContainsGet(initData, "mainPanelColor");
-        if (data) dynamicPanelConfig->color = data->colorV;
+        if (data) dynamicPanelConfig.color = data->colorV;
     }
 
-    buttonConfig = std::make_shared<Config::Button>();
+    buttonConfig = Config::Button();
     {
         data = Config::ifContainsGet(initData, "buttonColor");
-        if (data) buttonConfig->color = data->colorV;
+        if (data) buttonConfig.color = data->colorV;
 
         data = Config::ifContainsGet(initData, "buttonHoveredColor");
-        if (data) buttonConfig->hoveredColor = data->colorV;
+        if (data) buttonConfig.hoveredColor = data->colorV;
     }
 
-    textButtonConfig = std::make_shared<Config::TextButton>();
+    textButtonConfig = Config::TextButton();
     {
-        data = Config::ifContainsGet(initData, "textButtonFont");
-        if (data) {
-            auto fontSizeData = Config::ifContainsGet(initData, "textButtonFontSize");
-            
-            std::filesystem::path fontPath = data->stringV;
-            std::string fontName = fontPath.filename().string();
-
-            if (FontsHandler::loadEx(fontPath, fontName, fontSizeData? fontSizeData->unsignedCharV : DEFAULT_FONT_SIZE, nullptr, 0))
-                textButtonConfig->font = FontsHandler::get(fontName);
-        }
+        textButtonConfig.font = FontsHandler::get(0,0);
 
         data = Config::ifContainsGet(initData, "textButtonColor");
-        if (data) textButtonConfig->color = data->colorV;
+        if (data) textButtonConfig.color = data->colorV;
 
         data = Config::ifContainsGet(initData, "textButtonTextColor");
-        if (data) textButtonConfig->textColor = data->colorV;
+        if (data) textButtonConfig.textColor = data->colorV;
 
         data = Config::ifContainsGet(initData, "textButtonHoveredColor");
-        if (data) textButtonConfig->hoveredColor = data->colorV;
+        if (data) textButtonConfig.hoveredColor = data->colorV;
 
         data = Config::ifContainsGet(initData, "textButtonHoveredTextColor");
-        if (data) textButtonConfig->hoveredTextColor = data->colorV;
+        if (data) textButtonConfig.hoveredTextColor = data->colorV;
     }
 
-    inputTextBoxConfig = std::make_shared<Config::InputTextBox>();
+    inputTextBoxConfig = Config::InputTextBox();
     {
-        data = Config::ifContainsGet(initData, "InputTextBoxFont");
-        if (data) {
-            auto fontSizeData = Config::ifContainsGet(initData, "InputTextBoxFontSize");
-            
-            std::filesystem::path fontPath = data->stringV;
-            std::string fontName = fontPath.filename().string();
-
-            if (FontsHandler::loadEx(fontPath, fontName, fontSizeData? fontSizeData->unsignedCharV : DEFAULT_FONT_SIZE, nullptr, 0))
-                inputTextBoxConfig->font = FontsHandler::get(fontName);
-        }
-
-        inputTextBoxConfig->font = FontsHandler::get("default");
+        inputTextBoxConfig.font = FontsHandler::get(0,0);
 
         data = Config::ifContainsGet(initData, "inputTextBoxColor");
-        if (data) inputTextBoxConfig->color = data->colorV;
+        if (data) inputTextBoxConfig.color = data->colorV;
 
         data = Config::ifContainsGet(initData, "inputTextBoxTextColor");
-        if (data) inputTextBoxConfig->textColor = data->colorV;
+        if (data) inputTextBoxConfig.textColor = data->colorV;
 
         data = Config::ifContainsGet(initData, "inputTextBoxCursorColor");
-        if (data) inputTextBoxConfig->cursorColor = data->colorV;
+        if (data) inputTextBoxConfig.cursorColor = data->colorV;
     }
 
-    scrollBarConfig = std::make_shared<Config::ScrollBar>();
+    scrollBarConfig = Config::ScrollBar();
     {
         data = Config::ifContainsGet(initData, "scrollBarColor");
-        if (data) scrollBarConfig->barColor = data->colorV;
+        if (data) scrollBarConfig.barColor = data->colorV;
 
         data = Config::ifContainsGet(initData, "scrollBarThumbColor");
-        if (data) scrollBarConfig->thumbColor = data->colorV;
+        if (data) scrollBarConfig.thumbColor = data->colorV;
 
         data = Config::ifContainsGet(initData, "scrollBarHoveredColor");
-        if (data) scrollBarConfig->barHoveredColor = data->colorV;
+        if (data) scrollBarConfig.barHoveredColor = data->colorV;
 
         data = Config::ifContainsGet(initData, "scrollBarThumbHoveredColor1");
-        if (data) scrollBarConfig->thumbHoveredColor1 = data->colorV;
+        if (data) scrollBarConfig.thumbHoveredColor1 = data->colorV;
 
         data = Config::ifContainsGet(initData, "scrollBarThumbHoveredColor2");
-        if (data) scrollBarConfig->thumbHoveredColor2 = data->colorV;
+        if (data) scrollBarConfig.thumbHoveredColor2 = data->colorV;
     }
 
-    scrollTextBoxConfig = std::make_shared<Config::ScrollTextBox>();
+    scrollTextBoxConfig = Config::ScrollTextBox();
     {
-        data = Config::ifContainsGet(initData, "ScrollTextBoxFont");
-        if (data) {
-            auto fontSizeData = Config::ifContainsGet(initData, "ScrollTextBoxFontSize");
-            
-            std::filesystem::path fontPath = data->stringV;
-            std::string fontName = fontPath.filename().string();
-
-            if (FontsHandler::loadEx(fontPath, fontName, fontSizeData? fontSizeData->unsignedCharV : DEFAULT_FONT_SIZE, nullptr, 0))
-                scrollTextBoxConfig->font = FontsHandler::get(fontName);
-        }
+        scrollTextBoxConfig.font = FontsHandler::get(0,0);
 
         data = Config::ifContainsGet(initData, "color");
-        if (data) scrollTextBoxConfig->color = data->colorV;
+        if (data) scrollTextBoxConfig.color = data->colorV;
     }
 }
 
@@ -152,18 +125,6 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
     data = Config::ifContainsGet(consoleData, "OutputErrorColor");
     if (data) *Config::OutputColors::errorColor = data->colorV;
 
-    Config::ConfigData *fontSizeData = Config::ifContainsGet(consoleData, "fontSize");
-    data = Config::ifContainsGet(consoleData, "font");
-    if (data) {
-        std::filesystem::path fontPath = data->stringV;
-        std::string fontName = fontPath.filename().string();
-        if (FontsHandler::loadEx(fontPath, fontName, fontSizeData? fontSizeData->unsignedCharV : DEFAULT_FONT_SIZE, nullptr, 0))
-            consoleConfig->mainFont = FontsHandler::get(fontName);
-
-        if (FontsHandler::loadEx(fontPath, fontName+"Half", fontSizeData? fontSizeData->unsignedCharV*0.5 : DEFAULT_FONT_SIZE*0.5, nullptr, 0))
-            consoleConfig->labelFont = FontsHandler::get(fontName+"Half");
-    }
-
     data = Config::ifContainsGet(consoleData, "autoCompleteColor");
     if (data) consoleConfig->autoCompleteColor = data->colorV;
 
@@ -179,9 +140,26 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
     data = Config::ifContainsGet(consoleData, "labelColor");
     if (data) consoleConfig->labelTextColor = data->colorV;
 
+    consoleConfig->labelFont = FontsHandler::get(0,0);
     consoleConfig->labelText = "Local Console";
 
     auto consoleUI = Meatball::ConsoleUIScene({rect.x, rect.y, rect.width, rect.height}, std::move(consoleConfig));
+
+    data = Config::ifContainsGet(consoleData, "font");
+    if (data) {
+        std::filesystem::path fontPath = data->stringV;
+
+        int size = (int)consoleUI.inputBox.rect.height - 2 + (int)consoleUI.inputBox.rect.height % 2;
+        if (Meatball::loadFont(fontPath, 1, size, nullptr, 0)){
+            consoleUI.inputBox.config->font = consoleUI.outputBox.config->font = FontsHandler::get(1, size);
+        }
+
+        size = consoleUI.inputBox.rect.height*0.5;
+        if (Meatball::loadFont(fontPath, 1, size, nullptr, 0))
+            consoleUI.config->labelFont = FontsHandler::get(1, size);
+    }
+
+    consoleUI.onResize();
 
     // TODO: if ConsoleUI data contains changes related to static
     // configs, create a new shared ptr and use std::swap(old, new) and maybe std::move if something goes wrong?
