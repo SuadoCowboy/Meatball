@@ -134,7 +134,7 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
 
     data = Config::ifContainsGet(consoleData, "autoCompleteSelectedTextColor");
     if (data) consoleConfig->autoCompleteSelectedTextColor = data->colorV;
-    
+
     data = Config::ifContainsGet(consoleData, "labelColor");
     if (data) consoleConfig->labelTextColor = data->colorV;
 
@@ -142,6 +142,12 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
     consoleConfig->labelText = "Local Console";
 
     auto consoleUI = Meatball::ConsoleUIScene({rect.x, rect.y, rect.width, rect.height}, std::move(consoleConfig));
+
+    data = Config::ifContainsGet(consoleData, "closeButtonColor");
+    if (data) consoleUI.closeButton.config->color = data->colorV;
+
+    data = Config::ifContainsGet(consoleData, "closeButtonHoveredColor");
+    if (data) consoleUI.closeButton.config->hoveredColor = data->colorV;
 
     data = Config::ifContainsGet(consoleData, "font");
     if (data) {
