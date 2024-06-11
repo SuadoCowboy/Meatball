@@ -1,14 +1,11 @@
-# WARNINGS:
-- Alot of objects might create alot of new colors in memory. Not only that but probably other data types... What I want to come over with is yet another data handler that stores the data and all classes variables uses pointers.
+# A MAYBE:
+- A class that handles shared_ptrs of objects, probably colors(because i'm obsessed with colors). When creating a new color object, it checks if this color is already defined and give a shared_ptr to that color. If the color is new create a new object. Everytime a color changes it should also create a new shared_ptr so that it does not modifies the past one. If this works well and it really helps memory usage and does not affect much on performance, do that for stuff that is repeated too much. 
 
 # TODOS:
-- make FontsHandler use shared pointers to unload unreferenced fonts or something idk
+- how can i make font resize together with screen? let font be uglier(i believe it's a YES)?
 
-- test if defined value on InputTextBox.h is changing correctly in the .cpp version that is using function calls instead of the defined variable
-- grabHeight proportional to screen size or window size
-- NEW IDEA: static colors in .meatdata. if the type is STATIC_COLOR, then it will be defined in a specific structure or class that creates maybe a const color and every other static color that is the same color will use this reference
-- change draw functions to let developer choose what he wants to draw
-- create a .meatui(maybe delete .meatdata or use for another thing that .cfg can't do) file extension to make it possible to create a user interface. Should also include a meatUILoader.dll and meatUIViewer.exe in bin folder so that users can test their interfaces without joining the game everytime. Example: for Console, .meatui, the user have some options: mainPanel, closeButton, sendButton(optional), inputBox and OutputTextBox. !!! Also set a macro to define its actual version because it could change alot in the future
+- create a .meatui(maybe delete .meatdata or use for another thing that .cfg can't do) file extension to make it possible to create a user interface. Should also include a meatUILoader.dll and meatUIViewer.exe in bin folder so that users can test their interfaces without joining the game everytime. Example: for Console, .meatui, the user have some options: mainPanel, closeButton, sendButton(optional), inputBox and OutputTextBox.
+!!! Also set a macro to define its actual version because it could change alot in the future
 It would be something like this:
 ```py
 #      x y width height style   objectName
@@ -35,7 +32,7 @@ ScrollTextBox x y width height "outputBox"
 ```
 
 # FUTURE TODOS:
-- optimize code and use the right data structures. Also research const char* vs char[] vs std::string and look which is better for what
+- optimize code and use the right data structures.
 - use threads with locks, atomic and mutex
 - every data structure that is needed everywhere should be sent as a pointer
 - update function descriptions and anything else related to reading
