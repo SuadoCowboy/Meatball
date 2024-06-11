@@ -2,6 +2,8 @@
 
 #include <raylib.h>
 
+#include "Utils/Utils.h"
+
 namespace Meatball {
     void drawRect(const Rectangle &rect, const Color &color);
 
@@ -9,5 +11,5 @@ namespace Meatball {
     void drawX(Rectangle &rect, Color &color);
 
     /// @brief draws text inside the button bounds
-    void drawText(Font *font, const char *text, float x, float y, Color color, float spacing = 1);
+    void drawText(const Font &font, const char *text, float x, float y, Color color);
 }

@@ -19,7 +19,7 @@ void Meatball::drawX(Rectangle &rect, Color &color) {
     DrawLine(rect.x,rect.y+rect.height, rect.x+rect.width,rect.y, color);
 }
 
-void Meatball::drawText(Font *font, const char *text, float x, float y, Color color, float spacing) {
-    //SetTextLineSpacing(font->baseSize); // is this required?
-    DrawTextEx(*font, text, {x, y}, font->baseSize, spacing, color);
-}
+void Meatball::drawText(const Font &font, const char *text, float x, float y, Color color) {
+        //SetTextLineSpacing(textSpacing); // is this required?
+        DrawTextEx(font, text, {x, y}, font.baseSize, textSpacing, color);
+    }
