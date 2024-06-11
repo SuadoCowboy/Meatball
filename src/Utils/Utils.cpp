@@ -45,15 +45,18 @@ bool Meatball::loadFont(const std::filesystem::path& path, unsigned short fontsH
 }
 
 Vector2 Meatball::measureText(const Font &font, const char *text) {
+    SetTextLineSpacing(font.baseSize);
     return MeasureTextEx(font, text, font.baseSize, textSpacing);
 }
     
 float Meatball::measureTextWidth(const Font &font, const char *text) {
+    SetTextLineSpacing(font.baseSize);
     Vector2 textSize = MeasureTextEx(font, text, font.baseSize, textSpacing);
     return textSize.x;
 }
     
 float Meatball::measureTextHeight(const Font &font, const char *text) {
+    SetTextLineSpacing(font.baseSize);
     Vector2 textSize = MeasureTextEx(font, text, font.baseSize, textSpacing);
     return textSize.y;
 }
