@@ -1,8 +1,7 @@
-#include <vector>
-
 #include <raylib.h>
 
 #include <HayBCMD.h>
+
 #include <ConsoleUI.h>
 #include <Utils/Defaults.h>
 #include <FontsHandler.h>
@@ -36,7 +35,7 @@ int main(int, char**)
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Console Build In Progress");
     SetWindowState(FLAG_VSYNC_HINT);
     SetExitKey(KEY_NULL); // disable exit key
-    
+
     Meatball::Defaults::init("data/meatdata/Init.meatdata"); // for now it is sort of useless
     
     auto consoleUI = initConsole();
