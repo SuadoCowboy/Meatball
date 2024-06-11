@@ -145,9 +145,11 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
 
     data = Config::ifContainsGet(consoleData, "closeButtonColor");
     if (data) consoleUI.closeButton.config->color = data->colorV;
+    else consoleUI.closeButton.config->color = {100,100,100,255};
 
     data = Config::ifContainsGet(consoleData, "closeButtonHoveredColor");
     if (data) consoleUI.closeButton.config->hoveredColor = data->colorV;
+    else consoleUI.closeButton.config->hoveredColor = {255,255,255,255};
 
     data = Config::ifContainsGet(consoleData, "font");
     if (data) {
