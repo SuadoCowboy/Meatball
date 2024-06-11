@@ -165,7 +165,7 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
             consoleUI.config->labelFont = FontsHandler::get(1, size);
     }
 
-    consoleUI.onResize();
+    consoleUI.onResize(1, 1);
 
     // TODO: if ConsoleUI data contains changes related to static
     // configs, create a new shared ptr and use std::swap(old, new) and maybe std::move if something goes wrong?

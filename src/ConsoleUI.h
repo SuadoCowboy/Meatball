@@ -64,7 +64,9 @@ namespace Meatball {
         void update();
 
         /// @brief should be used when window is resized or render screen or even font size
-        void onResize();
+        /// @param ratioWidth renderWidthNow/renderWidthBefore
+        /// @param ratioHeight renderHeightNow/renderHeightBefore
+        void onResize(float ratioWidth, float ratioHeight);
 
         std::shared_ptr<Config::ConsoleUI> config;
 

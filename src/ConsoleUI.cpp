@@ -40,17 +40,17 @@ Meatball::ConsoleUIScene::ConsoleUIScene(const Rectangle &rect, const std::share
 		outputBox.setPosition(mainPanel.rect.x+margin, mainPanel.rect.y+config->labelFont->baseSize+margin);
 
 		inputBox.rect.x = mainPanel.rect.x+margin;
-		inputBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin-21;
+		inputBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin-inputBox.rect.height;
 	};
 
 	mainPanel.onResize = [&]() {
-			closeButton.rect.width = margin; // is inside the margin
+			closeButton.rect.width = margin; // it's inside the margin
 			closeButton.rect.height = margin;
 
-			outputBox.setSize(mainPanel.rect.width-margin*2, mainPanel.rect.height-config->labelFont->baseSize-1-margin*2-21);
+			inputBox.rect.height = mainPanel.rect.height*0.04;
+			inputBox.rect.width = mainPanel.rect.width-margin*2;
 			
-			inputBox.rect.width = outputBox.getRect().width;
-			inputBox.rect.height = 21;
+			outputBox.setSize(inputBox.rect.width, mainPanel.rect.height-config->labelFont->baseSize-1-margin*2-inputBox.rect.height);
 
 			mainPanel.onMove();
 	};
@@ -59,7 +59,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(const Rectangle &rect, const std::share
 		outputBox.updateTextWrap();
 	};
 
-	onResize();
+	onResize(1, 1);
 
 	// add auto completion
 	inputBox.onTextChange = [&](const std::string& text) {
@@ -252,8 +252,14 @@ void Meatball::ConsoleUIScene::draw() {
 	drawX(closeButton.rect, closeButton.isHovered()? closeButton.config->hoveredColor : closeButton.config->color);
 }
 
-void Meatball::ConsoleUIScene::onResize() {
+void Meatball::ConsoleUIScene::onResize(float ratioWidth, float ratioHeight) {
 	mainPanel.config->grabHeight = config->labelFont->baseSize;
+
+	mainPanel.rect.x = ratioWidth * mainPanel.rect.x;
+    mainPanel.rect.y = ratioHeight * mainPanel.rect.y;
+
+	mainPanel.rect.width = ratioWidth * mainPanel.rect.width;
+	mainPanel.rect.height = ratioHeight * mainPanel.rect.height;
 
 	mainPanel.config->minSize = {
 		// scrollBarWidth + (margin left + margin right) + labelText size
@@ -262,4 +268,5 @@ void Meatball::ConsoleUIScene::onResize() {
 		(int)outputBox.config->font->baseSize+inputBox.rect.height+margin*2+config->labelFont->baseSize};
 	
 	mainPanel.onResize();
+	mainPanel.onResizeStop();
 }
