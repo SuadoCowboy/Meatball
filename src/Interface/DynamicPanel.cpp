@@ -133,13 +133,16 @@ void Meatball::DynamicPanel::update() {
         conditions &= ~8;
     }
 
+    Vector2 minPos{6-rect.width, 0};
+    Vector2 maxPos{6, 6};
+
     if (conditions & 1) {
         float oldX = rect.x;
         float oldY = rect.y;
         rect.x = mousePos.x-offset.x;
         rect.y = mousePos.y-offset.y;
 
-        fitXYInRenderScreen(rect, {6-rect.width, 0}, {6, 6});
+        fitXYInRenderScreen(rect.x, rect.y, minPos, maxPos);
 
         if (onMove && (rect.x != oldX || oldY != rect.y)) onMove();
     
@@ -163,10 +166,10 @@ void Meatball::DynamicPanel::update() {
             } else rect.width = mousePos.x-offset.x;
         }
         
-        if (offset.y != -1) {
+        if (offset.y != -1 && mousePos.y > minPos.y) {
             if (conditions & 4) {
                 rect.y = mousePos.y-offset.y;
-                
+
                 if (rect.height-rect.y+oldY > config->minSize.y)
                     rect.height -= rect.y-oldY;
                 else {
@@ -180,7 +183,7 @@ void Meatball::DynamicPanel::update() {
         if (rect.width < config->minSize.x) rect.width = config->minSize.x;
         if (rect.height < config->minSize.y) rect.height = config->minSize.y;
 
-        fitXYInRenderScreen(rect, {6-rect.width, 6}, {6, 6});
+        fitXYInRenderScreen(rect.x, rect.y, minPos, maxPos);
 
         if (onResize && (oldWidth != rect.width || oldHeight != rect.height)) onResize(); // onResize should also call onMove
         else if (onMove && (oldX != rect.x || oldY != rect.y)) onMove();
