@@ -13,6 +13,7 @@ namespace Meatball {
             TextButton();
 
             std::shared_ptr<Font> font;
+            unsigned short fontSize;
 
             Color color;
             Color textColor;

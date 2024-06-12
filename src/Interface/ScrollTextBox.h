@@ -14,6 +14,7 @@ namespace Meatball {
             ScrollTextBox();
 
             std::shared_ptr<Font> font;
+            unsigned short fontSize;
 
             Color color;
         };
