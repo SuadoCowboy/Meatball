@@ -14,6 +14,8 @@ namespace Meatball {
             InputTextBox();
 
             std::shared_ptr<Font> font;
+            float fontSize; // this shouldn't be here but it's the best way I found
+
             Color color, textColor, cursorColor, selectionColor;
         };
     }
