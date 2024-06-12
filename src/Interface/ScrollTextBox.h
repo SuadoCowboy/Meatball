@@ -36,7 +36,7 @@ namespace Meatball {
         const unsigned int &getContentHeight() const;
         ScrollBar &getScrollBar();
 
-        void appendText(std::string text, const std::shared_ptr<Color>& color);
+        void appendText(std::string text, Color& color);
         void clearText();
 
         /// @brief checks the current rect size and wraps the whole text
@@ -45,7 +45,7 @@ namespace Meatball {
         /// @brief removes the text at index 0
         void popFront() noexcept;
 
-        const std::list<std::pair<std::string, const std::shared_ptr<Color>>> &getText() const;
+        const std::list<std::pair<std::string, const Color&>> &getText() const;
 
         void draw();
         void drawScrollbar();
@@ -57,7 +57,7 @@ namespace Meatball {
         std::shared_ptr<Config::ScrollTextBox> config;
 
     private:
-        std::list<std::pair<std::string, const std::shared_ptr<Color>>> text;
+        std::list<std::pair<std::string, const Color&>> text;
         unsigned int contentHeight = 0;
         
         ScrollBar scrollBar; // it appears when text is higher than rect.height

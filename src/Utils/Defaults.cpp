@@ -124,16 +124,16 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
         data->unsignedCharV : Meatball::ConsoleUIScene::margin;
 
     data = Config::ifContainsGet(consoleData, "OutputDefaultColor");
-    if (data) *Config::OutputColors::defaultColor = data->colorV;
+    if (data) Config::OutputColors::defaultColor = data->colorV;
 
     data = Config::ifContainsGet(consoleData, "OutputEchoColor");
-    if (data) *Config::OutputColors::echoColor = data->colorV;
+    if (data) Config::OutputColors::echoColor = data->colorV;
     
     data = Config::ifContainsGet(consoleData, "OutputWarningColor");
-    if (data) *Config::OutputColors::warningColor = data->colorV;
+    if (data) Config::OutputColors::warningColor = data->colorV;
 
     data = Config::ifContainsGet(consoleData, "OutputErrorColor");
-    if (data) *Config::OutputColors::errorColor = data->colorV;
+    if (data) Config::OutputColors::errorColor = data->colorV;
 
     data = Config::ifContainsGet(consoleData, "autoCompleteColor");
     if (data) consoleConfig->autoCompleteColor = data->colorV;

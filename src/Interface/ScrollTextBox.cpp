@@ -22,7 +22,7 @@ Meatball::ScrollTextBox::ScrollTextBox(const Rectangle& rect) {
     scrollBar.config = std::make_shared<Config::ScrollBar>(Defaults::scrollBarConfig);
 }
 
-static float _getContentHeight(const std::list<std::pair<std::string, const std::shared_ptr<Color>>> &text, unsigned short fontSize) {
+static float _getContentHeight(const std::list<std::pair<std::string, const Color&>> &text, unsigned short fontSize) {
     size_t lineIdx = 0;
     for (auto &line : text) {
         size_t newLineIdx = 0;
@@ -35,7 +35,7 @@ static float _getContentHeight(const std::list<std::pair<std::string, const std:
     return lineIdx*fontSize; // contentHeight
 }
 
-static inline void handleTextWrapping(std::list<std::pair<std::string, const std::shared_ptr<Color>>> &textList, const std::string &text, const std::shared_ptr<Color>& color, std::shared_ptr<Font> font, float maxWidth) {
+static inline void handleTextWrapping(std::list<std::pair<std::string, const Color&>> &textList, const std::string &text, Color& color, std::shared_ptr<Font> font, float maxWidth) {
     textList.push_back({"", color});
     std::string newText = text;
 
@@ -98,7 +98,7 @@ void Meatball::ScrollTextBox::updateTextWrap() {
     scrollBar.visible = contentHeight > rect.height;
 }
 
-void Meatball::ScrollTextBox::appendText(std::string newText, const std::shared_ptr<Color>& color) {
+void Meatball::ScrollTextBox::appendText(std::string newText, Color &color) {
     if (newText.size() == 0) return;
     
     if (Meatball::measureTextWidth(*config->font, config->fontSize, newText.c_str()) < rect.width-scrollBar.getRect().width) {
@@ -128,7 +128,7 @@ void Meatball::ScrollTextBox::popFront() noexcept {
     scrollBar.updateThumbHeight(rect.height, contentHeight);
 }
 
-const std::list<std::pair<std::string, const std::shared_ptr<Color>>> &Meatball::ScrollTextBox::getText() const {
+const std::list<std::pair<std::string, const Color&>> &Meatball::ScrollTextBox::getText() const {
     return text;
 }
 
@@ -178,7 +178,7 @@ void Meatball::ScrollTextBox::draw() {
 
         if (lineY+config->fontSize*newLineAmount > 0)
             drawText(*config->font, config->fontSize, line.first.c_str(), rect.x,
-            rect.y+lineY+1/*+1 because letters get stuck 1 pixel in the top*/, *line.second);
+            rect.y+lineY+1/*+1 because letters get stuck 1 pixel in the top*/, line.second);
         
         lineIdx += newLineAmount;
     }

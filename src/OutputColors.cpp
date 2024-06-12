@@ -1,13 +1,13 @@
 #include "OutputColors.h"
 
-std::shared_ptr<Color> Meatball::Config::OutputColors::defaultColor = std::make_shared<Color>(WHITE);
+Color Meatball::Config::OutputColors::defaultColor = WHITE;
 // Light blue
-std::shared_ptr<Color> Meatball::Config::OutputColors::echoColor = std::make_shared<Color>((Color){173, 216, 230, 255});
+Color Meatball::Config::OutputColors::echoColor = {173, 216, 230, 255};
 // Light yellow
-std::shared_ptr<Color> Meatball::Config::OutputColors::warningColor = std::make_shared<Color>((Color){253, 250, 114, 255});
-std::shared_ptr<Color> Meatball::Config::OutputColors::errorColor = std::make_shared<Color>(RED);
+Color Meatball::Config::OutputColors::warningColor = {253, 250, 114, 255};
+Color Meatball::Config::OutputColors::errorColor = RED;
 
-const std::shared_ptr<Color>& Meatball::outputLevelToOutputColor(const HayBCMD::OutputLevel& level) {
+Color& Meatball::outputLevelToOutputColor(const HayBCMD::OutputLevel& level) {
     switch (level) {
     case HayBCMD::OutputLevel::DEFAULT:
         return Meatball::Config::OutputColors::defaultColor;
