@@ -60,13 +60,6 @@ if a required objectName is not defined in the end: tell user and stop running
 - create documentation for everything that can be modified and which name should they have in .meatdata
 - maybe permit a console command to load .meatdata files and even examine them
 
-```cpp
-class ConsoleUI /*WORK IN PROGRESS*/ {
-    #missing inputbox;
-    #missing a little text box that indicates possible words the user might be looking for(maybe do like ddrace one).
-}
-```
-
 # FUTURE NEXT-STEPS:
 - Input handling with binds by HayBCMD
 - multiplayer Stuff
