@@ -1,5 +1,7 @@
 #include <raylib.h>
 
+#include <vector>
+
 #include <HayBCMD.h>
 
 #include <ConsoleUI.h>
@@ -49,6 +51,17 @@ int main(int, char**)
     }
 
     int screenWidth = GetRenderWidth(), screenHeight = GetRenderHeight();
+
+    HayBCMD::Command("reload_fonts", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
+        Meatball::FontsHandler::clear();
+        Meatball::FontsHandler::add(0, GetFontDefault());
+
+        auto consoleData = Config::loadData("data/meatdata/Console.meatdata");
+
+        auto data = Config::ifContainsGet(consoleData, "font");
+        if (data) Meatball::Defaults::loadConsoleFonts(consoleUI, data->stringV);
+
+    }, "reloads all text fonts.");
 
     while (!WindowShouldClose()) {
         if (IsWindowResized()) {

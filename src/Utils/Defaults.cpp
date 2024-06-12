@@ -1,6 +1,5 @@
 #include "Defaults.h"
 
-#include <filesystem>
 #include <memory>
 
 #include <HayBCMD.h>
@@ -99,6 +98,18 @@ void Meatball::Defaults::init(const std::string& meatdataPath) {
     }
 }
 
+void Meatball::Defaults::loadConsoleFonts(ConsoleUIScene& consoleUI, const std::filesystem::path& fontPath) {
+    int size = (int)consoleUI.inputBox.rect.height - 2 + (int)consoleUI.inputBox.rect.height % 2;
+    if (Meatball::loadFont(fontPath, 1, size, nullptr, 0))
+        consoleUI.inputBox.config->font = consoleUI.outputBox.config->font = FontsHandler::get(1, size);
+
+    size = consoleUI.inputBox.rect.height*0.5;
+    if (Meatball::loadFont(fontPath, 1, size, nullptr, 0))
+        consoleUI.config->labelFont = FontsHandler::get(1, size);
+    
+    consoleUI.onResize(1, 1);
+}
+
 Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& rect, const std::string &meatdataPath) {
     std::vector<std::pair<std::string, HayBCMD::OutputLevel>> texts;
     HayBCMD::Output::setPrintFunction([&](const HayBCMD::OutputLevel &level, const std::string &text) {
@@ -153,19 +164,7 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
     else consoleUI.closeButton.config->hoveredColor = {255,255,255,255};
 
     data = Config::ifContainsGet(consoleData, "font");
-    if (data) {
-        std::filesystem::path fontPath = data->stringV;
-
-        int size = (int)consoleUI.inputBox.rect.height - 2 + (int)consoleUI.inputBox.rect.height % 2;
-        if (Meatball::loadFont(fontPath, 1, size, nullptr, 0))
-            consoleUI.inputBox.config->font = consoleUI.outputBox.config->font = FontsHandler::get(1, size);
-
-        size = consoleUI.inputBox.rect.height*0.5;
-        if (Meatball::loadFont(fontPath, 1, size, nullptr, 0))
-            consoleUI.config->labelFont = FontsHandler::get(1, size);
-    }
-
-    consoleUI.onResize(1, 1);
+    if (data) loadConsoleFonts(consoleUI, {data->stringV});
 
     // TODO: if ConsoleUI data contains changes related to static
     // configs, create a new shared ptr and use std::swap(old, new) and maybe std::move if something goes wrong?
