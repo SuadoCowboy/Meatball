@@ -43,12 +43,14 @@ Meatball::ConsoleUIScene::ConsoleUIScene(const Rectangle &rect, const std::share
 		inputBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin-inputBox.rect.height;
 	};
 
+	inputBox.rect.height = mainPanel.rect.height*0.04;
+
 	mainPanel.onResize = [&]() {
 			closeButton.rect.width = margin; // it's inside the margin
 			closeButton.rect.height = margin;
 
-			inputBox.rect.height = mainPanel.rect.height*0.04;
 			inputBox.rect.width = mainPanel.rect.width-margin*2;
+			inputBox.config->fontSize = (int)inputBox.rect.height - 2 + (int)inputBox.rect.height % 2;
 			
 			outputBox.setSize(inputBox.rect.width, mainPanel.rect.height-config->labelFont->baseSize-1-margin*2-inputBox.rect.height);
 
@@ -219,14 +221,14 @@ void Meatball::ConsoleUIScene::draw() {
 			
 			for (auto &pair : autoCompleteText) {
 				if (pair.second == config->autoCompleteSelectedTextColor) {
-					selectedTextWidth += Meatball::measureTextWidth(*inputBox.config->font, pair.first.c_str());
+					selectedTextWidth += Meatball::measureTextWidth(*inputBox.config->font, inputBox.config->fontSize, pair.first.c_str());
 					passedThroughSelectedText = true;
 					continue;
 				}
 
 				if (passedThroughSelectedText) break;
 				
-				offsetX += Meatball::measureTextWidth(*inputBox.config->font, pair.first.c_str())+1;
+				offsetX += Meatball::measureTextWidth(*inputBox.config->font, inputBox.config->fontSize, pair.first.c_str())+1;
 			}
 
 			if (offsetX+selectedTextWidth < mainPanel.rect.width) offsetX = 0;
@@ -240,14 +242,14 @@ void Meatball::ConsoleUIScene::draw() {
 
 		float x = mainPanel.rect.x;
 		for (auto &pair : autoCompleteText) {
-			drawText(*inputBox.config->font, pair.first.c_str(), x-offsetX, autoCompleteY+1, pair.second);
-			x += Meatball::measureTextWidth(*inputBox.config->font, pair.first.c_str())+1;
+			drawText(*inputBox.config->font, inputBox.config->fontSize, pair.first.c_str(), x-offsetX, autoCompleteY+1, pair.second);
+			x += Meatball::measureTextWidth(*inputBox.config->font, inputBox.config->fontSize, pair.first.c_str())+1;
 		}
 
 		EndScissorMode();
 	}
 
-	drawText(*config->labelFont, config->labelText, mainPanel.rect.x+margin, mainPanel.rect.y+margin, config->labelTextColor);
+	drawText(*config->labelFont, config->labelFont->baseSize, config->labelText, mainPanel.rect.x+margin, mainPanel.rect.y+margin, config->labelTextColor);
 
 	drawX(closeButton.rect, closeButton.isHovered()? closeButton.config->hoveredColor : closeButton.config->color);
 }
@@ -255,15 +257,18 @@ void Meatball::ConsoleUIScene::draw() {
 void Meatball::ConsoleUIScene::onResize(float ratioWidth, float ratioHeight) {
 	mainPanel.config->grabHeight = config->labelFont->baseSize;
 
-	mainPanel.rect.x = ratioWidth * mainPanel.rect.x;
-    mainPanel.rect.y = ratioHeight * mainPanel.rect.y;
+	mainPanel.rect.x *= ratioWidth;
+    mainPanel.rect.y *= ratioHeight;
 
-	mainPanel.rect.width = ratioWidth * mainPanel.rect.width;
-	mainPanel.rect.height = ratioHeight * mainPanel.rect.height;
+	mainPanel.rect.width *= ratioWidth;
+	mainPanel.rect.height *= ratioHeight;
+
+	inputBox.rect.height *= ratioHeight;
+	//inputBox.config->fontSize *= ratioHeight;
 
 	mainPanel.config->minSize = {
 		// scrollBarWidth + (margin left + margin right) + labelText size
-		(int)outputBox.getScrollBar().getRect().width+margin*2+Meatball::measureTextWidth(*config->labelFont, config->labelText),
+		(int)outputBox.getScrollBar().getRect().width+margin*2+Meatball::measureTextWidth(*config->labelFont, config->labelFont->baseSize, config->labelText),
 		// outputBox minSize + inputBox minSize + (margin left + margin right)
 		(int)outputBox.config->font->baseSize+inputBox.rect.height+margin*2+config->labelFont->baseSize};
 	
