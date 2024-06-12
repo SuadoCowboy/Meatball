@@ -9,8 +9,8 @@
 #include <FontsHandler.h>
 #include <Config.h>
 
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 700
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 300
 
 namespace Config = Meatball::Config;
 
