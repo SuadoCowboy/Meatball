@@ -101,6 +101,7 @@ void Meatball::DynamicPanel::update() {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.y};
             conditions |= 2;
             conditions |= 4;
+            conditions |= 8;
         }
     }
 
