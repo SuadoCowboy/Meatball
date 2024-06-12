@@ -264,7 +264,6 @@ void Meatball::ConsoleUIScene::onResize(float ratioWidth, float ratioHeight) {
 	mainPanel.rect.height *= ratioHeight;
 
 	inputBox.rect.height *= ratioHeight;
-	//inputBox.config->fontSize *= ratioHeight;
 
 	mainPanel.config->minSize = {
 		// scrollBarWidth + (margin left + margin right) + labelText size
