@@ -82,6 +82,9 @@ int main(int, char**)
 
     }, "changes each console output color to a random color");
 
+    // of course quit would be a function but this is just a test
+    HayBCMD::CVARStorage::cvar("quit", false, "set to 1 to quit"); 
+
     while (!WindowShouldClose()) {
         if (IsWindowResized()) {
             int newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
@@ -90,6 +93,10 @@ int main(int, char**)
             screenWidth = newScreenWidth;
             screenHeight = newScreenHeight;
         }
+
+        bool quit = false;
+        if (HayBCMD::CVARStorage::getCvar("quit", quit) && quit)
+            break;
 
         ClearBackground(backgroundColor);
         
