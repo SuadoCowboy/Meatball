@@ -1,34 +1,43 @@
 # A MAYBE:
 - A class that handles shared_ptrs of objects, probably colors(because i'm obsessed with colors). When creating a new color object, it checks if this color is already defined and give a shared_ptr to that color. If the color is new create a new object. Everytime a color changes it should also create a new shared_ptr so that it does not modifies the past one. If this works well and it really helps memory usage and does not affect much on performance, do that for stuff that is repeated too much. 
 
-# TODOS:
+# TODOS
 - how can i make font resize together with screen? let font be uglier(i believe it's a YES)?
+- also maybe create a console command to reload fonts :D
 
-- create a .meatui(maybe delete .meatdata or use for another thing that .cfg can't do) file extension to make it possible to create a user interface. Should also include a meatUILoader.dll and meatUIViewer.exe in bin folder so that users can test their interfaces without joining the game everytime. Example: for Console, .meatui, the user have some options: mainPanel, closeButton, sendButton(optional), inputBox and OutputTextBox.
-!!! Also set a macro to define its actual version because it could change alot in the future
-It would be something like this:
-```py
-#      x y width height style   objectName
-Button x y width height STYLE_X "closeButton"
+# User Interface with Lua
+- Use lua language to create UI. Should also make a way so that users can test their interfaces without joining the game everytime.
+- Also set a macro to define its actual version because it could change alot in the future
 
-#            x y width height borderRadius objectName
-DynamicPanel x y width height 0           "mainPanel"
+- It would also require to implement the events related to specific classes for example DynamicPanel events like onMove, onResize, onResizeStop, and other classes that might have events and stuff. My idea is: make it in lua :D, It's just the UI in lua and later will be used in C++ so it will be fine I guess.
 
-# Optional stuff: use Void objectName
-Void "sendButton"
+- ConsoleUI: Try implementing a optional draw lua function so that the creator of the UI can draw the way he wants to. (this way they could also make stupid things, which is fun). If this is implemented, it would be nice to give lua variables the delta time and stuff related to game.
 
-#            x y width height defaultText                        objectName
-InputTextBox x y width height "default text written in input box" "inputBox"
+- Example: for Console, the user have some options: mainPanel, closeButton, sendButton(optional), inputBox and OutputTextBox. They also can modify events that the Console allowed, like: mainPanel::onMove, mainPanel::onResize and mainPanel::onResizeStop. The rest of the events are handled by the ConsoleUI code. closeButton::onRelease can not be changed because by default it should set ConsoleUI.visible to false. sendButton is the same thing, it should always send to the output and clear the input text. It would be something like this in lua:
+```lua
+-- THIS IS STILL ON THINKING, THINGS MIGHT NOT BE LIKE THIS ON RELEASE OF THE FIRST VERSION
 
-#             x y width height objectName
-ScrollTextBox x y width height "outputBox"
+-- params: x y width height style color hoveredColor
+closeButton = createButton(x, y, width, height, STYLES.STYLE_X, COLORS.LIGHTGRAY, COLORS.WHITE)
 
-# TODOS:
-# if game does not recognize objectName: tell user
-# if objectName is already defined: warn user and use the already defined instead
-# if x y width height is wrong: warn user but still let it pass with default values
-# if type is not allowed for objectName: tell user and stop running(because it might be dangerous)
-# if a objectName is not defined in the end: tell user and stop running(because it might be dangerous)
+-- params: x y width height borderRadius color
+mainPanel = createDynamicPanel(x, y, width, height, 0, {10,10,10,255})
+
+-- Optional stuff: we don't declare
+-- params: x, y, width, height, text
+--sendButton = createTextButton(x, y, width, height, "Send")
+
+-- params: x y width height defaultText color
+inputBox = createInputTextBox(x, y, width, height, "default text written in input box", {20,20,20,255})
+
+-- params: x y width height color
+outputBox = createScrollTextBox(x, y, width, height, {20, 20, 20, 255})
+
+--[[ TODOS:
+if game does not recognize objectName: tell user
+if type is not allowed for objectName: tell user and stop running
+if a required objectName is not defined in the end: tell user and stop running
+]]--
 ```
 
 # FUTURE TODOS:
