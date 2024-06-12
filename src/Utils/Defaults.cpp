@@ -60,6 +60,7 @@ void Meatball::Defaults::init(const std::string& meatdataPath) {
     inputTextBoxConfig = Config::InputTextBox();
     {
         inputTextBoxConfig.font = FontsHandler::get(0,0);
+        inputTextBoxConfig.fontSize = inputTextBoxConfig.font->baseSize;
 
         data = Config::ifContainsGet(initData, "inputTextBoxColor");
         if (data) inputTextBoxConfig.color = data->colorV;
@@ -156,9 +157,8 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
         std::filesystem::path fontPath = data->stringV;
 
         int size = (int)consoleUI.inputBox.rect.height - 2 + (int)consoleUI.inputBox.rect.height % 2;
-        if (Meatball::loadFont(fontPath, 1, size, nullptr, 0)){
+        if (Meatball::loadFont(fontPath, 1, size, nullptr, 0))
             consoleUI.inputBox.config->font = consoleUI.outputBox.config->font = FontsHandler::get(1, size);
-        }
 
         size = consoleUI.inputBox.rect.height*0.5;
         if (Meatball::loadFont(fontPath, 1, size, nullptr, 0))
