@@ -50,8 +50,8 @@ Meatball::ConsoleUIScene::ConsoleUIScene(const Rectangle &rect, const std::share
 			closeButton.rect.height = margin;
 
 			inputBox.rect.width = mainPanel.rect.width-margin*2;
-			inputBox.config->fontSize = (int)inputBox.rect.height - 2 + (int)inputBox.rect.height % 2;
-			
+			outputBox.config->fontSize = inputBox.config->fontSize = (int)inputBox.rect.height - 2 + (int)inputBox.rect.height % 2;
+
 			outputBox.setSize(inputBox.rect.width, mainPanel.rect.height-config->labelFont->baseSize-1-margin*2-inputBox.rect.height);
 
 			mainPanel.onMove();
