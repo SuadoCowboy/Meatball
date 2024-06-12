@@ -27,12 +27,12 @@ float Meatball::getRectCenterY(const Rectangle &rect) {
     return rect.y+rect.height*0.5;
 }
 
-void Meatball::fitXYInRenderScreen(Rectangle &rect, const Vector2 &minPos, const Vector2 &maxPos) {
-    if (rect.x < minPos.x) rect.x = minPos.x;
-    else if (rect.x > GetRenderWidth()-maxPos.x) rect.x = GetRenderWidth()-maxPos.x;
+void Meatball::fitXYInRenderScreen(float &x, float &y, const Vector2 &minPos, const Vector2 &maxPos) {
+    if (x < minPos.x) x = minPos.x;
+    else if (x > GetRenderWidth()-maxPos.x) x = GetRenderWidth()-maxPos.x;
     
-    if (rect.y < minPos.y) rect.y = minPos.y;
-    else if (rect.y > GetRenderHeight()-maxPos.y) rect.y = GetRenderHeight()-maxPos.y;
+    if (y < minPos.y) y = minPos.y;
+    else if (y > GetRenderHeight()-maxPos.y) y = GetRenderHeight()-maxPos.y;
 }
 
 bool Meatball::loadFont(const std::filesystem::path& path, unsigned short fontsHandlerId, int size, int *codepoints, int codepointCount) {
