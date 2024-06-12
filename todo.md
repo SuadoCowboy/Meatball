@@ -2,6 +2,8 @@
 - because sizeof(Color) is below 16(which is shared_ptr size), it's better cloning it or using a reference than actually using a pointer or shared_ptr.
 
 # TODOS
+- if config is below 16 use copy instead of shared_ptr(by that i mean to check each class that uses a config and modify the ones that need to, and if it's just a single variable, then it doesn't need a config struct)
+
 - create a compiler for meatdata files like .vpk(from source engine) so that it's easier for machine to read. BUT Users might be able to just use their customs without needing to compile(even though it's recommended)
 
 # User Interface with Lua
