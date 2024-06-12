@@ -24,11 +24,11 @@ namespace Meatball {
     /// @return false if path does not exist or is directory
     bool loadFont(const std::filesystem::path &path, unsigned short fontsHandlerId, int size, int *codepoints, int codepointCount);
 
-    Vector2 measureText(const Font &font, const char *text);
+    Vector2 measureText(const Font &font, float height, const char *text);
         
-    float measureTextWidth(const Font &font, const char *text);
+    float measureTextWidth(const Font &font, float height, const char *text);
         
-    float measureTextHeight(const Font &font, const char *text);
+    float measureTextHeight(const Font &font, float height, const char *text);
 }
 
 bool operator==(const Color &left, const Color &right);
