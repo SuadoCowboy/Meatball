@@ -40,6 +40,8 @@ bool Meatball::loadFont(const std::filesystem::path& path, unsigned short fontsH
         return false;
     
     Font font = LoadFontEx(path.string().c_str(), size, codepoints, codepointCount);
+    SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
+
     FontsHandler::add(fontsHandlerId, font);
     return true;
 }

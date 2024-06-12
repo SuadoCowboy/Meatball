@@ -21,6 +21,7 @@ namespace Meatball {
     void fitXYInRenderScreen(float &x, float &y, const Vector2 &minPos, const Vector2 &maxPos);
 
     /// @brief loads the font and adds to the FontsHandler
+    /// @note it sets font texture filter to bilinear
     /// @return false if path does not exist or is directory
     bool loadFont(const std::filesystem::path &path, unsigned short fontsHandlerId, int size, int *codepoints, int codepointCount);
 
