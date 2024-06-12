@@ -1,5 +1,5 @@
-# A MAYBE:
-- A class that handles shared_ptrs of objects, probably colors(because i'm obsessed with colors). When creating a new color object, it checks if this color is already defined and give a shared_ptr to that color. If the color is new create a new object. Everytime a color changes it should also create a new shared_ptr so that it does not modifies the past one. If this works well and it really helps memory usage and does not affect much on performance, do that for stuff that is repeated too much. 
+# WARNING
+- because sizeof(Color) is below 16(which is shared_ptr size), it's better cloning it or using a reference than actually using a pointer or shared_ptr.
 
 # TODOS
 - create a compiler for meatdata files like .vpk(from source engine) so that it's easier for machine to read. BUT Users might be able to just use their customs without needing to compile(even though it's recommended)
@@ -40,50 +40,21 @@ if a required objectName is not defined in the end: tell user and stop running
 ```
 
 # FUTURE TODOS:
-- optimize code and use the right data structures.
-- use threads with locks, atomic and mutex
-- every data structure that is needed everywhere should be sent as a pointer
-- update function descriptions and anything else related to reading
-- fontSize of stuff all stuffs is related to their height sizes
+- optimize code and use the right data structures;
+- use threads with locks, atomic and mutex;
+- every data structure that is needed in alot of places should be shared_ptr;
+- update function descriptions and anything else related to reading;
 
 # THINKING:
-- The developers could make their draw functions instead of the classes drawing, because then they could use the same classes but with different styles whether they want. All the classes could make is give specific drawing functions for stuff that requires a complexity level or private/protected-access. And together with that idea, the classes shall not store colors. Maybe store in a ColorsHandler or something and then the draw functions get the colors that way
+- The developers could make their draw functions instead of the classes drawing, because then they could use the same classes but with different styles whether they want. All that the classes could make is giving specific drawing functions for stuff that requires a complexity level or private/protected-access.
 
 - everything related to drawing is handled by the dev, so everyone could make the style they want their game to be!!
-example:
-```cpp
-// look for better name
-void borderfy(const Rectangle &rect, const Color &borderColor) {
-    DrawLine(rect.x, rect.y, rect.x+rect.width, rect.y, borderColor);
-    DrawLine(rect.x, rect.y+rect.height, rect.x+rect.width, rect.y+rect.height, borderColor);
-    DrawLine(rect.x, rect.y, rect.x, rect.y+rect.height, borderColor);
-    DrawLine(rect.x+rect.width, rect.y, rect.x+rect.width, rect.y+rect.height, borderColor);
-}
-```
-- maybe even do that with the hoveredColors and stuff in update function, so that the dev can choose if he wants that functionality or not. It would be something like:
-```cpp
-/// @brief can be used for everything that has a rect and uses color
-const Color* const updateHoverColor(const Rectangle &rect, const Color* const defaultColor, const Color* const hoverColor) {
-    return CheckCollisionPointRec(GetMousePosition(), rect)? hoverColor : defaultColor;
-}
-
-void update() {
-    /*
-    TextBox textBox;
-    Color textBoxColor, textBoxHoverColor;
-    */
-    // this means that each class should only need a pointer to a color and then no need to copy colors
-    textBox.color = updateHoverColor(textBox.getRect(), textBoxColor, textBoxHoverColor);
-}
-```
-
-- use char buffers instead of std::string because it seems like string is bad? idk, do more research
 
 # IMPORTANT:
-- make things minimalist, things like borders and effects can be added using functions or classes
+- make things minimalist, if code is too complex, find a better(and maybe optimized) way
 
-# IMPROVE .meatdata FILE TYPES:
-- let it have variables to identify colors and transparency stuff in the code or just variables, and also let have comments with # or something idk
+# IMPROVE .meatdata TYPE:
+- let it have variables to identify colors and transparency stuff in the code or just variables, and also let have comments with # or something idk;
 - create documentation for everything that can be modified and which name should they have in .meatdata
 - maybe permit a console command to load .meatdata files and even examine them
 
