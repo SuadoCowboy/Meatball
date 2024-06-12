@@ -2,9 +2,7 @@
 - A class that handles shared_ptrs of objects, probably colors(because i'm obsessed with colors). When creating a new color object, it checks if this color is already defined and give a shared_ptr to that color. If the color is new create a new object. Everytime a color changes it should also create a new shared_ptr so that it does not modifies the past one. If this works well and it really helps memory usage and does not affect much on performance, do that for stuff that is repeated too much. 
 
 # TODOS
-- create a compiler for meatdata files like .vpk(from source engine) so that it's easier for machine to read.
-- how can i make font resize together with screen? let font be uglier(i believe it's a YES)?
-- also maybe create a console command to reload fonts :D
+- create a compiler for meatdata files like .vpk(from source engine) so that it's easier for machine to read. BUT Users might be able to just use their customs without needing to compile(even though it's recommended)
 
 # User Interface with Lua
 - Use lua language to create UI. Should also make a way so that users can test their interfaces without joining the game everytime.
