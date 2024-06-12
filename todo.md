@@ -53,7 +53,7 @@ if a required objectName is not defined in the end: tell user and stop running
 - everything related to drawing is handled by the dev, so everyone could make the style they want their game to be!!
 
 # IMPORTANT:
-- make things minimalist, if code is too complex, find a better(and maybe optimized) way
+- make things minimalist, if code is too complex, find a better(and if possible optimized) way
 
 # IMPROVE .meatdata TYPE:
 - let it have variables to identify colors and transparency stuff in the code or just variables, and also let have comments with # or something idk;
