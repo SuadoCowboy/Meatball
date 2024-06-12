@@ -63,6 +63,25 @@ int main(int, char**)
 
     }, "reloads all text fonts.");
 
+    HayBCMD::Command("console_output_change_colors_random", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
+        Meatball::Config::OutputColors::defaultColor.r = (unsigned char)GetRandomValue(0, 255);
+        Meatball::Config::OutputColors::defaultColor.g = (unsigned char)GetRandomValue(0, 255);
+        Meatball::Config::OutputColors::defaultColor.b = (unsigned char)GetRandomValue(0, 255);
+
+        Meatball::Config::OutputColors::echoColor.r = (unsigned char)GetRandomValue(0, 255);
+        Meatball::Config::OutputColors::echoColor.g = (unsigned char)GetRandomValue(0, 255);
+        Meatball::Config::OutputColors::echoColor.b = (unsigned char)GetRandomValue(0, 255);
+
+        Meatball::Config::OutputColors::warningColor.r = (unsigned char)GetRandomValue(0, 255);
+        Meatball::Config::OutputColors::warningColor.g = (unsigned char)GetRandomValue(0, 255);
+        Meatball::Config::OutputColors::warningColor.b = (unsigned char)GetRandomValue(0, 255);
+
+        Meatball::Config::OutputColors::errorColor.r = (unsigned char)GetRandomValue(0, 255);
+        Meatball::Config::OutputColors::errorColor.g = (unsigned char)GetRandomValue(0, 255);
+        Meatball::Config::OutputColors::errorColor.b = (unsigned char)GetRandomValue(0, 255);
+
+    }, "changes each console output color to a random color");
+
     while (!WindowShouldClose()) {
         if (IsWindowResized()) {
             int newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
