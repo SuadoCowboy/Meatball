@@ -9,8 +9,8 @@
 #include <FontsHandler.h>
 #include <Config.h>
 
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 300
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 700
 
 namespace Config = Meatball::Config;
 
@@ -61,31 +61,14 @@ int main(int, char**)
         auto data = Config::ifContainsGet(consoleData, "font");
         if (data) Meatball::Defaults::loadConsoleFonts(consoleUI, data->stringV);
 
-    }, "reloads all text fonts.");
+    }, "- reloads all text fonts.");
 
-    HayBCMD::Command("console_output_change_colors_random", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
-        Meatball::Config::OutputColors::defaultColor.r = (unsigned char)GetRandomValue(0, 255);
-        Meatball::Config::OutputColors::defaultColor.g = (unsigned char)GetRandomValue(0, 255);
-        Meatball::Config::OutputColors::defaultColor.b = (unsigned char)GetRandomValue(0, 255);
+    bool shouldQuit = false;
+    HayBCMD::Command("quit", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
+        shouldQuit = true;
+    }, "- closes the window");
 
-        Meatball::Config::OutputColors::echoColor.r = (unsigned char)GetRandomValue(0, 255);
-        Meatball::Config::OutputColors::echoColor.g = (unsigned char)GetRandomValue(0, 255);
-        Meatball::Config::OutputColors::echoColor.b = (unsigned char)GetRandomValue(0, 255);
-
-        Meatball::Config::OutputColors::warningColor.r = (unsigned char)GetRandomValue(0, 255);
-        Meatball::Config::OutputColors::warningColor.g = (unsigned char)GetRandomValue(0, 255);
-        Meatball::Config::OutputColors::warningColor.b = (unsigned char)GetRandomValue(0, 255);
-
-        Meatball::Config::OutputColors::errorColor.r = (unsigned char)GetRandomValue(0, 255);
-        Meatball::Config::OutputColors::errorColor.g = (unsigned char)GetRandomValue(0, 255);
-        Meatball::Config::OutputColors::errorColor.b = (unsigned char)GetRandomValue(0, 255);
-
-    }, "changes each console output color to a random color");
-
-    // of course quit would be a function but this is just a test
-    HayBCMD::CVARStorage::cvar("quit", false, "set to 1 to quit"); 
-
-    while (!WindowShouldClose()) {
+    while (!shouldQuit) {
         if (IsWindowResized()) {
             int newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
             consoleUI.onResize((float)newScreenWidth/screenWidth, (float)newScreenHeight/screenHeight);
@@ -94,9 +77,7 @@ int main(int, char**)
             screenHeight = newScreenHeight;
         }
 
-        bool quit = false;
-        if (HayBCMD::CVARStorage::getCvar("quit", quit) && quit)
-            break;
+        if (WindowShouldClose()) shouldQuit = true;
 
         ClearBackground(backgroundColor);
         
@@ -109,4 +90,5 @@ int main(int, char**)
     }
 
     Meatball::FontsHandler::clear();
+    CloseWindow();
 }
