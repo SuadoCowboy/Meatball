@@ -47,12 +47,12 @@ namespace Meatball {
 
         /// @brief appends text to outputTextbox
         void print(const HayBCMD::OutputLevel &level, const std::string &text) {
-            size_t length = text.size()-1;
-            while (text[length] == '\n' && length != 0)
+            size_t length = text.size();
+            while (text[length-1] == '\n' && length != 0)
                 --length;
             
             if (length != 0)
-                outputBox.appendText(text.substr(0, length+1), outputLevelToOutputColor(level));
+                outputBox.appendText(text.substr(0, length), outputLevelToOutputColor(level));
             
             while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*(unsigned int)outputBox.config->font->baseSize) {
                 if (outputBox.getText().size() == 0) break;
