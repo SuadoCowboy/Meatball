@@ -10,8 +10,6 @@
 namespace Meatball { namespace Serialization {
     template<typename T>
     std::vector<char> serializeObject(const T& object) {
-        static_assert(std::is_trivially_copyable<T>::value, "Object must be trivially copyable");
-
         std::vector<char> buffer(sizeof(T));
         std::memcpy(buffer.data(), &object, sizeof(T));
         return buffer;
@@ -19,8 +17,6 @@ namespace Meatball { namespace Serialization {
 
     template<typename T>
     T deserializeVector(const std::vector<char>& serializedVector) {
-        static_assert(std::is_trivially_copyable<T>::value, "Object must be trivially copyable");
-
         T object;
         std::memcpy(&object, serializedVector.data(), sizeof(T));
         return object;
