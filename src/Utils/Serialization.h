@@ -67,9 +67,8 @@ namespace Meatball { namespace Serialization {
     template<typename T>
     bool readFile(const std::string& filename, T& output) {
         std::ifstream ifs(filename, std::ios::binary);
-        if (!ifs) {
-            throw std::runtime_error("Failed to open file for reading");
-        }
+        if (!ifs)
+            return false;
 
         // Read the compressed data size
         uLongf compressedSize;
@@ -88,9 +87,9 @@ namespace Meatball { namespace Serialization {
             return false;
 
         // Deserialize the object
-        T object = deserialize<T>(decompressedBuffer);
+        output = deserialize<T>(decompressedBuffer);
 
         ifs.close();
-        return object;
+        return true;
     }
 }}
