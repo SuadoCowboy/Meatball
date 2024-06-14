@@ -36,7 +36,7 @@ namespace Meatball {
 
         /// @brief A function that can be used to load meatdata
         /// @param path path to a file that contains data (should end with .meatdata)
-        /// @return data. If something went wrong it returns the data that got before the error
+        /// @return data. If something went wrong it returns a empty unordered_map
         std::unordered_map<std::string, ConfigData> loadData(std::filesystem::path path);
     }
 }

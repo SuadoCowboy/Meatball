@@ -43,13 +43,13 @@ std::unordered_map<std::string, Meatball::Config::ConfigData> Meatball::Config::
         
         // "name "
         size_t spaceIdx = line.find(" ");
-        if (handleSpaceError(spaceIdx, 0, lineIdx)) return data;
+        if (handleSpaceError(spaceIdx, 0, lineIdx)) return {};
         
         std::string name = line.substr(0, spaceIdx);
 
         // " type "
         size_t secondSpaceIdx = line.find(" ", spaceIdx+1);
-        if (handleSpaceError(secondSpaceIdx, spaceIdx, lineIdx)) return data;
+        if (handleSpaceError(secondSpaceIdx, spaceIdx, lineIdx)) return {};
 
         std::string type = line.substr(spaceIdx+1, secondSpaceIdx-spaceIdx-1);
         std::string value = line.substr(secondSpaceIdx+1);
