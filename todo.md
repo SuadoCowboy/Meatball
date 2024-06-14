@@ -2,7 +2,7 @@
 - because sizeof(Color) is below 16(which is shared_ptr size), it's better cloning it or using a reference than actually using a pointer or shared_ptr.
 
 # TODOS
-- create a compiler for meatdata files like .vpk(from source engine) so that it's easier for machine to read. BUT Users might be able to just use their customs without needing to compile(even though it's recommended)
+- create a serializer for meatdata files like .vpk(from source engine) so that it's easier for machine to read. BUT Users might be able to just use their customs without needing to serialize(even though it's recommended)
 
 # User Interface with Lua
 - Use lua language to create UI. Should also make a way so that users can test their interfaces without joining the game everytime.
