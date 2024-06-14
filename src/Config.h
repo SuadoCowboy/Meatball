@@ -34,7 +34,7 @@ namespace Meatball {
         /// @return pointer to data if contains else nullptr
         ConfigData *ifContainsGet(std::unordered_map<std::string, ConfigData> &data, const std::string &what);
 
-        /// @brief A function that can be used to load data, not to be confused with loadCfg
+        /// @brief A function that can be used to load meatdata
         /// @param path path to a file that contains data (should end with .meatdata)
         /// @return data. If something went wrong it returns the data that got before the error
         std::unordered_map<std::string, ConfigData> loadData(std::filesystem::path path);
