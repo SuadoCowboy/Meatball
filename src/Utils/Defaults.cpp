@@ -23,20 +23,20 @@ void Meatball::Defaults::init(const std::string& meatdataPath) {
     
     FontsHandler::add(0, GetFontDefault());
 
-    Meatball::Config::ConfigData *data;
+    Meatball::Config::ConfigData* data;
     dynamicPanelConfig = Config::DynamicPanel();
     {
         data = Config::ifContainsGet(initData, "mainPanelColor");
-        if (data) dynamicPanelConfig.color = data->colorV;
+        if (data) dynamicPanelConfig.color = Config::getConfig<Color>(data)->value;
     }
 
     buttonConfig = Config::Button();
     {
         data = Config::ifContainsGet(initData, "buttonColor");
-        if (data) buttonConfig.color = data->colorV;
+        if (data) buttonConfig.color = Config::getConfig<Color>(data)->value;
 
         data = Config::ifContainsGet(initData, "buttonHoveredColor");
-        if (data) buttonConfig.hoveredColor = data->colorV;
+        if (data) buttonConfig.hoveredColor = Config::getConfig<Color>(data)->value;
     }
 
     textButtonConfig = Config::TextButton();
@@ -44,16 +44,16 @@ void Meatball::Defaults::init(const std::string& meatdataPath) {
         textButtonConfig.font = FontsHandler::get(0,0);
 
         data = Config::ifContainsGet(initData, "textButtonColor");
-        if (data) textButtonConfig.color = data->colorV;
+        if (data) textButtonConfig.color = Config::getConfig<Color>(data)->value;
 
         data = Config::ifContainsGet(initData, "textButtonTextColor");
-        if (data) textButtonConfig.textColor = data->colorV;
+        if (data) textButtonConfig.textColor = Config::getConfig<Color>(data)->value;
 
         data = Config::ifContainsGet(initData, "textButtonHoveredColor");
-        if (data) textButtonConfig.hoveredColor = data->colorV;
+        if (data) textButtonConfig.hoveredColor = Config::getConfig<Color>(data)->value;
 
         data = Config::ifContainsGet(initData, "textButtonHoveredTextColor");
-        if (data) textButtonConfig.hoveredTextColor = data->colorV;
+        if (data) textButtonConfig.hoveredTextColor = Config::getConfig<Color>(data)->value;
     }
 
     inputTextBoxConfig = Config::InputTextBox();
@@ -62,31 +62,31 @@ void Meatball::Defaults::init(const std::string& meatdataPath) {
         inputTextBoxConfig.fontSize = inputTextBoxConfig.font->baseSize;
 
         data = Config::ifContainsGet(initData, "inputTextBoxColor");
-        if (data) inputTextBoxConfig.color = data->colorV;
+        if (data) inputTextBoxConfig.color = Config::getConfig<Color>(data)->value;
 
         data = Config::ifContainsGet(initData, "inputTextBoxTextColor");
-        if (data) inputTextBoxConfig.textColor = data->colorV;
+        if (data) inputTextBoxConfig.textColor = Config::getConfig<Color>(data)->value;
 
         data = Config::ifContainsGet(initData, "inputTextBoxCursorColor");
-        if (data) inputTextBoxConfig.cursorColor = data->colorV;
+        if (data) inputTextBoxConfig.cursorColor = Config::getConfig<Color>(data)->value;
     }
 
     scrollBarConfig = Config::ScrollBar();
     {
         data = Config::ifContainsGet(initData, "scrollBarColor");
-        if (data) scrollBarConfig.barColor = data->colorV;
+        if (data) scrollBarConfig.barColor = Config::getConfig<Color>(data)->value;
 
         data = Config::ifContainsGet(initData, "scrollBarThumbColor");
-        if (data) scrollBarConfig.thumbColor = data->colorV;
+        if (data) scrollBarConfig.thumbColor = Config::getConfig<Color>(data)->value;
 
         data = Config::ifContainsGet(initData, "scrollBarHoveredColor");
-        if (data) scrollBarConfig.barHoveredColor = data->colorV;
+        if (data) scrollBarConfig.barHoveredColor = Config::getConfig<Color>(data)->value;
 
         data = Config::ifContainsGet(initData, "scrollBarThumbHoveredColor1");
-        if (data) scrollBarConfig.thumbHoveredColor1 = data->colorV;
+        if (data) scrollBarConfig.thumbHoveredColor1 = Config::getConfig<Color>(data)->value;
 
         data = Config::ifContainsGet(initData, "scrollBarThumbHoveredColor2");
-        if (data) scrollBarConfig.thumbHoveredColor2 = data->colorV;
+        if (data) scrollBarConfig.thumbHoveredColor2 = Config::getConfig<Color>(data)->value;
     }
 
     scrollTextBoxConfig = Config::ScrollTextBox();
@@ -94,8 +94,10 @@ void Meatball::Defaults::init(const std::string& meatdataPath) {
         scrollTextBoxConfig.font = FontsHandler::get(0,0);
 
         data = Config::ifContainsGet(initData, "color");
-        if (data) scrollTextBoxConfig.color = data->colorV;
+        if (data) scrollTextBoxConfig.color = ((Config::ConfigTypeData<Color>*)data)->value;
     }
+
+    Config::clearData(initData);
 }
 
 void Meatball::Defaults::loadConsoleFonts(ConsoleUIScene& consoleUI, const std::filesystem::path& fontPath) {
@@ -121,34 +123,34 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
 
     Config::ConfigData *data = Config::ifContainsGet(consoleData, "margin");
     Meatball::ConsoleUIScene::margin = data?
-        data->unsignedCharV : Meatball::ConsoleUIScene::margin;
+        Config::getConfig<unsigned char>(data)->value : Meatball::ConsoleUIScene::margin;
 
     data = Config::ifContainsGet(consoleData, "OutputDefaultColor");
-    if (data) Config::OutputColors::defaultColor = data->colorV;
+    if (data) Config::OutputColors::defaultColor = Config::getConfig<Color>(data)->value;
 
     data = Config::ifContainsGet(consoleData, "OutputEchoColor");
-    if (data) Config::OutputColors::echoColor = data->colorV;
+    if (data) Config::OutputColors::echoColor = Config::getConfig<Color>(data)->value;
     
     data = Config::ifContainsGet(consoleData, "OutputWarningColor");
-    if (data) Config::OutputColors::warningColor = data->colorV;
+    if (data) Config::OutputColors::warningColor = Config::getConfig<Color>(data)->value;
 
     data = Config::ifContainsGet(consoleData, "OutputErrorColor");
-    if (data) Config::OutputColors::errorColor = data->colorV;
+    if (data) Config::OutputColors::errorColor = Config::getConfig<Color>(data)->value;
 
     data = Config::ifContainsGet(consoleData, "autoCompleteColor");
-    if (data) consoleConfig->autoCompleteColor = data->colorV;
+    if (data) consoleConfig->autoCompleteColor = Config::getConfig<Color>(data)->value;
 
     data = Config::ifContainsGet(consoleData, "autoCompleteTextColor");
-    if (data) consoleConfig->autoCompleteTextColor = data->colorV;
+    if (data) consoleConfig->autoCompleteTextColor = Config::getConfig<Color>(data)->value;
 
     data = Config::ifContainsGet(consoleData, "autoCompleteHightlightedTextColor");
-    if (data) consoleConfig->autoCompleteHighlightedTextColor = data->colorV;
+    if (data) consoleConfig->autoCompleteHighlightedTextColor = Config::getConfig<Color>(data)->value;
 
     data = Config::ifContainsGet(consoleData, "autoCompleteSelectedTextColor");
-    if (data) consoleConfig->autoCompleteSelectedTextColor = data->colorV;
+    if (data) consoleConfig->autoCompleteSelectedTextColor = Config::getConfig<Color>(data)->value;
 
     data = Config::ifContainsGet(consoleData, "labelColor");
-    if (data) consoleConfig->labelTextColor = data->colorV;
+    if (data) consoleConfig->labelTextColor = Config::getConfig<Color>(data)->value;
 
     consoleConfig->labelFont = FontsHandler::get(0,0);
     consoleConfig->labelText = "Local Console";
@@ -156,23 +158,25 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
     auto consoleUI = Meatball::ConsoleUIScene({rect.x, rect.y, rect.width, rect.height}, std::move(consoleConfig));
 
     data = Config::ifContainsGet(consoleData, "closeButtonColor");
-    if (data) consoleUI.closeButton.config->color = data->colorV;
+    if (data) consoleUI.closeButton.config->color = Config::getConfig<Color>(data)->value;
     else consoleUI.closeButton.config->color = {100,100,100,255};
 
     data = Config::ifContainsGet(consoleData, "closeButtonHoveredColor");
-    if (data) consoleUI.closeButton.config->hoveredColor = data->colorV;
+    if (data) consoleUI.closeButton.config->hoveredColor = Config::getConfig<Color>(data)->value;
     else consoleUI.closeButton.config->hoveredColor = {255,255,255,255};
 
     data = Config::ifContainsGet(consoleData, "font");
-    if (data) loadConsoleFonts(consoleUI, {data->stringV});
+    if (data) loadConsoleFonts(consoleUI, {Config::getConfig<std::string>(data)->value});
 
     // TODO: if ConsoleUI data contains changes related to static
     // configs, create a new shared ptr and use std::swap(old, new) and maybe std::move if something goes wrong?
     //data = Config::ifContainsGet(consoleData, "outputBoxColor");
-    //if (data) consoleUI.outputBox.config->color = data->colorV;
+    //if (data) consoleUI.outputBox.config->color = Config::getConfig<Color>(data)->value;
 
     //data = Config::ifContainsGet(consoleData, "outputBoxTextColor");
-    //if (data) consoleUI.outputBox.config->textColor = data->colorV;
+    //if (data) consoleUI.outputBox.config->textColor = Config::getConfig<Color>(data)->value;
+
+    Config::clearData(consoleData);
 
     Console::init([&](const HayBCMD::OutputLevel &level, const std::string &text) {
         size_t spaceIdxBefore = 0;

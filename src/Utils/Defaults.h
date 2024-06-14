@@ -18,5 +18,5 @@ namespace Meatball { namespace Defaults {
     /// @param rect position and size of the console
     /// @param meatdataPath the path to the .meatdata file
     /// @return ConsoleUIScene since it's not a static class
-    ConsoleUIScene initLocalConsole(const Rectangle& rect, const std::string &meatdataPath);
+    ConsoleUIScene initLocalConsole(const Rectangle& rect, const std::string& meatdataPath);
 }}
