@@ -8,30 +8,34 @@
 #include <zlib.h>
 
 namespace Meatball { namespace Serialization {
+    /// @tparam T serializable type
     template<typename T>
-    std::vector<char> serializeObject(const T& object) {
+    std::vector<char> serialize(const T& object) {
         std::vector<char> buffer(sizeof(T));
         std::memcpy(buffer.data(), &object, sizeof(T));
         return buffer;
     }
 
+    /// @tparam T serializable type
     template<typename T>
-    T deserializeVector(const std::vector<char>& serializedVector) {
+    T deserialize(const std::vector<char>& serializedData) {
         T object;
-        std::memcpy(&object, serializedVector.data(), sizeof(T));
+        std::memcpy(&object, serializedData.data(), sizeof(T));
         return object;
     }
 
+    /// @return false if something went wrong
     bool compressData(const std::vector<char>& data, std::vector<char>& compressedData);
+    /// @return false if something went wrong
     bool uncompressData(const std::vector<char>& compressedData, uLongf uncompressedSize, std::vector<char>& decompressedData);
 
     /// @brief serializes, compressed and writes the object into a binary file
-    /// @tparam T copiable type
+    /// @tparam T serializable type
     /// @param object object to be serialized
     /// @return false if something went wrong
     template<typename T>
-    bool compressObjectToFile(const T& object, const std::string& filename) {
-        std::vector<char> serializedData = serializeObject(object);
+    bool writeToFile(const T& object, const std::string& filename) {
+        std::vector<char> serializedData = serialize(object);
 
         // Compress the serialized data
         std::vector<char> compressedData;
@@ -57,11 +61,11 @@ namespace Meatball { namespace Serialization {
     }
 
     /// @brief read the file, uncompresses, deserialize, and returns the data
-    /// @tparam T copiable type
+    /// @tparam T serializable type
     /// @param output returned data
     /// @return 
     template<typename T>
-    bool uncompressObjectToFile(const std::string& filename, T& output) {
+    bool readFile(const std::string& filename, T& output) {
         std::ifstream ifs(filename, std::ios::binary);
         if (!ifs) {
             throw std::runtime_error("Failed to open file for reading");
@@ -84,7 +88,7 @@ namespace Meatball { namespace Serialization {
             return false;
 
         // Deserialize the object
-        T object = deserializeVector<T>(decompressedBuffer);
+        T object = deserialize<T>(decompressedBuffer);
 
         ifs.close();
         return object;

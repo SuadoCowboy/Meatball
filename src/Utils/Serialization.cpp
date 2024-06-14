@@ -8,7 +8,7 @@ bool Meatball::Serialization::compressData(const std::vector<char>& data, std::v
                 reinterpret_cast<const Bytef*>(data.data()), data.size()) != Z_OK)
         return false;
 
-    compressedData.resize(compressedSize);  // Resize to actual compressed size
+    compressedData.resize(compressedSize);  // resize to actual compressed size
     return true;
 }
 
