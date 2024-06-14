@@ -4,11 +4,8 @@
 #include <vector>
 #include <cstring>  // For std::memcpy
 #include <type_traits>  // For type traits
-#include <unordered_map>
 
 #include <zlib.h>
-
-#include "Config.h"
 
 namespace Meatball { namespace Serialization {
     template<typename T>
@@ -96,7 +93,4 @@ namespace Meatball { namespace Serialization {
         ifs.close();
         return object;
     }
-
-    /// @brief compresses
-    void compressMeatdataToFile(std::unordered_map<std::string, Config::ConfigData>& data);
 }}
