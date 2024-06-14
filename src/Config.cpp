@@ -4,14 +4,6 @@
 
 #include "Console.h"
 
-Meatball::Config::ConfigData::ConfigData(int i) : intV(i) {}
-Meatball::Config::ConfigData::ConfigData(double d): doubleV(d) {}
-Meatball::Config::ConfigData::ConfigData(float f): floatV(f) {}
-Meatball::Config::ConfigData::ConfigData(bool b) : boolV(b) {}
-Meatball::Config::ConfigData::ConfigData(unsigned char uc) : unsignedCharV(uc) {}
-Meatball::Config::ConfigData::ConfigData(std::string s): stringV(s) {}
-Meatball::Config::ConfigData::ConfigData(Color color): colorV(color) {}
-Meatball::Config::ConfigData::ConfigData() {}
 
 static bool handleSpaceError(size_t spaceIdx, size_t spaceIdxBefore, size_t lineIdx) {
     if (spaceIdx == std::string::npos || spaceIdx == 0 || spaceIdx == spaceIdxBefore+1) {
@@ -22,11 +14,18 @@ static bool handleSpaceError(size_t spaceIdx, size_t spaceIdxBefore, size_t line
     return false;
 }
 
-Meatball::Config::ConfigData *Meatball::Config::ifContainsGet(std::unordered_map<std::string, Meatball::Config::ConfigData> &data, const std::string &what) {
-    return data.count(what)? &data[what] : nullptr;
+void Meatball::Config::clearData(std::unordered_map<std::string, Meatball::Config::ConfigData*>& map) {
+    for (auto& data : map)
+        delete data.second;
+
+    map.clear();
 }
 
-std::unordered_map<std::string, Meatball::Config::ConfigData> Meatball::Config::loadData(std::filesystem::path path) {
+Meatball::Config::ConfigData* Meatball::Config::ifContainsGet(std::unordered_map<std::string, Meatball::Config::ConfigData*>& data, const std::string& what) {
+    return data.count(what)? data[what] : nullptr;
+}
+
+std::unordered_map<std::string, Meatball::Config::ConfigData*> Meatball::Config::loadData(std::filesystem::path path) {
     if (!std::filesystem::exists(path) || std::filesystem::is_directory(path) || path.extension() != ".meatdata") {
         Console::printf(HayBCMD::OutputLevel::ERROR, "could not load data: \"{}\" is not compatible or does not exist\n", path.string());
         return {};
@@ -34,7 +33,7 @@ std::unordered_map<std::string, Meatball::Config::ConfigData> Meatball::Config::
 
     std::ifstream file(path);
 
-    std::unordered_map<std::string, Config::ConfigData> data = {};
+    std::unordered_map<std::string, Config::ConfigData*> data{};
 
     // line example: "mainPanelColor COLOR 22,22,22,200"
     size_t lineIdx = 1;
@@ -43,29 +42,42 @@ std::unordered_map<std::string, Meatball::Config::ConfigData> Meatball::Config::
         
         // "name "
         size_t spaceIdx = line.find(" ");
-        if (handleSpaceError(spaceIdx, 0, lineIdx)) return {};
+        if (handleSpaceError(spaceIdx, 0, lineIdx)) {
+            clearData(data);
+            return data;
+        }
         
         std::string name = line.substr(0, spaceIdx);
 
         // " type "
         size_t secondSpaceIdx = line.find(" ", spaceIdx+1);
-        if (handleSpaceError(secondSpaceIdx, spaceIdx, lineIdx)) return {};
+        if (handleSpaceError(secondSpaceIdx, spaceIdx, lineIdx)) {
+            clearData(data);
+            return data;
+        }
 
         std::string type = line.substr(spaceIdx+1, secondSpaceIdx-spaceIdx-1);
         std::string value = line.substr(secondSpaceIdx+1);
 
-        if (type == "STRING")
-            data[name.c_str()] = Config::ConfigData(value);
-        else if (type == "INT")
-            data[name.c_str()] = Config::ConfigData(std::stoi(value));
-        else if (type == "FLOAT")
-            data[name.c_str()] = Config::ConfigData(std::stof(value));
-        else if (type == "DOUBLE")
-            data[name.c_str()] = Config::ConfigData(std::stod(value));
-        else if (type == "BOOL")
-            data[name.c_str()] = Config::ConfigData((bool)std::stoi(value));
-        else if (type == "UNSIGNED_CHAR")
-            data[name.c_str()] = Config::ConfigData((unsigned char)std::stoi(value));
+        if (type == "STRING") {
+            data[name] = new Config::ConfigTypeData(value);
+            data[name]->type = STRING;
+        } else if (type == "INT") {
+            data[name] = new Config::ConfigTypeData(value);
+            data[name]->type = INT;
+        } else if (type == "FLOAT") {
+            data[name] = new Config::ConfigTypeData(value);
+            data[name]->type = FLOAT;
+        } else if (type == "DOUBLE") {
+            data[name] = new Config::ConfigTypeData(value);
+            data[name]->type = DOUBLE;
+        } else if (type == "BOOL") {
+            data[name] = new Config::ConfigTypeData(value);
+            data[name]->type = BOOL;
+        } else if (type == "UNSIGNED_CHAR") {
+            data[name] = new Config::ConfigTypeData(value);
+            data[name]->type = UNSIGNED_CHAR;
+        }
         
         else if (type == "COLOR") {
             size_t firstCommaIdx = value.find(",");
@@ -80,12 +92,14 @@ std::unordered_map<std::string, Meatball::Config::ConfigData> Meatball::Config::
             if (thirdCommaIdx != std::string::npos)
                 color.a = std::stoi(value.substr(thirdCommaIdx+1));
 
-            data[name.c_str()] = Config::ConfigData(color);
+            data[name] = new Config::ConfigTypeData(color);
+            data[name]->type = COLOR;
         }
 
         else {
             Meatball::Console::printf(HayBCMD::OutputLevel::ERROR, "could not load data: missing TYPE in line {}\n", lineIdx);
-            return {};
+            clearData(data);
+            return data;
         }
         
         lineIdx++;
