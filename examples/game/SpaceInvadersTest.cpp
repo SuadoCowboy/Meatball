@@ -47,7 +47,9 @@ int main(int, char**)
         auto mainSceneData = Config::loadData("data/meatdata/MainScene.meatdata");
         auto backgroundColorData = Config::ifContainsGet(mainSceneData, "backgroundColor");
         if (backgroundColorData != nullptr)
-            backgroundColor = backgroundColorData->colorV;
+            backgroundColor = ((Meatball::Config::ConfigTypeData<Color>*)backgroundColorData)->value;
+        
+        Meatball::Config::clearData(mainSceneData);
     }
 
     int screenWidth = GetRenderWidth(), screenHeight = GetRenderHeight();
@@ -59,8 +61,10 @@ int main(int, char**)
         auto consoleData = Config::loadData("data/meatdata/Console.meatdata");
 
         auto data = Config::ifContainsGet(consoleData, "font");
-        if (data) Meatball::Defaults::loadConsoleFonts(consoleUI, data->stringV);
+        std::string path;
+        if (data) Meatball::Defaults::loadConsoleFonts(consoleUI,((Meatball::Config::ConfigTypeData<std::string>*)data)->value);
 
+        Meatball::Config::clearData(consoleData);
     }, "- reloads all text fonts.");
 
     bool shouldQuit = false;
