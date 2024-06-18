@@ -39,7 +39,7 @@ int main(int, char**)
     SetExitKey(KEY_NULL); // disable exit key
 
     Meatball::Defaults::init("data/meatdata/Init.cpmd");
-    
+
     auto consoleUI = initConsole();
 
     Color backgroundColor = RAYWHITE;

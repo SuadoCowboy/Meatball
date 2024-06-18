@@ -22,4 +22,5 @@ target_include_directories(Meatball PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJ
 
 target_link_libraries(Meatball -L${PROJECT_SOURCE_DIR}/libs -lHayBCMD -lraylib -lz)
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/examples)
+add_subdirectory(${PROJECT_SOURCE_DIR}/bin)
+add_subdirectory(${PROJECT_SOURCE_DIR}/test)
