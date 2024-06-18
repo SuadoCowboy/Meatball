@@ -44,7 +44,7 @@ int main(int, char**)
 
     Color backgroundColor = RAYWHITE;
     {
-        auto mainSceneData = Config::loadData("data/meatdata/MainScene.meatdata");
+        auto mainSceneData = Config::loadData("data/meatdata/MainScene.cpmd");
         auto backgroundColorData = Config::ifContainsGet(mainSceneData, "backgroundColor");
         if (backgroundColorData != nullptr)
             backgroundColor = ((Meatball::Config::ConfigTypeData<Color>*)backgroundColorData)->value;
@@ -58,7 +58,7 @@ int main(int, char**)
         Meatball::FontsHandler::clear();
         Meatball::FontsHandler::add(0, GetFontDefault());
 
-        auto consoleData = Config::loadData("data/meatdata/Console.meatdata");
+        auto consoleData = Config::loadData("data/meatdata/Console.cpmd");
 
         auto data = Config::ifContainsGet(consoleData, "font");
         std::string path;
