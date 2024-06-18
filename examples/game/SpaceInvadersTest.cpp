@@ -22,7 +22,7 @@ static Meatball::ConsoleUIScene initConsole() {
     // Utils/Defaults.h
     auto consoleUI = Meatball::Defaults::initLocalConsole(
         consoleUIRect,
-        "data/meatdata/Console.meatdata");
+        "data/meatdata/Console.cpmd");
     
     return consoleUI;
 }
@@ -38,7 +38,7 @@ int main(int, char**)
     SetWindowState(FLAG_VSYNC_HINT);
     SetExitKey(KEY_NULL); // disable exit key
 
-    Meatball::Defaults::init("data/meatdata/Init.meatdata"); // for now it is sort of useless
+    Meatball::Defaults::init("data/meatdata/Init.cpmd");
     
     auto consoleUI = initConsole();
 
