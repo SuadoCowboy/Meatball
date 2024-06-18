@@ -8,7 +8,7 @@
 
 namespace Meatball {namespace Config {
     enum ConfigType {
-        STRING,
+        STRING = 0,
         INT,
         FLOAT,
         DOUBLE,
@@ -46,8 +46,8 @@ namespace Meatball {namespace Config {
     ConfigData* ifContainsGet(std::unordered_map<std::string, ConfigData*>& data, const std::string& what);
 
     /// @brief A function that can be used to load meatdata
-    /// @param path path to a file that contains data (should end with .meatdata)
-    /// @return data. If something went wrong it returns a empty unordered_map
+    /// @param path path to a file that contains meatdata (should end with .meatdata)
+    /// @return data unless if something went wrong, then returns a empty unordered_map
     /// @warning do not forget to use clearData function to delete data afterwards
-    std::unordered_map<std::string, ConfigData*> loadData(std::filesystem::path path);
+    std::unordered_map<std::string, ConfigData*> loadData(const std::filesystem::path& path);
 }}
