@@ -3,7 +3,6 @@
 #include <fstream>
 
 #include "Console.h"
-#include "Utils\MeatdataSerializer.h"
 
 static bool handleSpaceError(size_t spaceIdx, size_t spaceIdxBefore, size_t lineIdx) {
     if (spaceIdx == std::string::npos || spaceIdx == 0 || spaceIdx == spaceIdxBefore+1) {
@@ -52,9 +51,6 @@ std::unordered_map<std::string, Meatball::Config::ConfigData*> Meatball::Config:
         Console::printf(HayBCMD::OutputLevel::ERROR, "could not load data: \"{}\" is not compatible or does not exist\n", path.string());
         return {};
     }
-
-    if (pathExtension == ".cpmd")
-        return deserializeConfigDataMapFromFile(path.string());
 
     std::ifstream file(path);
 
