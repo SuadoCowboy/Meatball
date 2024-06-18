@@ -1,0 +1,7 @@
+programmerIsOkay BOOL 0
+programmerName STRING Segmentation Fault
+programmerAge INT 1359
+programmerBoat FLOAT 0.359
+programmerDouble DOUBLE 1509.9051
+programmerSkin COLOR 121,57,137,20
+programmerMaturiyLevelPercentage UNSIGNED_CHAR 2
