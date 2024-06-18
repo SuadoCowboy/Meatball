@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     });
 
     if (argc < 2) {
-        Meatball::Console::printf(HayBCMD::OutputLevel::WARNING, "Usage: {} <path_to_meatdata> <output_path>\nOr: {} <path_to_compressed_meatdata>", argv[0], argv[0]);
+        Meatball::Console::printf(HayBCMD::OutputLevel::WARNING, "Usage: {} <path_to_meatdata> <output_path>\nOr: {} <path_to_compressed_meatdata> <output_path>", argv[0], argv[0]);
         return 1;
     }
 
