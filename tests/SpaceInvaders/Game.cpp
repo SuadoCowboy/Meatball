@@ -22,7 +22,7 @@ static Meatball::ConsoleUIScene initConsole() {
     // Utils/Defaults.h
     auto consoleUI = Meatball::Defaults::initLocalConsole(
         consoleUIRect,
-        "data/meatdata/Console.cpmd");
+        "data/meatdata/Console.meatdata");
     
     return consoleUI;
 }
@@ -38,13 +38,13 @@ int main(int, char**)
     SetWindowState(FLAG_VSYNC_HINT);
     SetExitKey(KEY_NULL); // disable exit key
 
-    Meatball::Defaults::init("data/meatdata/Init.cpmd");
+    Meatball::Defaults::init("data/meatdata/Init.meatdata");
 
     auto consoleUI = initConsole();
 
     Color backgroundColor = RAYWHITE;
     {
-        auto mainSceneData = Config::loadData("data/meatdata/MainScene.cpmd");
+        auto mainSceneData = Config::loadData("data/meatdata/MainScene.meatdata");
         auto backgroundColorData = Config::ifContainsGet(mainSceneData, "backgroundColor");
         if (backgroundColorData != nullptr)
             backgroundColor = ((Meatball::Config::ConfigTypeData<Color>*)backgroundColorData)->value;
@@ -58,7 +58,7 @@ int main(int, char**)
         Meatball::FontsHandler::clear();
         Meatball::FontsHandler::add(0, GetFontDefault());
 
-        auto consoleData = Config::loadData("data/meatdata/Console.cpmd");
+        auto consoleData = Config::loadData("data/meatdata/Console.meatdata");
 
         auto data = Config::ifContainsGet(consoleData, "font");
         std::string path;

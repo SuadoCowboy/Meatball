@@ -46,8 +46,7 @@ Meatball::Config::ConfigData* Meatball::Config::ifContainsGet(std::unordered_map
 }
 
 std::unordered_map<std::string, Meatball::Config::ConfigData*> Meatball::Config::loadData(const std::filesystem::path& path) {
-    std::string pathExtension = path.extension().string();
-    if (!std::filesystem::exists(path) || std::filesystem::is_directory(path) || (pathExtension != ".meatdata" && pathExtension != ".cpmd")) {
+    if (!std::filesystem::exists(path) || std::filesystem::is_directory(path) || path.extension().string() != ".meatdata") {
         Console::printf(HayBCMD::OutputLevel::ERROR, "could not load data: \"{}\" is not compatible or does not exist\n", path.string());
         return {};
     }
