@@ -5,13 +5,13 @@
 #include "Console.h"
 
 void Meatball::serializeString(std::ofstream& out, const std::string& str) {
-    unsigned char length = str.length();
+    unsigned short length = str.length();
     out.write(reinterpret_cast<const char*>(&length), sizeof(length));
     out.write(str.c_str(), length);
 }
 
 std::string Meatball::deserializeString(std::ifstream& in) {
-    unsigned char length;
+    unsigned short length;
     in.read(reinterpret_cast<char*>(&length), sizeof(length));
     std::string str(length, ' ');
     in.read(&str[0], length);
