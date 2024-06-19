@@ -14,6 +14,32 @@
 
 namespace Config = Meatball::Config;
 
+struct Enemy {
+    Vector2 position;
+    Texture2D texture;
+
+    inline void draw() {
+        DrawTexture(texture, position.x, position.y, WHITE);
+    }
+
+    Enemy(const Vector2& position) : position(position) {
+        texture = LoadTexture("data/images/enemy01.png");
+    }
+};
+
+struct Player {
+    Vector2 position;
+    Texture2D texture;
+
+    inline void draw() {
+        DrawTexture(texture, position.x, position.y, WHITE);
+    }
+
+    Player(const Vector2& position) : position(position) {
+        texture = LoadTexture("data/images/player.png");
+    }
+};
+
 static Meatball::ConsoleUIScene initConsole() {
     Rectangle consoleUIRect = {0, 0, WINDOW_WIDTH*0.5f, WINDOW_HEIGHT*0.75f};
     consoleUIRect.x = WINDOW_WIDTH*0.5f-consoleUIRect.width*0.5;
@@ -42,17 +68,7 @@ int main(int, char**)
 
     auto consoleUI = initConsole();
 
-    Color backgroundColor = RAYWHITE;
-    {
-        auto mainSceneData = Config::loadData("data/meatdata/MainScene.meatdata");
-        auto backgroundColorData = Config::ifContainsGet(mainSceneData, "backgroundColor");
-        if (backgroundColorData != nullptr)
-            backgroundColor = ((Meatball::Config::ConfigTypeData<Color>*)backgroundColorData)->value;
-        
-        Meatball::Config::clearData(mainSceneData);
-    }
-
-    int screenWidth = GetRenderWidth(), screenHeight = GetRenderHeight();
+    Texture2D backgroundTexture = LoadTexture("data/images/background.png");
 
     HayBCMD::Command("reload_fonts", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
         Meatball::FontsHandler::clear();
@@ -72,23 +88,29 @@ int main(int, char**)
         shouldQuit = true;
     }, "- closes the window");
 
+    Player player{{.0f,.0f}};
+    player.position.x = (backgroundTexture.width-player.texture.width)*0.5f;
+    player.position.y = backgroundTexture.height*0.9f-player.texture.height;
+
     while (!shouldQuit) {
         if (IsWindowResized()) {
             int newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
-            consoleUI.onResize((float)newScreenWidth/screenWidth, (float)newScreenHeight/screenHeight);
+            consoleUI.onResize((float)newScreenWidth/backgroundTexture.width, (float)newScreenHeight/backgroundTexture.height);
 
-            screenWidth = newScreenWidth;
-            screenHeight = newScreenHeight;
+            backgroundTexture.width = newScreenWidth;
+            backgroundTexture.height = newScreenHeight;
         }
 
         if (WindowShouldClose()) shouldQuit = true;
 
-        ClearBackground(backgroundColor);
+        ClearBackground(BLUE);
         
         consoleUI.update();
 
         BeginDrawing();
         consoleUI.draw();
+
+        player.draw();
 
         EndDrawing();
     }
