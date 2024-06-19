@@ -85,6 +85,11 @@ static unsigned char moves = 0;
 8 = right
 */
 
+void quit(HayBCMD::Command*, const std::vector<std::string>&) {
+    Meatball::FontsHandler::clear();
+    CloseWindow();
+}
+
 void moveup(HayBCMD::Command*, const std::vector<std::string>&) {
     if (moves & 1) return;
     pPlayerDirection->y--;
@@ -134,6 +139,8 @@ void stopmoveright(HayBCMD::Command*, const std::vector<std::string>&) {
 }
 
 void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
+    HayBCMD::Command("quit", 0, 0, quit,"- closes the window");
+
     HayBCMD::Command("+moveup", 0, 0, moveup, "Moves up");
     HayBCMD::Command("+movedown", 0, 0, movedown, "Moves down");
     HayBCMD::Command("+moveleft", 0, 0, moveleft, "Moves left");
@@ -156,10 +163,6 @@ void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
 
         Meatball::Config::clearData(consoleData);
     }, "- reloads all text fonts.");
-
-    HayBCMD::Command("quit", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
-        CloseWindow();
-    }, "- closes the window");
 }
 
 int main(int, char**)
@@ -250,6 +253,5 @@ int main(int, char**)
         EndDrawing();
     }
 
-    Meatball::FontsHandler::clear();
-    CloseWindow();
+    quit(nullptr, {});
 }
