@@ -102,6 +102,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(const Rectangle &rect, const std::share
 
 	inputBox.onSend = [&](const std::string& text) {
 		autoCompleteText.clear();
+		autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd = 0;
 		print(HayBCMD::OutputLevel::DEFAULT, text);
 		Console::run(text);
 		addToInputHistory(text);
