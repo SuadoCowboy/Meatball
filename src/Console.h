@@ -21,8 +21,7 @@ namespace Meatball {
         static void printf(const HayBCMD::OutputLevel& level, const std::string& format, Args ...args) {
             HayBCMD::Output::printf(level, format, args...);
         }
-
-    private:
+    
         static std::unordered_map<std::string, std::string> variables; // HayBCMD aliases are stored here
     };
 }
