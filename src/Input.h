@@ -52,6 +52,14 @@ namespace Meatball {
 		static std::unordered_map<std::string, InputData> mouseState;
 		
 		static std::string mouseWheelUpCallback;
+		static std::string mouseWheelUpOffCallback;
 		static std::string mouseWheelDownCallback;
+		static std::string mouseWheelDownOffCallback;
+
+		static unsigned char mouseWheelRolled;
+		/*
+		1 = up
+		2 = down
+		*/
 	};
 }

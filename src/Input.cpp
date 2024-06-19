@@ -10,7 +10,12 @@ std::unordered_map<std::string, Meatball::InputData> Meatball::Input::keyState;
 std::unordered_map<std::string, Meatball::InputData> Meatball::Input::mouseState;
 
 std::string Meatball::Input::mouseWheelUpCallback;
+std::string Meatball::Input::mouseWheelUpOffCallback;
+
 std::string Meatball::Input::mouseWheelDownCallback;
+std::string Meatball::Input::mouseWheelDownOffCallback;
+
+unsigned char Meatball::Input::mouseWheelRolled;
 
 void Meatball::Input::bind(std::string keyName, const std::string& callback) {
 	std::transform(keyName.begin(), keyName.end(), keyName.begin(),
@@ -24,16 +29,24 @@ void Meatball::Input::bind(std::string keyName, const std::string& callback) {
 		mouseWheelUpCallback = callback;
 	else if (isMouseWheelDown)
 		mouseWheelDownCallback = callback;
-	else if (keyState.count(keyName) == 0 && !isMouseButton) return;
+	else if (keyState.count(keyName) == 0 && !isMouseButton) {
+		Console::printf(HayBCMD::ERROR, "unknown key \"{}\"", keyName);
+		return;
+	}
 	
 	if (!isMouseButton) keyState[keyName].callback = callback;
 	else mouseState[keyName].callback = callback;
 	
 	std::stringstream stream;
 	HayBCMD::Lexer lexer{callback};
-	HayBCMD::Token token;
+	HayBCMD::Token token = lexer.nextToken();
 	while (token.getType() != HayBCMD::TokenType::_EOF) {
-		if (token.getType() == HayBCMD::TokenType::COMMAND && token.getValue()[0] == '+') {
+		if (token.getValue()[0] == '+') {
+			if (token.getType() != HayBCMD::TokenType::COMMAND && Console::variables.count(token.getValue()) == 0) {
+				token = lexer.nextToken();
+				continue;
+			}
+
 			stream << '-'+token.getValue().substr(1) << ";";
 			
 			while (token.getType() != HayBCMD::TokenType::_EOF && token.getType() != HayBCMD::TokenType::EOS)
@@ -49,10 +62,10 @@ void Meatball::Input::bind(std::string keyName, const std::string& callback) {
 	if (offCallback.size() == 0) return;
 
 	if (isMouseWheelUp) // mouse wheel up
-		mouseWheelUpCallback += ';'+offCallback;
+		mouseWheelUpOffCallback = offCallback;
 	
 	else if (isMouseWheelDown) // mouse wheel down
-		mouseWheelDownCallback += ';'+offCallback;
+		mouseWheelDownOffCallback = offCallback;
 	
 	else if (isMouseButton) // mouse buttons
 		mouseState[keyName].offCallback = offCallback;
@@ -105,19 +118,33 @@ void Meatball::Input::update() {
 	}
 
 	for (auto& button : mouseState) {
-		if (IsKeyPressed(button.second.code))
+		if (IsMouseButtonPressed(button.second.code))
 			Console::run(button.second.callback);
 		
-		else if (IsKeyReleased(button.second.code)) 
+		else if (IsMouseButtonReleased(button.second.code)) 
 			Console::run(button.second.offCallback);
 	}
 
 	float wheel = GetMouseWheelMove();
-	if (wheel == 1.0f)
+	if (wheel == 1.0f) {
 		Console::run(mouseWheelUpCallback);
+		mouseWheelRolled |= 1;
+	}
 	
-	else if (wheel == -1.0f)
+	else if (wheel == -1.0f) {
 		Console::run(mouseWheelDownCallback);
+		mouseWheelRolled |= 2;
+	}
+
+	else {
+		if (mouseWheelRolled & 1) {
+			Console::run(mouseWheelUpOffCallback);
+			mouseWheelRolled &= ~1;
+		} else if (mouseWheelRolled & 2) {
+			Console::run(mouseWheelDownOffCallback);
+			mouseWheelRolled &= ~2;
+		}
+	}
 }
 
 void Meatball::Input::bindCommand(HayBCMD::Command*, const std::vector<std::string>& args) {
@@ -151,7 +178,7 @@ void Meatball::Input::unBindCommand(HayBCMD::Command*, const std::vector<std::st
 	unbind(args[0]);
 }
 
-void Meatball::Input::unBindAllCommand(HayBCMD::Command*, const std::vector<std::string>& args) {
+void Meatball::Input::unBindAllCommand(HayBCMD::Command*, const std::vector<std::string>&) {
 	for (auto& key : keyState) {
 		key.second.callback = "";
 		key.second.offCallback = "";
@@ -173,7 +200,7 @@ void Meatball::Input::registerCommands() {
 
 void Meatball::Input::mapKeyboardKeys() {
     // A-Z
-	for (unsigned char i = KEY_A; i < KEY_Z; ++i)
+	for (unsigned char i = KEY_A; i <= KEY_Z; ++i)
         setKey(std::string(1, static_cast<char>(i+32)), i);
     
 	// left & right
@@ -193,7 +220,7 @@ void Meatball::Input::mapKeyboardKeys() {
     setKey("downarrow", KEY_DOWN);
 	
 	// KeyPad
-	for (unsigned short i = KEY_KP_0; i < KEY_KP_9; ++i)
+	for (unsigned short i = KEY_KP_0; i <= KEY_KP_9; ++i)
 		setKey("kp_"+std::to_string(i-KEY_KP_0), i);
 	
 	setKey("kp_add", KEY_KP_ADD);
@@ -205,11 +232,11 @@ void Meatball::Input::mapKeyboardKeys() {
 	setKey("kp_subtract", KEY_KP_SUBTRACT);
 
 	// Digits
-	for (unsigned short i = KEY_ZERO; i < KEY_NINE; ++i)
+	for (unsigned short i = KEY_ZERO; i <= KEY_NINE; ++i)
 		setKey(std::to_string(i-KEY_ZERO), i);
 
 	// Function keys
-	for (unsigned short i = KEY_F1; i < KEY_F12; ++i)
+	for (unsigned short i = KEY_F1; i <= KEY_F12; ++i)
 		setKey("f"+std::to_string(i-KEY_F1+1), i);
 
 	// Others (alphabetical order)
@@ -260,5 +287,5 @@ void Meatball::Input::mapKeyboardKeys() {
 
 void Meatball::Input::mapMouseKeys() {
 	for (unsigned short i = MOUSE_BUTTON_LEFT; i < MOUSE_BUTTON_BACK; ++i)
-		setKey("mouse"+std::to_string(i), i);
+		setKey("mouse"+std::to_string(i+1), i);
 }
