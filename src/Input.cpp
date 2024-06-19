@@ -6,6 +6,8 @@
 
 #include "Console.h"
 
+std::vector<std::string> Meatball::Input::allowedUiCommands;
+
 std::unordered_map<std::string, Meatball::InputData> Meatball::Input::keyState;
 std::unordered_map<std::string, Meatball::InputData> Meatball::Input::mouseState;
 
@@ -41,6 +43,13 @@ void Meatball::Input::bind(std::string keyName, const std::string& callback) {
 	HayBCMD::Lexer lexer{callback};
 	HayBCMD::Token token = lexer.nextToken();
 	while (token.getType() != HayBCMD::TokenType::_EOF) {
+		if (token.getType() == HayBCMD::TokenType::COMMAND && std::find(allowedUiCommands.begin(), allowedUiCommands.end(), token.getValue()) == allowedUiCommands.end()) {
+			if (isMouseButton)
+				mouseState[keyName].uiAllowed = false;
+			else if (!isMouseWheelDown && !isMouseWheelUp)
+				keyState[keyName].uiAllowed = false;
+		}
+
 		if (token.getValue()[0] == '+') {
 			if (token.getType() != HayBCMD::TokenType::COMMAND && Console::variables.count(token.getValue()) == 0) {
 				token = lexer.nextToken();
@@ -77,10 +86,12 @@ void Meatball::Input::unbind(const std::string& keyName) {
 	if (keyState.count(keyName) != 0) {
 		keyState[keyName].callback = "";
 		keyState[keyName].offCallback = "";
+		keyState[keyName].uiAllowed = true;
 	
 	} else if (mouseState.count(keyName) != 0) {
 		mouseState[keyName].callback = "";
 		mouseState[keyName].offCallback = "";
+		keyState[keyName].uiAllowed = true;
 	
 	} else if (keyName == "mwheelup")
 		mouseWheelUpCallback = "";
@@ -91,39 +102,36 @@ void Meatball::Input::unbind(const std::string& keyName) {
 
 void Meatball::Input::setKey(const std::string& name, unsigned short code) {
 	if (name.size() > 5 && name.substr(0, 5) == "mouse")
-		mouseState[name] = {code, "", ""};
+		mouseState[name] = {code, "", "", true};
 	else
-		keyState[name] = {code, "", ""};
+		keyState[name] = {code, "", "", true};
 }
 
 void Meatball::Input::removeKey(const std::string& name) {
 	keyState.erase(name);
 }
 
-void Meatball::Input::setMouseKey(const std::string& name, unsigned short code) {
-	mouseState[name] = {code, "", ""};
-}
-
-void Meatball::Input::removeMouseKey(const std::string& name) {
-	mouseState.erase(name);
-}
-
-void Meatball::Input::update() {
+void Meatball::Input::update(bool uiAllowedCommandsOnly) {
 	for (auto& key : keyState) {
+		if (!key.second.uiAllowed && uiAllowedCommandsOnly) continue;
+
 		if (IsKeyPressed(key.second.code))
 			Console::run(key.second.callback);
-		
 		else if (IsKeyReleased(key.second.code))
 			Console::run(key.second.offCallback);
 	}
 
 	for (auto& button : mouseState) {
+		if (!button.second.uiAllowed && uiAllowedCommandsOnly) continue;
+
 		if (IsMouseButtonPressed(button.second.code))
 			Console::run(button.second.callback);
 		
 		else if (IsMouseButtonReleased(button.second.code)) 
 			Console::run(button.second.offCallback);
 	}
+
+	if (uiAllowedCommandsOnly) return;
 
 	float wheel = GetMouseWheelMove();
 	if (wheel == 1.0f) {
