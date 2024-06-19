@@ -9,6 +9,7 @@
 #include <Utils/Defaults.h>
 #include <FontsHandler.h>
 #include <Config.h>
+#include <Input.h>
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 600
@@ -58,6 +59,7 @@ struct Player {
 
     Player(const Vector2& position, const Vector2& velocity) : position(position), direction({0,0}), velocity(velocity) {
         texture = LoadTexture("data/images/player.png");
+        direction = {NOMOVE, NOMOVE};
     }
 };
 
@@ -75,25 +77,60 @@ static Meatball::ConsoleUIScene initConsole() {
 }
 
 static Vector2uc* pPlayerDirection;
+static unsigned char moves = 0;
+/*
+1 = up
+2 = down
+4 = left
+8 = right
+*/
 
 void moveup(HayBCMD::Command*, const std::vector<std::string>&) {
-    if (pPlayerDirection->y != MOVEUP)
-        pPlayerDirection->y--;
+    if (moves & 1) return;
+    pPlayerDirection->y--;
+    moves |= 1;
 }
 
 void movedown(HayBCMD::Command*, const std::vector<std::string>&) {
-    if (pPlayerDirection->y != MOVEDOWN)
-        pPlayerDirection->y++;
+    if (moves & 2) return;
+    pPlayerDirection->y++;
+    moves |= 2;
 }
 
 void moveleft(HayBCMD::Command*, const std::vector<std::string>&) {
-    if (pPlayerDirection->x != MOVELEFT)
-        pPlayerDirection->x--;
+    if (moves & 4) return;
+    pPlayerDirection->x--;
+    moves |= 4;
 }
 
 void moveright(HayBCMD::Command*, const std::vector<std::string>&) {
-    if (pPlayerDirection->x != MOVERIGHT)
-        pPlayerDirection->x++;
+    if (moves & 8) return;
+    pPlayerDirection->x++;
+    moves |= 8;
+}
+
+void stopmoveup(HayBCMD::Command*, const std::vector<std::string>&) {
+    if (!(moves & 1)) return;
+    pPlayerDirection->y++;
+    moves &= ~1;
+}
+
+void stopmovedown(HayBCMD::Command*, const std::vector<std::string>&) {
+    if (!(moves & 2)) return;
+    pPlayerDirection->y--;
+    moves &= ~2;
+}
+
+void stopmoveleft(HayBCMD::Command*, const std::vector<std::string>&) {
+    if (!(moves & 4)) return;
+    pPlayerDirection->x++;
+    moves &= ~4;
+}
+
+void stopmoveright(HayBCMD::Command*, const std::vector<std::string>&) {
+    if (!(moves & 8)) return;
+    pPlayerDirection->x--;
+    moves &= ~8;
 }
 
 void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
@@ -101,6 +138,11 @@ void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
     HayBCMD::Command("+movedown", 0, 0, movedown, "Moves down");
     HayBCMD::Command("+moveleft", 0, 0, moveleft, "Moves left");
     HayBCMD::Command("+moveright", 0, 0, moveright, "Moves right");
+
+    HayBCMD::Command("-moveup", 0, 0, stopmoveup, "Stop moving up");
+    HayBCMD::Command("-movedown", 0, 0, stopmovedown, "Stop moving down");
+    HayBCMD::Command("-moveleft", 0, 0, stopmoveleft, "Stop moving left");
+    HayBCMD::Command("-moveright", 0, 0, stopmoveright, "Stop moving right");
 
     HayBCMD::Command("reload_fonts", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
         Meatball::FontsHandler::clear();
@@ -140,6 +182,14 @@ int main(int, char**)
 
     auto consoleUI = initConsole();
 
+    loadCommands(consoleUI);
+    Meatball::Input::registerCommands();
+    Meatball::Input::mapKeyboardKeys();
+    Meatball::Input::mapMouseKeys();
+
+    HayBCMD::execConfigFile("data/cfg/autoexec.cfg", Meatball::Console::variables);
+    HayBCMD::execConfigFile("data/cfg/config.cfg", Meatball::Console::variables);
+
     Texture2D backgroundTexture = LoadTexture("data/images/background.png");
     backgroundTexture.width = GetRenderWidth();
     backgroundTexture.height = GetRenderHeight();
@@ -154,9 +204,6 @@ int main(int, char**)
     pPlayerDirection = &player.direction;
 
     std::vector<Enemy> enemies;
-
-    // TODO: binds system :P (for now I will just test with pure code)
-    loadCommands(consoleUI);
 
     while (!WindowShouldClose()) {
         if (IsWindowResized()) {
@@ -190,7 +237,10 @@ int main(int, char**)
         float dt = GetFrameTime();        
         consoleUI.update();
 
+        Meatball::Input::update();
+
         player.update(dt);
+        HayBCMD::handleLoopAliasesRunning(Meatball::Console::variables);
 
         BeginDrawing();
 
@@ -198,8 +248,6 @@ int main(int, char**)
 
         consoleUI.draw();
         EndDrawing();
-
-        HayBCMD::handleLoopAliasesRunning(Meatball::Console::variables);
     }
 
     Meatball::FontsHandler::clear();
