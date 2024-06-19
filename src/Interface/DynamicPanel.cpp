@@ -36,7 +36,6 @@ void Meatball::DynamicPanel::update() {
     conditions |= 16;
 
     if (!(conditions & 1) && !(conditions & 2)) {
-    SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     
     if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y+2, rect.width-4, config->grabHeight})) {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
@@ -123,6 +122,8 @@ void Meatball::DynamicPanel::update() {
             conditions |= 2;
         }
     }
+    else
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     } // if (!resizing && !dragging)
 
     if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
