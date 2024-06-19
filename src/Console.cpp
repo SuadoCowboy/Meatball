@@ -8,11 +8,7 @@ void Meatball::Console::init(const HayBCMD::PrintFunction& printFunction) {
 }
 
 void Meatball::Console::run(const std::string& input) {
-    HayBCMD::Lexer *lexer = new HayBCMD::Lexer(input);
-
-    HayBCMD::Parser parser{ lexer, variables };
+    HayBCMD::Lexer lexer = HayBCMD::Lexer(input);
+    HayBCMD::Parser parser{&lexer, variables};
     parser.parse();
-
-    delete lexer;
-    lexer = nullptr;
 }
