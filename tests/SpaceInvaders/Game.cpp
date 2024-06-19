@@ -244,7 +244,7 @@ int main(int, char**)
         ClearBackground(BLACK);
         DrawTexture(backgroundTexture, 0,0, WHITE);
 
-        float dt = GetFrameTime();        
+        float dt = GetFrameTime();
         consoleUI.update();
 
         Meatball::Input::update(consoleUI.visible);
