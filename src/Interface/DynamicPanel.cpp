@@ -1,6 +1,7 @@
 #include "DynamicPanel.h"
 
 #include "Utils/Utils.h"
+#include "MouseCursor.h"
 
 Meatball::Config::DynamicPanel Meatball::Defaults::dynamicPanelConfig;
 
@@ -27,7 +28,8 @@ void Meatball::DynamicPanel::update() {
 
     if ((!(conditions & 1) && !(conditions & 2) && !CheckCollisionPointRec(mousePos, {rect.x, rect.y, rect.width, rect.height})) || !IsWindowFocused()) {
         if (conditions & 16) {
-            SetMouseCursor(MOUSE_CURSOR_DEFAULT); // what if two dynamic panels intersects? TODO: test this case
+            // what if two dynamic panels intersects? TODO: test this case
+            resetCursor(MouseCursorPriorityLevel::DYNAMIC_PANEL);
             conditions &= ~16;
         }
         return;
@@ -38,7 +40,7 @@ void Meatball::DynamicPanel::update() {
     if (!(conditions & 1) && !(conditions & 2)) {
     
     if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y+2, rect.width-4, config->grabHeight})) {
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+        setCursor(MOUSE_CURSOR_POINTING_HAND, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.y};
             conditions |= 1;
@@ -47,7 +49,7 @@ void Meatball::DynamicPanel::update() {
 
     // Resize North
     else if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y, rect.width-4, 2})) {
-        SetMouseCursor(MOUSE_CURSOR_RESIZE_NS);
+        setCursor(MOUSE_CURSOR_RESIZE_NS, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {-1, GetMouseY()-rect.y};
             conditions |= 2;
@@ -57,7 +59,7 @@ void Meatball::DynamicPanel::update() {
 
     // Resize West 
     else if (CheckCollisionPointRec(mousePos, {rect.x, rect.y+2, 2, rect.height-4})) {
-        SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
+        setCursor(MOUSE_CURSOR_RESIZE_EW, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, -1};
             conditions |= 2;
@@ -67,7 +69,7 @@ void Meatball::DynamicPanel::update() {
 
     // Resize South
     else if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y+rect.height-2, rect.width-4, 2})) {
-        SetMouseCursor(MOUSE_CURSOR_RESIZE_NS);
+        setCursor(MOUSE_CURSOR_RESIZE_NS, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {-1, GetMouseY()-rect.height};
             conditions |= 2;
@@ -76,7 +78,7 @@ void Meatball::DynamicPanel::update() {
 
     // Resize East
     else if (CheckCollisionPointRec(mousePos, {rect.x+rect.width-2, rect.y+2, 2, rect.height-4})) {
-        SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
+        setCursor(MOUSE_CURSOR_RESIZE_EW, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.width, -1};
             conditions |= 2;
@@ -85,7 +87,7 @@ void Meatball::DynamicPanel::update() {
 
     // Resize South West
     else if (CheckCollisionPointRec(mousePos, {rect.x-1, rect.y+rect.height-2, 3, 3})) {
-        SetMouseCursor(MOUSE_CURSOR_RESIZE_NESW);
+        setCursor(MOUSE_CURSOR_RESIZE_NESW, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.height};
             conditions |= 2;
@@ -95,7 +97,7 @@ void Meatball::DynamicPanel::update() {
     
     // Resize North West
     else if (CheckCollisionPointRec(mousePos, {rect.x-1, rect.y-1, 3, 3})) {
-        SetMouseCursor(MOUSE_CURSOR_RESIZE_NWSE);
+        setCursor(MOUSE_CURSOR_RESIZE_NWSE, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.y};
             conditions |= 2;
@@ -106,7 +108,7 @@ void Meatball::DynamicPanel::update() {
 
     // Resize North East
     else if (CheckCollisionPointRec(mousePos, {rect.x+rect.width-2, rect.y-1, 3, 3})) {
-        SetMouseCursor(MOUSE_CURSOR_RESIZE_NESW);
+        setCursor(MOUSE_CURSOR_RESIZE_NESW, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.width, GetMouseY()-rect.y};
             conditions |= 2;
@@ -116,14 +118,14 @@ void Meatball::DynamicPanel::update() {
 
     // Resize South East
     else if (CheckCollisionPointRec(mousePos, {rect.x+rect.width-2, rect.y+rect.height-2, 3, 3})) {
-        SetMouseCursor(MOUSE_CURSOR_RESIZE_NWSE);
+        setCursor(MOUSE_CURSOR_RESIZE_NWSE, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.width, GetMouseY()-rect.height};
             conditions |= 2;
         }
     }
     else
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+        resetCursor(MouseCursorPriorityLevel::DYNAMIC_PANEL);
     } // if (!resizing && !dragging)
 
     if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {

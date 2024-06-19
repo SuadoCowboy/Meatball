@@ -10,15 +10,14 @@
 #include <FontsHandler.h>
 #include <Config.h>
 #include <Input.h>
+#include <MouseCursor.h>
 
 #define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 600
+#define WINDOW_HEIGHT 720
 
 #define MOVEUP 0
 #define MOVEDOWN 2
-
 #define NOMOVE 1
-
 #define MOVELEFT 0
 #define MOVERIGHT 2
 
@@ -77,6 +76,7 @@ static Meatball::ConsoleUIScene initConsole() {
 }
 
 static Vector2uc* pPlayerDirection;
+
 static unsigned char moves = 0;
 /*
 1 = up
@@ -166,6 +166,8 @@ void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
 
     HayBCMD::Command("toggle_local_console", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
         consoleUI.visible = not consoleUI.visible;
+        if (!consoleUI.visible)
+            Meatball::resetCursor(Meatball::MouseCursorPriorityLevel::INPUT_TEXT_BOX);
     }, "- toggles the console ui visibility");
 
     Meatball::Input::allowedUiCommands.push_back("toggle_local_console");

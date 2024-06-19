@@ -3,6 +3,7 @@
 #include "Utils/DrawFuncs.h"
 #include "Utils/Utils.h"
 #include "Console.h"
+#include "MouseCursor.h"
 
 Meatball::Config::InputTextBox Meatball::Defaults::inputTextBoxConfig;
 
@@ -66,9 +67,15 @@ const std::string& Meatball::InputTextBox::getText() const {
 void Meatball::InputTextBox::update() {
     unsigned short textSize = text.size();
     
+    bool hovered = CheckCollisionPointRec(GetMousePosition(), rect);
+    if (hovered)
+        setCursor(MOUSE_CURSOR_IBEAM, MouseCursorPriorityLevel::INPUT_TEXT_BOX);
+    else
+        resetCursor(MouseCursorPriorityLevel::INPUT_TEXT_BOX);
+
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         bool wasFocusedBefore = focused;
-        focused = CheckCollisionPointRec(GetMousePosition(), rect);
+        focused = hovered;
         
         if (wasFocusedBefore && focused && textSize != 0) {
             unsigned int newCursorPos = 0;

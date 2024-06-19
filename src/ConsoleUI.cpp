@@ -3,6 +3,7 @@
 #include "Console.h"
 #include "Utils/DrawFuncs.h"
 #include "Utils/Utils.h"
+#include "MouseCursor.h"
 
 unsigned char Meatball::ConsoleUIScene::margin = 4;
 
@@ -122,7 +123,8 @@ Meatball::ConsoleUIScene::ConsoleUIScene(const Rectangle &rect, const std::share
 	*/
 
 	closeButton.onRelease = [&]() {
-		this->visible = false; // WHY USING this->visible WORKS AND visible = false DOESN'T?
+		this->visible = false;
+		resetCursor(MouseCursorPriorityLevel::BUTTON);
 		// TODO: fading effect (maybe add a task system? Meatball::Task() or Meatball::newTask() or something)
 	};
 

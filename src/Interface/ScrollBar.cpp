@@ -1,6 +1,7 @@
 #include "ScrollBar.h"
 
 #include "Utils/Utils.h"
+#include "MouseCursor.h"
 
 unsigned char Meatball::ScrollBar::scrollSpeed = 50;
 
@@ -54,6 +55,10 @@ void Meatball::ScrollBar::update(const Rectangle &parentRect) {
     Vector2 mousePosition = GetMousePosition();
     
     barHovered = CheckCollisionPointRec(mousePosition, rect);
+    if (barHovered)
+        setCursor(MOUSE_CURSOR_POINTING_HAND, MouseCursorPriorityLevel::SCROLL_BAR);
+    else
+        resetCursor(MouseCursorPriorityLevel::SCROLL_BAR);
     
     thumbHovered = CheckCollisionPointRec(mousePosition,
         {rect.x, rect.y+thumbY, rect.width, thumbHeight});

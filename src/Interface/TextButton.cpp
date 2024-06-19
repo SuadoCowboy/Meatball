@@ -2,6 +2,7 @@
 
 #include "Utils/Utils.h"
 #include "Utils/DrawFuncs.h"
+#include "MouseCursor.h"
 
 Meatball::Config::TextButton Meatball::Defaults::textButtonConfig;
 
@@ -20,6 +21,11 @@ bool Meatball::TextButton::isHovered() {
 }
 
 void Meatball::TextButton::update() {
+    if (hovered)
+        setCursor(MOUSE_CURSOR_POINTING_HAND, MouseCursorPriorityLevel::BUTTON);
+    else
+        resetCursor(MouseCursorPriorityLevel::BUTTON);
+
     checkHovered(hovered, rect, &onHover, &onRelease);
 }
 
