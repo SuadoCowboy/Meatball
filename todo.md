@@ -2,6 +2,8 @@
 - because sizeof(Color) is below 16(which is shared_ptr size), it's better cloning it or using a reference than actually using a pointer or shared_ptr.
 
 # TODOS
+- Bind system
+
 - The UI with Lua thing
 
 # User Interface with Lua

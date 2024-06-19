@@ -1,53 +1,73 @@
 #include "Input.h"
 
-MouseButton Meatball::Input::convertInpMouseButton(InpMouseButton button) {
-	switch (button) {
-	case InpMouseButton::MOUSE1:
-		return MouseButton::MOUSE_BUTTON_LEFT;
-	case InpMouseButton::MOUSE2:
-		return MouseButton::MOUSE_BUTTON_RIGHT;
-	case InpMouseButton::MOUSE3:
-		return MouseButton::MOUSE_BUTTON_MIDDLE;
-	case InpMouseButton::MOUSE4:
-		return MouseButton::MOUSE_BUTTON_SIDE;
-	case InpMouseButton::MOUSE5:
-		return MouseButton::MOUSE_BUTTON_EXTRA;
-	case InpMouseButton::MOUSE6:
-		return MouseButton::MOUSE_BUTTON_FORWARD;
-	case InpMouseButton::MOUSE7:
-		return MouseButton::MOUSE_BUTTON_BACK;
+#include <algorithm>
+#include <cctype>
+#include <sstream>
 
-	default:
-		return MouseButton::MOUSE_BUTTON_LEFT; // ??? why would be default
+#include "Console.h"
+
+void Meatball::Input::bind(std::string keyName, const std::string& callback) {
+	std::transform(keyName.begin(), keyName.end(), keyName.begin(),
+    [](unsigned char c){ return std::tolower(c); });
+
+	if (keyState.count(keyName) == 0) return;
+	
+	keyState[keyName].callback = callback;
+	
+	std::stringstream stream;
+	HayBCMD::Lexer lexer{callback};
+	HayBCMD::Token token;
+	while (token.getType() != HayBCMD::TokenType::_EOF) {
+		if (token.getType() == HayBCMD::TokenType::COMMAND && token.getValue()[0] == '+') {
+			stream << token.getValue() << ";";
+			
+			while (token.getType() != HayBCMD::TokenType::_EOF && token.getType() != HayBCMD::TokenType::EOS)
+				token = lexer.nextToken();
+		}
+
+		token = lexer.nextToken();
 	}
+
+	keyState[keyName].offCallback = stream.str();
+	keyState[keyName].offCallback = keyState[keyName].offCallback.substr(0, keyState[keyName].offCallback.size()-1);
 }
 
-Meatball::Input::InpMouseButton Meatball::Input::convertInpMouseButton(MouseButton button) {
-	switch (button) {
-	case MouseButton::MOUSE_BUTTON_LEFT:
-		return InpMouseButton::MOUSE1;
-	case MouseButton::MOUSE_BUTTON_RIGHT:
-		return InpMouseButton::MOUSE2;
-	case MouseButton::MOUSE_BUTTON_MIDDLE:
-		return InpMouseButton::MOUSE3;
-	case MouseButton::MOUSE_BUTTON_SIDE:
-		return InpMouseButton::MOUSE4;
-	case MouseButton::MOUSE_BUTTON_EXTRA:
-		return InpMouseButton::MOUSE5;
-	case MouseButton::MOUSE_BUTTON_FORWARD:
-		return InpMouseButton::MOUSE6;
-	case MouseButton::MOUSE_BUTTON_BACK:
-		return InpMouseButton::MOUSE7;
+void Meatball::Input::unbind(const std::string& keyName) {
+	if (keyState.count(keyName) == 0) return;
 
-	default:
-		return InpMouseButton::MOUSE1;
-	}
+	keyState[keyName].callback = "";
 }
 
-unsigned char Meatball::Input::anyMouseButtonPressed() {
-	unsigned char buttonsPressed = 0;
-	for (unsigned char button = (unsigned char)MouseButton::MOUSE_BUTTON_LEFT; button < (unsigned char)MouseButton::MOUSE_BUTTON_BACK; button++)
-		if (IsMouseButtonPressed(button))
-			buttonsPressed |= convertInpMouseButton((MouseButton)button);
-	return buttonsPressed;
+void Meatball::Input::setKey(const std::string& name, unsigned short code) {
+	keyState[name] = {code, ""};
+}
+
+void Meatball::Input::removeKey(const std::string& name) {
+	keyState.erase(name);
+}
+
+void Meatball::Input::setMouseKey(const std::string& name, unsigned short code) {
+	mouseState[name] = {code, ""};
+}
+
+void Meatball::Input::removeMouseKey(const std::string& name) {
+	mouseState.erase(name);
+}
+
+void Meatball::Input::update() {
+	for (auto& key : keyState) {
+		if (IsKeyPressed(key.second.code))
+			Console::run(key.second.callback);
+		
+		else if (IsKeyReleased(key.second.code))
+			Console::run(key.second.offCallback);
+	}
+
+	for (auto& button : mouseState) {
+		if (IsKeyPressed(button.second.code))
+			Console::run(button.second.callback);
+		
+		else if (IsKeyReleased(button.second.code)) 
+			Console::run(button.second.offCallback);
+	}
 }

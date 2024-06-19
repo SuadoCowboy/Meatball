@@ -6,34 +6,36 @@
 #include <raylib.h>
 
 namespace Meatball {
-	namespace Input {
-		// WARNING: do not use this enum for raylib functions. ONLY USE ON FUNCTIONS OF THIS NAMESPACE
-		// why this enum exists? simple: I want to anyMouseButtonPressed
-		// to return correctly when more than 1 button is pressed.
-		enum InpMouseButton {
-			// I don't think it's necessary to recreate a enum -> SHUT UP, NOW IT IS!
-			MOUSE1 = 1,  // left
-			MOUSE2 = 2,  // right
-			MOUSE3 = 4,  // middle
-			MOUSE4 = 8,  // side
-			MOUSE5 = 16, // side extra
-			MOUSE6 = 32, // I don't actually know and I don't give a fuck. FUCK YOU MOUSE6
-			MOUSE7 = 64, // have no idea what button this is.
-		};
+	struct KeyData {
+		unsigned short code;
+		std::string callback;
+		std::string offCallback; // to turn off all the toggle types that might be in the callback
+	};
 
-		// InpMouseButton -> Raylib MouseButton enum
-		// NOT TO BE CONFUSED WITH THE OTHER WAY AROUND!
-		// It's TWO functions! Same name, opposite direction
-		MouseButton convertInpMouseButton(InpMouseButton button);
-		// Raylib MouseButton enum -> InpMouseButton
-		// NOT TO BE CONFUSED WITH THE OTHER WAY AROUND!
-		// It's TWO functions! Same name, opposite direction
-		InpMouseButton convertInpMouseButton(MouseButton button);
+	class Input {
+	public:
+		void bind(std::string keyName, const std::string& callback);
+		void unbind(const std::string& keyName);
+		
+		/// @brief registers a key to be checked if is pressed or not
+		/// @param name the name of the key ex: lalt
+		/// @param code the raylib code of the key ex: KEY_LEFT_ALT
+		void setKey(const std::string& name, unsigned short code);
+		
+		void removeKey(const std::string& name);
 
-		// WARNING: read return
-		// @return InpMouseButton with all the pressed buttons together bitwise; 0 if no button pressed
-		unsigned char anyMouseButtonPressed();
-	}
+		/// @brief registers a key to be checked if is pressed or not
+		/// @param name the name of the key ex: mouse1
+		/// @param code the raylib code of the key ex: MOUSE_BUTTON_LEFT
+		void setMouseKey(const std::string& name, unsigned short code);
+		void removeMouseKey(const std::string& name);
 
-	// I don't know what to do with input.h... Maybe handle binds?
+		void update();
+
+	private:
+		static std::unordered_map<std::string, KeyData> keyState;
+		static std::unordered_map<std::string, KeyData> mouseState;
+		static KeyData mouseWheelUp;
+		static KeyData mouseWheelDown;
+	};
 }

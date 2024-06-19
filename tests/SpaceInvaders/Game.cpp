@@ -10,8 +10,16 @@
 #include <FontsHandler.h>
 #include <Config.h>
 
-#define WINDOW_WIDTH 600
+#define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 600
+
+#define MOVEUP 0
+#define MOVEDOWN 2
+
+#define NOMOVE 1
+
+#define MOVELEFT 0
+#define MOVERIGHT 2
 
 namespace Config = Meatball::Config;
 
@@ -28,55 +36,20 @@ struct Enemy {
     }
 };
 
+struct Vector2uc {
+    unsigned char x;
+    unsigned char y;
+};
+
 struct Player {
     Vector2 position;
-    Vector2 direction;
+    Vector2uc direction;
     Texture2D texture;
     Vector2 velocity;
 
     inline void update(float dt) {
-        if (IsKeyPressed(KEY_W) && direction.y != -1) {
-            HayBCMD::Lexer lexer{"+moveup"};
-            HayBCMD::Parser parser(&lexer, Meatball::Console::variables);
-            parser.parse();
-        } else if (IsKeyReleased(KEY_W)) {
-            HayBCMD::Lexer lexer{"-moveup"};
-            HayBCMD::Parser parser(&lexer, Meatball::Console::variables);
-            parser.parse();
-        }
-        
-        if (IsKeyPressed(KEY_S) && direction.y != 1) {
-            HayBCMD::Lexer lexer{"+movedown"};
-            HayBCMD::Parser parser(&lexer, Meatball::Console::variables);
-            parser.parse();
-        } else if (IsKeyReleased(KEY_S)) {
-            HayBCMD::Lexer lexer{"-movedown"};
-            HayBCMD::Parser parser(&lexer, Meatball::Console::variables);
-            parser.parse();
-        }
-        
-        if (IsKeyPressed(KEY_A) && direction.x != -1) {
-            HayBCMD::Lexer lexer{"+moveleft"};
-            HayBCMD::Parser parser(&lexer, Meatball::Console::variables);
-            parser.parse();
-        } else if (IsKeyReleased(KEY_A)) {
-            HayBCMD::Lexer lexer{"-moveleft"};
-            HayBCMD::Parser parser(&lexer, Meatball::Console::variables);
-            parser.parse();
-        }
-
-        if (IsKeyPressed(KEY_D) && direction.x != 1) {
-            HayBCMD::Lexer lexer{"+moveright"};
-            HayBCMD::Parser parser(&lexer, Meatball::Console::variables);
-            parser.parse();
-        } else if (IsKeyReleased(KEY_D)) {
-            HayBCMD::Lexer lexer{"-moveright"};
-            HayBCMD::Parser parser(&lexer, Meatball::Console::variables);
-            parser.parse();
-        }
-
-        position.x += direction.x*dt*velocity.x;
-        position.y += direction.y*dt*velocity.y;
+        position.x += (((short)direction.x)-1)*dt*velocity.x;
+        position.y += (((short)direction.y)-1)*dt*velocity.y;
     }
 
     inline void draw() {
@@ -99,6 +72,52 @@ static Meatball::ConsoleUIScene initConsole() {
         "data/meatdata/Console.meatdata");
     
     return consoleUI;
+}
+
+static Vector2uc* pPlayerDirection;
+
+void moveup(HayBCMD::Command*, const std::vector<std::string>&) {
+    if (pPlayerDirection->y != MOVEUP)
+        pPlayerDirection->y--;
+}
+
+void movedown(HayBCMD::Command*, const std::vector<std::string>&) {
+    if (pPlayerDirection->y != MOVEDOWN)
+        pPlayerDirection->y++;
+}
+
+void moveleft(HayBCMD::Command*, const std::vector<std::string>&) {
+    if (pPlayerDirection->x != MOVELEFT)
+        pPlayerDirection->x--;
+}
+
+void moveright(HayBCMD::Command*, const std::vector<std::string>&) {
+    if (pPlayerDirection->x != MOVERIGHT)
+        pPlayerDirection->x++;
+}
+
+void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
+    HayBCMD::Command("+moveup", 0, 0, moveup, "Moves up");
+    HayBCMD::Command("+movedown", 0, 0, movedown, "Moves down");
+    HayBCMD::Command("+moveleft", 0, 0, moveleft, "Moves left");
+    HayBCMD::Command("+moveright", 0, 0, moveright, "Moves right");
+
+    HayBCMD::Command("reload_fonts", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
+        Meatball::FontsHandler::clear();
+        Meatball::FontsHandler::add(0, GetFontDefault());
+
+        auto consoleData = Config::loadData("data/meatdata/Console.meatdata");
+
+        auto data = Config::ifContainsGet(consoleData, "font");
+        std::string path;
+        if (data) Meatball::Defaults::loadConsoleFonts(consoleUI,((Meatball::Config::ConfigTypeData<std::string>*)data)->value);
+
+        Meatball::Config::clearData(consoleData);
+    }, "- reloads all text fonts.");
+
+    HayBCMD::Command("quit", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
+        CloseWindow();
+    }, "- closes the window");
 }
 
 int main(int, char**)
@@ -125,56 +144,21 @@ int main(int, char**)
     backgroundTexture.width = GetRenderWidth();
     backgroundTexture.height = GetRenderHeight();
 
-    HayBCMD::Command("reload_fonts", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
-        Meatball::FontsHandler::clear();
-        Meatball::FontsHandler::add(0, GetFontDefault());
-
-        auto consoleData = Config::loadData("data/meatdata/Console.meatdata");
-
-        auto data = Config::ifContainsGet(consoleData, "font");
-        std::string path;
-        if (data) Meatball::Defaults::loadConsoleFonts(consoleUI,((Meatball::Config::ConfigTypeData<std::string>*)data)->value);
-
-        Meatball::Config::clearData(consoleData);
-    }, "- reloads all text fonts.");
-
-    bool shouldQuit = false;
-    HayBCMD::Command("quit", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
-        shouldQuit = true;
-    }, "- closes the window");
-
-    Player player{{.0f,.0f}, {backgroundTexture.width*0.3f, backgroundTexture.height*0.3f}};
+    Player player{{.0f,.0f}, {backgroundTexture.width*0.4f, backgroundTexture.height*0.6f}};
     player.texture.width = backgroundTexture.width*0.05f;
     player.texture.height = backgroundTexture.width*0.05f;
 
     player.position.x = backgroundTexture.width*0.5f-player.texture.width*0.5f;
     player.position.y = backgroundTexture.height*0.9f-player.texture.height;
 
+    pPlayerDirection = &player.direction;
+
     std::vector<Enemy> enemies;
 
-    // now this would be too easy for someone to set plr_direction_x 9999
-    // so this needs a fix. Maybe private-access cvars or something i don't really know
-    // maybe just don't use cvars and create something that allows direct access lol.
-    HayBCMD::CVARStorage::cvar("plr_direction_x", &player.direction.x, "");
-    HayBCMD::CVARStorage::cvar("plr_direction_y", &player.direction.y, "");
+    // TODO: binds system :P (for now I will just test with pure code)
+    loadCommands(consoleUI);
 
-    { // TODO: binds system :P (for now I will just test with pure code)
-        HayBCMD::Lexer lexer{"\
-        alias +moveup \"plr_direction_y -1\";\
-        alias -moveup \"plr_direction_y 0\";\
-        alias +movedown \"plr_direction_y 1\";\
-        alias -movedown \"plr_direction_y 0\";\
-        alias +moveleft \"plr_direction_x -1\";\
-        alias -moveleft \"plr_direction_x 0\";\
-        alias +moveright \"plr_direction_x 1\";\
-        alias -moveright \"plr_direction_x 0\"\
-        "};
-
-        HayBCMD::Parser parser(&lexer, Meatball::Console::variables);
-        parser.parse();
-    }
-
-    while (!shouldQuit) {
+    while (!WindowShouldClose()) {
         if (IsWindowResized()) {
             int newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
             Vector2 ratio = {(float)newScreenWidth/backgroundTexture.width, (float)newScreenHeight/backgroundTexture.height};
@@ -199,8 +183,6 @@ int main(int, char**)
                 enemy.texture.height *= ratio.y;
             }
         }
-
-        if (WindowShouldClose()) shouldQuit = true;
 
         ClearBackground(BLACK);
         DrawTexture(backgroundTexture, 0,0, WHITE);
