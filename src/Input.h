@@ -20,12 +20,6 @@ namespace Meatball {
 		static void bind(std::string keyName, const std::string& callback);
 		static void unbind(const std::string& keyName);
 
-		static void bindCommand(HayBCMD::Command*, const std::vector<std::string>& args);
-		static void unBindCommand(HayBCMD::Command*, const std::vector<std::string>& args);
-		static void unBindAllCommand(HayBCMD::Command*, const std::vector<std::string>& args);
-		
-		static void registerCommands();
-
 		/// @brief registers a key to be checked if is pressed or not
 		/// @param name the name of the key ex: lalt
 		/// @param code the raylib code of the key ex: KEY_LEFT_ALT
@@ -40,6 +34,18 @@ namespace Meatball {
 		static void removeMouseKey(const std::string& name);
 
 		static void update();
+
+		static void bindCommand(HayBCMD::Command*, const std::vector<std::string>& args);
+		static void unBindCommand(HayBCMD::Command*, const std::vector<std::string>& args);
+		static void unBindAllCommand(HayBCMD::Command*, const std::vector<std::string>& args);
+		
+		static void registerCommands();
+
+		/// @brief maps the keys of a US keyboard layout
+		static void mapKeyboardKeys();
+
+		/// @brief maps the keys of a 7 buttons mouse
+		static void mapMouseKeys();
 
 	private:
 		static std::unordered_map<std::string, InputData> keyState;

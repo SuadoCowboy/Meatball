@@ -76,6 +76,50 @@ void Meatball::Input::unbind(const std::string& keyName) {
 		mouseWheelDownCallback = "";
 }
 
+void Meatball::Input::setKey(const std::string& name, unsigned short code) {
+	if (name.size() > 5 && name.substr(0, 5) == "mouse")
+		mouseState[name] = {code, "", ""};
+	else
+		keyState[name] = {code, "", ""};
+}
+
+void Meatball::Input::removeKey(const std::string& name) {
+	keyState.erase(name);
+}
+
+void Meatball::Input::setMouseKey(const std::string& name, unsigned short code) {
+	mouseState[name] = {code, "", ""};
+}
+
+void Meatball::Input::removeMouseKey(const std::string& name) {
+	mouseState.erase(name);
+}
+
+void Meatball::Input::update() {
+	for (auto& key : keyState) {
+		if (IsKeyPressed(key.second.code))
+			Console::run(key.second.callback);
+		
+		else if (IsKeyReleased(key.second.code))
+			Console::run(key.second.offCallback);
+	}
+
+	for (auto& button : mouseState) {
+		if (IsKeyPressed(button.second.code))
+			Console::run(button.second.callback);
+		
+		else if (IsKeyReleased(button.second.code)) 
+			Console::run(button.second.offCallback);
+	}
+
+	float wheel = GetMouseWheelMove();
+	if (wheel == 1.0f)
+		Console::run(mouseWheelUpCallback);
+	
+	else if (wheel == -1.0f)
+		Console::run(mouseWheelDownCallback);
+}
+
 void Meatball::Input::bindCommand(HayBCMD::Command*, const std::vector<std::string>& args) {
 	if (args.size() != 1) { // set
 		bind(args[0], args[1]);
@@ -127,43 +171,94 @@ void Meatball::Input::registerCommands() {
 	HayBCMD::Command("unbindall", 0, 0, unBindAllCommand, "unbinds all keys");
 }
 
-void Meatball::Input::setKey(const std::string& name, unsigned short code) {
-	keyState[name] = {code, "", ""};
-}
-
-void Meatball::Input::removeKey(const std::string& name) {
-	keyState.erase(name);
-}
-
-void Meatball::Input::setMouseKey(const std::string& name, unsigned short code) {
-	mouseState[name] = {code, "", ""};
-}
-
-void Meatball::Input::removeMouseKey(const std::string& name) {
-	mouseState.erase(name);
-}
-
-void Meatball::Input::update() {
-	for (auto& key : keyState) {
-		if (IsKeyPressed(key.second.code))
-			Console::run(key.second.callback);
-		
-		else if (IsKeyReleased(key.second.code))
-			Console::run(key.second.offCallback);
-	}
-
-	for (auto& button : mouseState) {
-		if (IsKeyPressed(button.second.code))
-			Console::run(button.second.callback);
-		
-		else if (IsKeyReleased(button.second.code)) 
-			Console::run(button.second.offCallback);
-	}
-
-	float wheel = GetMouseWheelMove();
-	if (wheel == 1.0f)
-		Console::run(mouseWheelUpCallback);
+void Meatball::Input::mapKeyboardKeys() {
+    // A-Z
+	for (unsigned char i = KEY_A; i < KEY_Z; ++i)
+        setKey(std::string(1, static_cast<char>(i+32)), i);
+    
+	// left & right
+	setKey("lalt", KEY_LEFT_ALT);
+	setKey("ralt", KEY_RIGHT_ALT);
+	setKey("[", KEY_LEFT_BRACKET);
+	setKey("]", KEY_RIGHT_BRACKET);
+	setKey("lctrl", KEY_LEFT_CONTROL);
+	setKey("rctrl", KEY_RIGHT_CONTROL);
+	setKey("lshift", KEY_LEFT_SHIFT);
+	setKey("rshift", KEY_RIGHT_SHIFT);
+	setKey("lsuper", KEY_LEFT_SUPER);
+	setKey("rsuper", KEY_RIGHT_SUPER);
+    setKey("leftarrow", KEY_LEFT);
+    setKey("rightarrow", KEY_RIGHT);
+    setKey("uparrow", KEY_UP);
+    setKey("downarrow", KEY_DOWN);
 	
-	else if (wheel == -1.0f)
-		Console::run(mouseWheelDownCallback);
+	// KeyPad
+	for (unsigned short i = KEY_KP_0; i < KEY_KP_9; ++i)
+		setKey("kp_"+std::to_string(i-KEY_KP_0), i);
+	
+	setKey("kp_add", KEY_KP_ADD);
+	setKey("kp_decimal", KEY_KP_DECIMAL);
+	setKey("kp_divide", KEY_KP_DIVIDE);
+	setKey("kp_enter", KEY_KP_ENTER);
+	setKey("kp_equal", KEY_KP_EQUAL);
+	setKey("kp_multiply", KEY_KP_MULTIPLY);
+	setKey("kp_subtract", KEY_KP_SUBTRACT);
+
+	// Digits
+	for (unsigned short i = KEY_ZERO; i < KEY_NINE; ++i)
+		setKey(std::to_string(i-KEY_ZERO), i);
+
+	// Function keys
+	for (unsigned short i = KEY_F1; i < KEY_F12; ++i)
+		setKey("f"+std::to_string(i-KEY_F1+1), i);
+
+	// Others (alphabetical order)
+	setKey("'", KEY_APOSTROPHE);
+
+	setKey("\\", KEY_BACKSLASH);
+	setKey("backspace", KEY_BACKSPACE);
+	
+	setKey("capslock", KEY_CAPS_LOCK);
+	setKey(",", KEY_COMMA);
+	
+	setKey("delete", KEY_DELETE);
+	
+	setKey("", KEY_END);
+	setKey("enter", KEY_ENTER);
+	setKey("equal", KEY_EQUAL);
+	setKey("escape", KEY_ESCAPE);
+
+	setKey("`", KEY_GRAVE);
+	
+	setKey("home", KEY_HOME);
+
+	setKey("insert", KEY_INSERT);
+
+	setKey("kb_menu", KEY_KB_MENU); // should this be keypad? what is that key?
+	
+	setKey("menu", KEY_MENU);
+	setKey("-", KEY_MINUS);
+
+	setKey("numlock", KEY_NUM_LOCK);
+
+	setKey("pagedown", KEY_PAGE_DOWN);
+	setKey("pageup", KEY_PAGE_UP);
+	setKey("pause", KEY_PAUSE);
+	setKey(".", KEY_PERIOD);
+	setKey("printscreen", KEY_PRINT_SCREEN);
+
+	setKey("scrolllock", KEY_SCROLL_LOCK); // lll haha
+	setKey(";", KEY_SEMICOLON);
+	setKey("/", KEY_SLASH);
+	setKey("space", KEY_SPACE);
+
+	setKey("tab", KEY_TAB);
+
+	setKey("volumedown", KEY_VOLUME_DOWN);
+	setKey("volumeup", KEY_VOLUME_UP);
+}
+
+void Meatball::Input::mapMouseKeys() {
+	for (unsigned short i = MOUSE_BUTTON_LEFT; i < MOUSE_BUTTON_BACK; ++i)
+		setKey("mouse"+std::to_string(i), i);
 }
