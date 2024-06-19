@@ -83,11 +83,11 @@ static unsigned char moves = 0;
 2 = down
 4 = left
 8 = right
+16 = NON RELATED -> 16 = should quit
 */
 
 void quit(HayBCMD::Command*, const std::vector<std::string>&) {
-    Meatball::FontsHandler::clear();
-    CloseWindow();
+    moves |= 16;
 }
 
 void moveup(HayBCMD::Command*, const std::vector<std::string>&) {
@@ -141,15 +141,15 @@ void stopmoveright(HayBCMD::Command*, const std::vector<std::string>&) {
 void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
     HayBCMD::Command("quit", 0, 0, quit,"- closes the window");
 
-    HayBCMD::Command("+moveup", 0, 0, moveup, "Moves up");
-    HayBCMD::Command("+movedown", 0, 0, movedown, "Moves down");
-    HayBCMD::Command("+moveleft", 0, 0, moveleft, "Moves left");
-    HayBCMD::Command("+moveright", 0, 0, moveright, "Moves right");
+    HayBCMD::Command("+moveup", 0, 0, moveup, "- moves up");
+    HayBCMD::Command("+movedown", 0, 0, movedown, "- moves down");
+    HayBCMD::Command("+moveleft", 0, 0, moveleft, "- moves left");
+    HayBCMD::Command("+moveright", 0, 0, moveright, "- moves right");
 
-    HayBCMD::Command("-moveup", 0, 0, stopmoveup, "Stop moving up");
-    HayBCMD::Command("-movedown", 0, 0, stopmovedown, "Stop moving down");
-    HayBCMD::Command("-moveleft", 0, 0, stopmoveleft, "Stop moving left");
-    HayBCMD::Command("-moveright", 0, 0, stopmoveright, "Stop moving right");
+    HayBCMD::Command("-moveup", 0, 0, stopmoveup, "- stops moving up");
+    HayBCMD::Command("-movedown", 0, 0, stopmovedown, "- stops moving down");
+    HayBCMD::Command("-moveleft", 0, 0, stopmoveleft, "- stops moving left");
+    HayBCMD::Command("-moveright", 0, 0, stopmoveright, "- stops moving right");
 
     HayBCMD::Command("reload_fonts", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
         Meatball::FontsHandler::clear();
@@ -163,6 +163,13 @@ void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
 
         Meatball::Config::clearData(consoleData);
     }, "- reloads all text fonts.");
+
+    HayBCMD::Command("toggle_local_console", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
+        consoleUI.visible = not consoleUI.visible;
+    }, "- toggles the console ui visibility");
+
+    Meatball::Input::allowedUiCommands.push_back("toggle_local_console");
+    Meatball::Input::allowedUiCommands.push_back("quit");
 }
 
 int main(int, char**)
@@ -208,7 +215,7 @@ int main(int, char**)
 
     std::vector<Enemy> enemies;
 
-    while (!WindowShouldClose()) {
+    while (!(moves & 16)) {
         if (IsWindowResized()) {
             int newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
             Vector2 ratio = {(float)newScreenWidth/backgroundTexture.width, (float)newScreenHeight/backgroundTexture.height};
@@ -240,10 +247,12 @@ int main(int, char**)
         float dt = GetFrameTime();        
         consoleUI.update();
 
-        Meatball::Input::update();
+        Meatball::Input::update(consoleUI.visible);
 
         player.update(dt);
         HayBCMD::handleLoopAliasesRunning(Meatball::Console::variables);
+
+        if (WindowShouldClose()) moves |= 16;
 
         BeginDrawing();
 
@@ -253,5 +262,6 @@ int main(int, char**)
         EndDrawing();
     }
 
-    quit(nullptr, {});
+    Meatball::FontsHandler::clear();
+    CloseWindow();
 }
