@@ -45,18 +45,18 @@ struct Player {
     Vector2 position;
     Vector2uc direction;
     Texture2D texture;
-    Vector2 velocity;
+    Vector2 speed;
 
     inline void update(float dt) {
-        position.x += (((short)direction.x)-1)*dt*velocity.x;
-        position.y += (((short)direction.y)-1)*dt*velocity.y;
+        position.x += (((short)direction.x)-1)*dt*speed.x;
+        position.y += (((short)direction.y)-1)*dt*speed.y;
     }
 
     inline void draw() {
         DrawTexture(texture, position.x, position.y, WHITE);
     }
 
-    Player(const Vector2& position, const Vector2& velocity) : position(position), direction({0,0}), velocity(velocity) {
+    Player(const Vector2& position, const Vector2& speed) : position(position), direction({0,0}), speed(speed) {
         texture = LoadTexture("data/images/player.png");
         direction = {NOMOVE, NOMOVE};
     }
@@ -232,8 +232,8 @@ int main(int, char**)
             player.texture.width *= ratio.x;
             player.texture.height *= ratio.y;
 
-            player.velocity.x *= ratio.x;
-            player.velocity.y *= ratio.y;
+            player.speed.x *= ratio.x;
+            player.speed.y *= ratio.y;
 
             for (auto& enemy : enemies) {
                 enemy.position.x *= ratio.x;
