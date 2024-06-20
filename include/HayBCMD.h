@@ -169,29 +169,21 @@ namespace HayBCMD {
         Token lastToken;
     };
 
+    struct CVariable {
+        std::function<void(const std::string& value)> set;
+        std::function<std::string()> toString;
+    };
+
     class CVARStorage {
     public:
-        static void cvar(const std::string& name, bool* value, const std::string& usage);
-        static void cvar(const std::string& name, float* value, const std::string& usage);
-        static void cvar(const std::string& name, std::string* value, const std::string& usage);
+        static void setCvar(const std::string& name, const std::function<void(const std::string& value)>& set, const std::function<std::string()>& toString, const std::string& usage);
 
-        static void setCvar(const std::string& name, const bool& value);
-        static void setCvar(const std::string& name, const float& value);
-        static void setCvar(const std::string& name, const std::string& value);
-
-        // Searches for the CVAR and returns it to a buffer
-        // @return false if could not get cvar
-        static bool getCvar(const std::string& name, bool*& buf);
-        static bool getCvar(const std::string& name, std::string*& buf);
-        static bool getCvar(const std::string& name, float*& buf);
-        
-        // @return n = not found; s = string; b = bool; f = float
-        static char getCvarType(const std::string& name);
+        /// @brief Searches for the CVAR and returns it to a buffer
+        /// @return false if could not get cvar
+        static bool getCvar(const std::string& name, CVariable*& buf);
 
     private:
-        static std::unordered_map<std::string, bool*> boolCvars;
-        static std::unordered_map<std::string, float*> floatCvars;
-        static std::unordered_map<std::string, std::string*> stringCvars;
+        static std::unordered_map<std::string, CVariable> cvars;
         
         static void asCommand(Command* pCommand, const std::vector<std::string>& args);
     };
