@@ -74,6 +74,8 @@ public:
     short health;
 };
 
+static std::vector<Enemy> enemies;
+
 struct Vector2uc {
     unsigned char x;
     unsigned char y;
@@ -183,6 +185,8 @@ void stopmoveright(HayBCMD::Command*, const std::vector<std::string>&) {
 
 void fire(HayBCMD::Command*, const std::vector<std::string>&) {
     bullets.push_back({PLAYER, {player.position.x+player.texture.width*0.5f-bulletSize.x*0.5f, player.position.y+bulletSize.y*0.25f}});
+    if (enemies.size() != 0)
+        Meatball::Console::printf(HayBCMD::WARNING, "{} [{}, {}]", entityData[PLAYER].damage, enemies[0].health, (short)entityData[ENEMY_WEAK].defaultHealth);
 }
 
 void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
@@ -245,7 +249,7 @@ int main(int, char**)
     auto consoleUI = initConsole();
 
     {
-        entityData[PLAYER] = {30, 90, {255,255,0,255}};
+        entityData[PLAYER] = {10, 90, {255,255,0,255}};
         entityData[ENEMY_WEAK] = {10, 30, {0,0,255,255}};
         entityData[ENEMY_MEDIUM] = {25, 60, {255,0,0,255}};
         entityData[ENEMY_STRONG] = {40, 90, {0,255,0,255}};
@@ -294,7 +298,7 @@ int main(int, char**)
     HayBCMD::execConfigFile("data/cfg/autoexec.cfg", Meatball::Console::variables);
     HayBCMD::execConfigFile("data/cfg/config.cfg", Meatball::Console::variables);
 
-    std::vector<Enemy> enemies = {Enemy({50.0f, 50.0f}, ENEMY_WEAK)};
+    enemies = {Enemy({50.0f, 50.0f}, ENEMY_WEAK)};
 
     bulletSize.x = backgroundTexture.width*0.01f;
     bulletSize.y = backgroundTexture.height*0.02f;
@@ -357,51 +361,51 @@ int main(int, char**)
             enemies[i].draw();
         }
 
-        for (size_t i = 0; i < bullets.size(); ++i) {
-            Rectangle rect = {bullets[i].position.x, bullets[i].position.y, bulletSize.x, bulletSize.y};
-            if (bullets[i].position.y > backgroundTexture.height) {
-                bullets.erase(bullets.begin()+i);
-                --i;
+        for (size_t bulletIdx = 0; bulletIdx < bullets.size(); ++bulletIdx) {
+            Rectangle rect = {bullets[bulletIdx].position.x, bullets[bulletIdx].position.y, bulletSize.x, bulletSize.y};
+            if (bullets[bulletIdx].position.y > backgroundTexture.height) {
+                bullets.erase(bullets.begin()+bulletIdx);
+                --bulletIdx;
                 continue;
             }
 
-            if (bullets[i].ownerType == PLAYER) {
+            if (bullets[bulletIdx].ownerType == PLAYER) {
                 bool hitEnemy = false;
-                for (size_t ii = 0; ii < enemies.size(); ++ii) {
-                    if (!CheckCollisionRecs(rect, {enemies[ii].position.x, enemies[ii].position.y, (float)enemies[ii].texture.width, (float)enemies[ii].texture.height}))
+                for (size_t enemyIdx = 0; enemyIdx < enemies.size(); ++enemyIdx) {
+                    if (!CheckCollisionRecs(rect, {enemies[enemyIdx].position.x, enemies[enemyIdx].position.y, (float)enemies[enemyIdx].texture.width, (float)enemies[enemyIdx].texture.height}))
                         continue;
                     
-                    enemies[ii].health -= entityData[bullets[i].ownerType].damage;
+                    enemies[enemyIdx].health -= entityData[bullets[bulletIdx].ownerType].damage;
                     hitEnemy = true;
                     
-                    if (enemies[i].health < 0) {
-                        enemies.erase(enemies.begin()+ii);
-                        --ii;
+                    if (enemies[enemyIdx].health <= 0) {
+                        enemies.erase(enemies.begin()+enemyIdx);
+                        --enemyIdx;
                         continue;
                     }
                     break;
                 }
 
                 if (hitEnemy) {
-                    bullets.erase(bullets.begin()+i);
-                    --i;
+                    bullets.erase(bullets.begin()+bulletIdx);
+                    --bulletIdx;
                     continue;
                 }
 
-                bullets[i].position.y -= bulletSpeed*dt;
+                bullets[bulletIdx].position.y -= bulletSpeed*dt;
             }
             else {
                 if (CheckCollisionRecs(rect, {player.position.x, player.position.y, (float)player.texture.width, (float)player.texture.height})) {
-                    player.health -= entityData[bullets[i].ownerType].damage;
-                    bullets.erase(bullets.begin()+i);
-                    --i;
+                    player.health -= entityData[bullets[bulletIdx].ownerType].damage;
+                    bullets.erase(bullets.begin()+bulletIdx);
+                    --bulletIdx;
                     continue;
                 }
 
-                bullets[i].position.y += bulletSpeed*dt;
+                bullets[bulletIdx].position.y += bulletSpeed*dt;
             }
 
-            DrawRectangle(rect.x, rect.y, rect.width, rect.height, entityData[bullets[i].ownerType].color);
+            DrawRectangle(rect.x, rect.y, rect.width, rect.height, entityData[bullets[bulletIdx].ownerType].color);
         }
 
         consoleUI.draw();
