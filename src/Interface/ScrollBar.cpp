@@ -99,7 +99,7 @@ void Meatball::ScrollBar::updateThumbHeight(float viewHeight, float contentHeigh
     float newThumbHeight = (viewHeight / contentHeight) * rect.height;
     if (newThumbHeight < 1) newThumbHeight = 1;
 
-    if (thumbY+thumbHeight == rect.height) thumbY = rect.height-newThumbHeight;
+    if (thumbY+thumbHeight <= rect.height+1 && thumbY+thumbHeight >= rect.height-1) thumbY = rect.height-newThumbHeight;
     else thumbY = scrollValue*newThumbHeight;
 
     thumbHeight = newThumbHeight;
