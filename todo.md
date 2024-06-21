@@ -2,7 +2,7 @@
 - because sizeof(Color) is below 16(which is shared_ptr size), it's better cloning it or using a reference than actually using a pointer or shared_ptr.
 
 # TODOS
-- Make meatdata better with variables and comments and default color definitions
+- Make meatdata better with variables, comments and default color definitions
 
 - Test multiple dynamic panels together
 
@@ -42,6 +42,8 @@ if type is not allowed for objectName: tell user and stop running
 if a required objectName is not defined in the end: tell user and stop running
 ]]--
 ```
+
+- Create tasks system, the console commands will run through tasks and then the players will be able to use the wait command(also add wait_ticks which waits ticks instead of milliseconds)
 
 # FUTURE TODOS:
 - optimize code and use the right data structures;
