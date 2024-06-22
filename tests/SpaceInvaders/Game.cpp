@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <cmath>
 
 #include <HayBCMD.h>
 
@@ -35,6 +36,7 @@ struct EntityData {
     unsigned char damage;
     unsigned char defaultHealth;
     Color color;
+    Texture2D texture;
 };
 
 static float bulletSpeed;
@@ -55,20 +57,18 @@ std::vector<Bullet> bullets;
 class Enemy {
 public:
     Enemy(const Vector2& position, const EntityType& type) : position(position), type(type) {
-        texture = LoadTexture("data/images/enemy01.png");
         health = entityData[type].defaultHealth;
     }
 
     inline void draw() {
-        DrawTexture(texture, position.x, position.y, WHITE);
+        DrawTexture(entityData[type].texture, position.x, position.y, WHITE);
     }
 
     inline void shoot() {
-        bullets.push_back({type, {position.x+texture.width*0.5f-bulletSize.x*0.5f, position.y+texture.height*0.5f-bulletSize.y*0.25f}});
+        bullets.push_back({type, {position.x+entityData[type].texture.width*0.5f-bulletSize.x*0.5f, position.y+entityData[type].texture.height*0.5f-bulletSize.y*0.25f}});
     }
 
     Vector2 position;
-    Texture2D texture;
     EntityType type;
     unsigned char damage;
     short health;
@@ -86,7 +86,6 @@ public:
     Player() {}
 
     Player(const Vector2& position, const Vector2& speed) : position(position), direction({0,0}), speed(speed) {
-        texture = LoadTexture("data/images/player.png");
         direction = {NOMOVE, NOMOVE};
         health = 100;
     }
@@ -97,12 +96,11 @@ public:
     }
 
     inline void draw() {
-        DrawTexture(texture, position.x, position.y, WHITE);
+        DrawTexture(entityData[PLAYER].texture, position.x, position.y, WHITE);
     }
 
     Vector2 position;
     Vector2uc direction;
-    Texture2D texture;
     Vector2 speed;
     short health;
 };
@@ -122,90 +120,46 @@ static Meatball::ConsoleUIScene initConsole() {
 
 static Player player;
 
-static unsigned char conditions = 0;
-/*
-1 = up
-2 = down
-4 = left
-8 = right
-16 = NON RELATED -> 16 = should quit
-*/
+static bool shouldQuit = false;
 
-void quit(HayBCMD::Command*, const std::vector<std::string>&) {
-    conditions |= 16;
+void quit(void*, const std::vector<std::string>&) {
+    shouldQuit = true;
 }
 
-void moveup(HayBCMD::Command*, const std::vector<std::string>&) {
-    if (conditions & 1) return;
-    player.direction.y--;
-    conditions |= 1;
-}
-
-void movedown(HayBCMD::Command*, const std::vector<std::string>&) {
-    if (conditions & 2) return;
-    player.direction.y++;
-    conditions |= 2;
-}
-
-void moveleft(HayBCMD::Command*, const std::vector<std::string>&) {
-    if (conditions & 4) return;
-    player.direction.x--;
-    conditions |= 4;
-}
-
-void moveright(HayBCMD::Command*, const std::vector<std::string>&) {
-    if (conditions & 8) return;
-    player.direction.x++;
-    conditions |= 8;
-}
-
-void stopmoveup(HayBCMD::Command*, const std::vector<std::string>&) {
-    if (!(conditions & 1)) return;
-    player.direction.y++;
-    conditions &= ~1;
-}
-
-void stopmovedown(HayBCMD::Command*, const std::vector<std::string>&) {
-    if (!(conditions & 2)) return;
-    player.direction.y--;
-    conditions &= ~2;
-}
-
-void stopmoveleft(HayBCMD::Command*, const std::vector<std::string>&) {
-    if (!(conditions & 4)) return;
-    player.direction.x++;
-    conditions &= ~4;
-}
-
-void stopmoveright(HayBCMD::Command*, const std::vector<std::string>&) {
-    if (!(conditions & 8)) return;
-    player.direction.x--;
-    conditions &= ~8;
-}
-
-void fire(HayBCMD::Command*, const std::vector<std::string>&) {
-    bullets.push_back({PLAYER, {player.position.x+player.texture.width*0.5f-bulletSize.x*0.5f, player.position.y+bulletSize.y*0.25f}});
-    if (enemies.size() != 0)
-        Meatball::Console::printf(HayBCMD::WARNING, "{} [{}, {}]", entityData[PLAYER].damage, enemies[0].health, (short)entityData[ENEMY_WEAK].defaultHealth);
+void move(void* pStoredData, const std::vector<std::string>&) {
+    Vector2uc* pDir = (Vector2uc*)pStoredData;
+    player.direction.x = pDir->x;
+    player.direction.y = pDir->y;
 }
 
 void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
     HayBCMD::Command("quit", 0, 0, quit,"- closes the window");
 
-    HayBCMD::Command("+moveup", 0, 0, moveup, "- moves up");
-    HayBCMD::Command("+movedown", 0, 0, movedown, "- moves down");
-    HayBCMD::Command("+moveleft", 0, 0, moveleft, "- moves left");
-    HayBCMD::Command("+moveright", 0, 0, moveright, "- moves right");
+    HayBCMD::Command("+moveup", 0, 0, [](void*, const std::vector<std::string>&){player.direction.y--;},
+        "- moves up");
+    HayBCMD::Command("+movedown", 0, 0, [](void*, const std::vector<std::string>&){player.direction.y++;},
+        "- moves down");
+    HayBCMD::Command("+moveleft", 0, 0, [](void*, const std::vector<std::string>&){player.direction.x--;},
+        "- moves left");
+    HayBCMD::Command("+moveright", 0, 0, [](void*, const std::vector<std::string>&){player.direction.x++;},
+        "- moves right");
 
-    HayBCMD::Command("-moveup", 0, 0, stopmoveup, "- stops moving up");
-    HayBCMD::Command("-movedown", 0, 0, stopmovedown, "- stops moving down");
-    HayBCMD::Command("-moveleft", 0, 0, stopmoveleft, "- stops moving left");
-    HayBCMD::Command("-moveright", 0, 0, stopmoveright, "- stops moving right");
+    HayBCMD::Command("-moveup", 0, 0, [](void*, const std::vector<std::string>&){player.direction.y++;},
+        "- stops moving up");
+    HayBCMD::Command("-movedown", 0, 0, [](void*, const std::vector<std::string>&){player.direction.y--;},
+        "- stops moving down");
+    HayBCMD::Command("-moveleft", 0, 0, [](void*, const std::vector<std::string>&){player.direction.x++;},
+        "- stops moving left");
+    HayBCMD::Command("-moveright", 0, 0, [](void*, const std::vector<std::string>&){player.direction.x--;},
+        "- stops moving right");
 
-    HayBCMD::Command("+fire", 0, 0, fire, "- shoots a bullet");
+    HayBCMD::Command("+fire", 0, 0, [](void*, const std::vector<std::string>&){
+        bullets.push_back({PLAYER, {player.position.x+entityData[PLAYER].texture.width*0.5f-bulletSize.x*0.5f, player.position.y+bulletSize.y*0.25f}});
+    }, "- shoots a bullet");
+    
     Meatball::Console::variables["-fire"] = " ";
 
-    HayBCMD::Command("reload_fonts", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
+    HayBCMD::Command("reload_fonts", 0, 0, [&](void*, const std::vector<std::string>&) {
         Meatball::FontsHandler::clear();
         Meatball::FontsHandler::add(0, GetFontDefault());
 
@@ -218,7 +172,7 @@ void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
         Meatball::Config::clearData(consoleData);
     }, "- reloads all text fonts.");
 
-    HayBCMD::Command("toggle_local_console", 0, 0, [&](HayBCMD::Command*, const std::vector<std::string>&) {
+    HayBCMD::Command("toggle_local_console", 0, 0, [&](void*, const std::vector<std::string>&) {
         consoleUI.visible = not consoleUI.visible;
         if (!consoleUI.visible)
             Meatball::resetCursor(Meatball::MouseCursorPriorityLevel::INPUT_TEXT_BOX);
@@ -226,6 +180,59 @@ void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
 
     Meatball::Input::allowedUiCommands.push_back("toggle_local_console");
     Meatball::Input::allowedUiCommands.push_back("quit");
+}
+
+size_t handleBullet(size_t& bulletIdx, const float& dt, Texture2D& backgroundTexture) {
+    Rectangle rect = {bullets[bulletIdx].position.x, bullets[bulletIdx].position.y, bulletSize.x, bulletSize.y};
+
+    float movement = (bulletSpeed * dt);
+    unsigned int substeps = std::ceil(movement / bulletSize.y);
+    for (unsigned int i = 0; i < substeps; ++i) {
+       rect.y += dt * (bullets[bulletIdx].ownerType == PLAYER? -bulletSize.y : bulletSize.y);
+
+        if (bullets[bulletIdx].position.y > backgroundTexture.height || bullets[bulletIdx].position.y+bulletSize.y < 0) {
+            bullets.erase(bullets.begin()+bulletIdx);
+            --bulletIdx;
+            return bulletIdx;
+        }
+
+        if (bullets[bulletIdx].ownerType == PLAYER) {
+            bool hitEnemy = false;
+
+            for (size_t enemyIdx = 0; enemyIdx < enemies.size(); ++enemyIdx) {
+                if (!CheckCollisionRecs(rect, {enemies[enemyIdx].position.x, enemies[enemyIdx].position.y, (float)entityData[enemies[enemyIdx].type].texture.width, (float)entityData[enemies[enemyIdx].type].texture.height}))
+                    continue;
+                
+                enemies[enemyIdx].health -= entityData[bullets[bulletIdx].ownerType].damage;
+                hitEnemy = true;
+                
+                if (enemies[enemyIdx].health <= 0) {
+                    enemies.erase(enemies.begin()+enemyIdx);
+                    --enemyIdx;
+                }
+                break;
+            }
+
+            if (hitEnemy) {
+                bullets.erase(bullets.begin()+bulletIdx);
+                --bulletIdx;
+                return bulletIdx;
+            }
+        }
+        else {
+            if (CheckCollisionRecs(rect, {player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height})) {
+                player.health -= entityData[bullets[bulletIdx].ownerType].damage;
+                bullets.erase(bullets.begin()+bulletIdx);
+                --bulletIdx;
+                return bulletIdx;
+            }
+        }
+
+    }
+    
+    bullets[bulletIdx].position.y = rect.y;
+    DrawRectangle(rect.x, rect.y, rect.width, rect.height, entityData[bullets[bulletIdx].ownerType].color);
+    return bulletIdx;
 }
 
 int main(int, char**)
@@ -247,12 +254,13 @@ int main(int, char**)
     Meatball::Defaults::init("data/meatdata/Init.meatdata");
 
     auto consoleUI = initConsole();
+    consoleUI.visible = false;
 
     {
-        entityData[PLAYER] = {10, 90, {255,255,0,255}};
-        entityData[ENEMY_WEAK] = {10, 30, {0,0,255,255}};
-        entityData[ENEMY_MEDIUM] = {25, 60, {255,0,0,255}};
-        entityData[ENEMY_STRONG] = {40, 90, {0,255,0,255}};
+        entityData[PLAYER] = {10, 90, {255,255,0,255}, LoadTexture("data/images/player.png")};
+        entityData[ENEMY_WEAK] = {10, 30, {0,0,255,255}, LoadTexture("data/images/enemy0.png")};
+        entityData[ENEMY_MEDIUM] = {25, 60, {255,0,0,255}, LoadTexture("data/images/enemy1.png")};
+        entityData[ENEMY_STRONG] = {40, 90, {0,255,0,255}, LoadTexture("data/images/enemy2.png")};
 
         auto dataMap = Meatball::Config::loadData("data/meatdata/Game.meatdata");
         auto data = Meatball::Config::ifContainsGet(dataMap, "playerBulletColor");
@@ -280,11 +288,11 @@ int main(int, char**)
     backgroundTexture.height = GetRenderHeight();
 
     player = {{.0f,.0f}, {backgroundTexture.width*0.4f, backgroundTexture.height*0.6f}};
-    player.texture.width = backgroundTexture.width*0.05f;
-    player.texture.height = backgroundTexture.width*0.05f;
+    entityData[PLAYER].texture.width = backgroundTexture.width*0.05f;
+    entityData[PLAYER].texture.height = backgroundTexture.width*0.05f;
 
-    player.position.x = backgroundTexture.width*0.5f-player.texture.width*0.5f;
-    player.position.y = backgroundTexture.height*0.9f-player.texture.height;
+    player.position.x = backgroundTexture.width*0.5f-entityData[PLAYER].texture.width*0.5f;
+    player.position.y = backgroundTexture.height*0.9f-entityData[PLAYER].texture.height;
 
     bulletSpeed = backgroundTexture.height*0.6f;
 
@@ -298,12 +306,12 @@ int main(int, char**)
     HayBCMD::execConfigFile("data/cfg/autoexec.cfg", Meatball::Console::variables);
     HayBCMD::execConfigFile("data/cfg/config.cfg", Meatball::Console::variables);
 
-    enemies = {Enemy({50.0f, 50.0f}, ENEMY_WEAK)};
+    enemies = {Enemy({WINDOW_WIDTH*0.5f, WINDOW_HEIGHT*0.5f}, ENEMY_WEAK)};
 
     bulletSize.x = backgroundTexture.width*0.01f;
     bulletSize.y = backgroundTexture.height*0.02f;
 
-    while (!(conditions & 16)) {
+    while (!shouldQuit) {
         if (IsWindowResized()) {
             int newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
             Vector2 ratio = {(float)newScreenWidth/backgroundTexture.width, (float)newScreenHeight/backgroundTexture.height};
@@ -315,8 +323,8 @@ int main(int, char**)
 
             player.position.x *= ratio.x;
             player.position.y *= ratio.y;
-            player.texture.width *= ratio.x;
-            player.texture.height *= ratio.y;
+            entityData[PLAYER].texture.width *= ratio.x;
+            entityData[PLAYER].texture.height *= ratio.y;
 
             bulletSpeed *= ratio.y;
             bulletSize.x *= ratio.x;
@@ -328,8 +336,8 @@ int main(int, char**)
             for (auto& enemy : enemies) {
                 enemy.position.x *= ratio.x;
                 enemy.position.y *= ratio.y;
-                enemy.texture.width *= ratio.x;
-                enemy.texture.height *= ratio.y;
+                entityData[enemy.type].texture.width *= ratio.x;
+                entityData[enemy.type].texture.height *= ratio.y;
             }
         }
 
@@ -342,16 +350,16 @@ int main(int, char**)
         Meatball::Input::update(consoleUI.visible);
 
         HayBCMD::handleLoopAliasesRunning(Meatball::Console::variables);
-        if (WindowShouldClose()) conditions |= 16;
+        if (WindowShouldClose()) shouldQuit = true;
 
         BeginDrawing();
 
         player.update(dt);
         player.draw();
 
-        Rectangle playerRect = {player.position.x, player.position.y, (float)player.texture.width, (float)player.texture.height};
+        Rectangle playerRect = {player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height};
         for (size_t i = 0; i < enemies.size(); ++i) {
-            if (CheckCollisionRecs(playerRect, {enemies[i].position.x, enemies[i].position.y, (float)enemies[i].texture.width, (float)enemies[i].texture.height})) {
+            if (CheckCollisionRecs(playerRect, {enemies[i].position.x, enemies[i].position.y, (float)entityData[enemies[i].type].texture.width, (float)entityData[enemies[i].type].texture.height})) {
                 player.health -= enemies[i].health;
                 enemies.erase(enemies.begin()+i);
                 --i;
@@ -362,50 +370,7 @@ int main(int, char**)
         }
 
         for (size_t bulletIdx = 0; bulletIdx < bullets.size(); ++bulletIdx) {
-            Rectangle rect = {bullets[bulletIdx].position.x, bullets[bulletIdx].position.y, bulletSize.x, bulletSize.y};
-            if (bullets[bulletIdx].position.y > backgroundTexture.height) {
-                bullets.erase(bullets.begin()+bulletIdx);
-                --bulletIdx;
-                continue;
-            }
-
-            if (bullets[bulletIdx].ownerType == PLAYER) {
-                bool hitEnemy = false;
-                for (size_t enemyIdx = 0; enemyIdx < enemies.size(); ++enemyIdx) {
-                    if (!CheckCollisionRecs(rect, {enemies[enemyIdx].position.x, enemies[enemyIdx].position.y, (float)enemies[enemyIdx].texture.width, (float)enemies[enemyIdx].texture.height}))
-                        continue;
-                    
-                    enemies[enemyIdx].health -= entityData[bullets[bulletIdx].ownerType].damage;
-                    hitEnemy = true;
-                    
-                    if (enemies[enemyIdx].health <= 0) {
-                        enemies.erase(enemies.begin()+enemyIdx);
-                        --enemyIdx;
-                        continue;
-                    }
-                    break;
-                }
-
-                if (hitEnemy) {
-                    bullets.erase(bullets.begin()+bulletIdx);
-                    --bulletIdx;
-                    continue;
-                }
-
-                bullets[bulletIdx].position.y -= bulletSpeed*dt;
-            }
-            else {
-                if (CheckCollisionRecs(rect, {player.position.x, player.position.y, (float)player.texture.width, (float)player.texture.height})) {
-                    player.health -= entityData[bullets[bulletIdx].ownerType].damage;
-                    bullets.erase(bullets.begin()+bulletIdx);
-                    --bulletIdx;
-                    continue;
-                }
-
-                bullets[bulletIdx].position.y += bulletSpeed*dt;
-            }
-
-            DrawRectangle(rect.x, rect.y, rect.width, rect.height, entityData[bullets[bulletIdx].ownerType].color);
+            bulletIdx = handleBullet(bulletIdx, dt, backgroundTexture);
         }
 
         consoleUI.draw();
