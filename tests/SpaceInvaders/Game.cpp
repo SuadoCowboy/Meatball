@@ -187,8 +187,9 @@ size_t handleBullet(size_t& bulletIdx, const float& dt, Texture2D& backgroundTex
 
     float movement = (bulletSpeed * dt);
     unsigned int substeps = std::ceil(movement / bulletSize.y);
+    float substepMovement = movement/substeps;
     for (unsigned int i = 0; i < substeps; ++i) {
-       rect.y += dt * (bullets[bulletIdx].ownerType == PLAYER? -bulletSize.y : bulletSize.y);
+       rect.y += substepMovement * (bullets[bulletIdx].ownerType == PLAYER? -1 : 1);
 
         if (bullets[bulletIdx].position.y > backgroundTexture.height || bullets[bulletIdx].position.y+bulletSize.y < 0) {
             bullets.erase(bullets.begin()+bulletIdx);
@@ -287,17 +288,21 @@ int main(int, char**)
     backgroundTexture.width = GetRenderWidth();
     backgroundTexture.height = GetRenderHeight();
 
-    player = {{.0f,.0f}, {backgroundTexture.width*0.4f, backgroundTexture.height*0.6f}};
+    player = {{.0f,.0f}, {backgroundTexture.width*0.004f, backgroundTexture.height*0.006f}};
     entityData[PLAYER].texture.width = backgroundTexture.width*0.05f;
     entityData[PLAYER].texture.height = backgroundTexture.width*0.05f;
 
     player.position.x = backgroundTexture.width*0.5f-entityData[PLAYER].texture.width*0.5f;
     player.position.y = backgroundTexture.height*0.9f-entityData[PLAYER].texture.height;
 
-    bulletSpeed = backgroundTexture.height*0.6f;
+    bulletSpeed = backgroundTexture.height*0.006f;
 
     HayBCMD::CVARStorage::setCvar("bullet_speed",
-        [](const std::string& value){bulletSpeed = std::stof(value);},
+        [](const std::string& value){
+            bulletSpeed = std::stof(value);
+            if (bulletSpeed < 0.0f)
+                bulletSpeed = 0.0f;
+        },
         [](){return std::to_string(bulletSpeed);}, "");
     HayBCMD::CVARStorage::setCvar("player_health",
         [](const std::string& value){player.health = (unsigned char)std::stoi(value);},
@@ -344,7 +349,7 @@ int main(int, char**)
         ClearBackground(BLACK);
         DrawTexture(backgroundTexture, 0,0, WHITE);
 
-        float dt = GetFrameTime();
+        float dt = GetFrameTime()*100;
         consoleUI.update();
 
         Meatball::Input::update(consoleUI.visible);
@@ -372,6 +377,8 @@ int main(int, char**)
         for (size_t bulletIdx = 0; bulletIdx < bullets.size(); ++bulletIdx) {
             bulletIdx = handleBullet(bulletIdx, dt, backgroundTexture);
         }
+
+        DrawFPS(0, 0);
 
         consoleUI.draw();
         EndDrawing();
