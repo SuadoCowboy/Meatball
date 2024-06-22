@@ -31,9 +31,9 @@ namespace Meatball {
 		/// @param uiAllowedCommandsOnly this is used when an interface is active, so that only ui-allowed commands can run
 		static void update(bool uiAllowedCommandsOnly);
 
-		static void bindCommand(HayBCMD::Command*, const std::vector<std::string>& args);
-		static void unBindCommand(HayBCMD::Command*, const std::vector<std::string>& args);
-		static void unBindAllCommand(HayBCMD::Command*, const std::vector<std::string>& args);
+		static void bindCommand(void*, const std::vector<std::string>& args);
+		static void unBindCommand(void*, const std::vector<std::string>& args);
+		static void unBindAllCommand(void*, const std::vector<std::string>& args);
 		
 		static void registerCommands();
 

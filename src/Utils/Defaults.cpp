@@ -197,7 +197,7 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
         Console::print(text.second, text.first);
 
     HayBCMD::Command("clear", 0, 0,
-        [&](HayBCMD::Command*, const std::vector<std::string>&) {
+        [&](void*, const std::vector<std::string>&) {
             consoleUI.outputBox.clearText();}, "- clears the console");
 
     return consoleUI;
