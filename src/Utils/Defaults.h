@@ -7,7 +7,7 @@
 
 #include "ConsoleUI.h"
 
-namespace Meatball { namespace Defaults {
+namespace Meatball::Defaults {
     /// @brief loads all the needed data
     /// @param meatdataPath the path to the .meatdata file
     void init(const std::string& meatdataPath);
@@ -19,4 +19,4 @@ namespace Meatball { namespace Defaults {
     /// @param meatdataPath the path to the .meatdata file
     /// @return ConsoleUIScene since it's not a static class
     ConsoleUIScene initLocalConsole(const Rectangle& rect, const std::string& meatdataPath);
-}}
+}
