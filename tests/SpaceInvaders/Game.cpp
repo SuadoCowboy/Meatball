@@ -1,8 +1,9 @@
-#include <raylib.h>
-
 #include <vector>
 #include <unordered_map>
 #include <cmath>
+#include <chrono>
+
+#include <raylib.h>
 
 #include <HayBCMD.h>
 
@@ -126,11 +127,8 @@ void quit(void*, const std::vector<std::string>&) {
     shouldQuit = true;
 }
 
-void move(void* pStoredData, const std::vector<std::string>&) {
-    Vector2uc* pDir = (Vector2uc*)pStoredData;
-    player.direction.x = pDir->x;
-    player.direction.y = pDir->y;
-}
+// TODO: cooldown should be handled with TPS(Ticks Per Second) System
+//short shootCooldown = 500; // in ms
 
 void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
     HayBCMD::Command("quit", 0, 0, quit,"- closes the window");
@@ -153,7 +151,7 @@ void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
     HayBCMD::Command("-moveright", 0, 0, [](void*, const std::vector<std::string>&){player.direction.x--;},
         "- stops moving right");
 
-    HayBCMD::Command("+fire", 0, 0, [](void*, const std::vector<std::string>&){
+    HayBCMD::Command("+fire", 0, 0, [](void*, const std::vector<std::string>&) {
         bullets.push_back({PLAYER, {player.position.x+entityData[PLAYER].texture.width*0.5f-bulletSize.x*0.5f, player.position.y+bulletSize.y*0.25f}});
     }, "- shoots a bullet");
     
@@ -182,7 +180,7 @@ void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
     Meatball::Input::allowedUiCommands.push_back("quit");
 }
 
-size_t handleBullet(size_t& bulletIdx, const float& dt, Texture2D& backgroundTexture) {
+bool handleBullet(size_t& bulletIdx, const float& dt, Texture2D& backgroundTexture) {
     Rectangle rect = {bullets[bulletIdx].position.x, bullets[bulletIdx].position.y, bulletSize.x, bulletSize.y};
 
     float movement = (bulletSpeed * backgroundTexture.height * dt);
@@ -193,8 +191,7 @@ size_t handleBullet(size_t& bulletIdx, const float& dt, Texture2D& backgroundTex
 
         if (bullets[bulletIdx].position.y > backgroundTexture.height || bullets[bulletIdx].position.y+bulletSize.y < 0) {
             bullets.erase(bullets.begin()+bulletIdx);
-            --bulletIdx;
-            return bulletIdx;
+            return false;
         }
 
         if (bullets[bulletIdx].ownerType == PLAYER) {
@@ -216,16 +213,14 @@ size_t handleBullet(size_t& bulletIdx, const float& dt, Texture2D& backgroundTex
 
             if (hitEnemy) {
                 bullets.erase(bullets.begin()+bulletIdx);
-                --bulletIdx;
-                return bulletIdx;
+                return false;
             }
         }
         else {
             if (CheckCollisionRecs(rect, {player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height})) {
                 player.health -= entityData[bullets[bulletIdx].ownerType].damage;
                 bullets.erase(bullets.begin()+bulletIdx);
-                --bulletIdx;
-                return bulletIdx;
+                return false;
             }
         }
 
@@ -233,7 +228,7 @@ size_t handleBullet(size_t& bulletIdx, const float& dt, Texture2D& backgroundTex
     
     bullets[bulletIdx].position.y = rect.y;
     DrawRectangle(rect.x, rect.y, rect.width, rect.height, entityData[bullets[bulletIdx].ownerType].color);
-    return bulletIdx;
+    return true;
 }
 
 int main(int, char**)
@@ -308,13 +303,25 @@ int main(int, char**)
         [](const std::string& value){player.health = (unsigned char)std::stoi(value);},
         [](){return std::to_string(player.health);}, "");
 
+    HayBCMD::CVARStorage::setCvar("player_speed_x",
+        [](const std::string& value) {player.speed.x = std::stof(value);},
+        [](){
+            return std::to_string(player.speed.x);
+        }, "");
+    
+    HayBCMD::CVARStorage::setCvar("player_speed_y",
+        [](const std::string& value) {player.speed.y = std::stof(value);},
+        [](){
+            return std::to_string(player.speed.y);
+        }, "");
+
     HayBCMD::execConfigFile("data/cfg/autoexec.cfg", Meatball::Console::variables);
     HayBCMD::execConfigFile("data/cfg/config.cfg", Meatball::Console::variables);
 
     enemies = {Enemy({WINDOW_WIDTH*0.5f, WINDOW_HEIGHT*0.5f}, ENEMY_WEAK)};
 
     bulletSize.x = backgroundTexture.width*0.01f;
-    bulletSize.y = backgroundTexture.height*0.02f;
+    bulletSize.y = backgroundTexture.height*0.04f;
 
     while (!shouldQuit) {
         if (IsWindowResized()) {
@@ -334,6 +341,11 @@ int main(int, char**)
             bulletSize.x *= ratio.x;
             bulletSize.y *= ratio.y;
 
+            for (auto& bullet : bullets) {
+                bullet.position.x *= ratio.x;
+                bullet.position.y *= ratio.y;
+            }
+
             for (auto& enemy : enemies) {
                 enemy.position.x *= ratio.x;
                 enemy.position.y *= ratio.y;
@@ -346,6 +358,7 @@ int main(int, char**)
         DrawTexture(backgroundTexture, 0,0, WHITE);
 
         float dt = GetFrameTime();
+
         consoleUI.update();
 
         Meatball::Input::update(consoleUI.visible);
@@ -370,8 +383,9 @@ int main(int, char**)
             enemies[i].draw();
         }
 
-        for (size_t bulletIdx = 0; bulletIdx < bullets.size(); ++bulletIdx) {
-            bulletIdx = handleBullet(bulletIdx, dt, backgroundTexture);
+        for (size_t bulletIdx = 0; bulletIdx < bullets.size();) {
+            if (handleBullet(bulletIdx, dt, backgroundTexture))
+                ++bulletIdx;
         }
 
         DrawFPS(0, 0);
