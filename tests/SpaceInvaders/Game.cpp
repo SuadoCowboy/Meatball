@@ -90,9 +90,9 @@ public:
         health = 100;
     }
 
-    inline void update(float dt) {
-        position.x += (((short)direction.x)-1)*dt*speed.x;
-        position.y += (((short)direction.y)-1)*dt*speed.y;
+    inline void update(float dt, int renderWidth, int renderHeight) {
+        position.x += (((short)direction.x)-1)*dt*speed.x*renderWidth;
+        position.y += (((short)direction.y)-1)*dt*speed.y*renderHeight;
     }
 
     inline void draw() {
@@ -185,7 +185,7 @@ void loadCommands(Meatball::ConsoleUIScene& consoleUI) {
 size_t handleBullet(size_t& bulletIdx, const float& dt, Texture2D& backgroundTexture) {
     Rectangle rect = {bullets[bulletIdx].position.x, bullets[bulletIdx].position.y, bulletSize.x, bulletSize.y};
 
-    float movement = (bulletSpeed * dt);
+    float movement = (bulletSpeed * backgroundTexture.height * dt);
     unsigned int substeps = std::ceil(movement / bulletSize.y);
     float substepMovement = movement/substeps;
     for (unsigned int i = 0; i < substeps; ++i) {
@@ -288,14 +288,14 @@ int main(int, char**)
     backgroundTexture.width = GetRenderWidth();
     backgroundTexture.height = GetRenderHeight();
 
-    player = {{.0f,.0f}, {backgroundTexture.width*0.004f, backgroundTexture.height*0.006f}};
+    player = {{.0f,.0f}, {0.4f, 0.6f}};
     entityData[PLAYER].texture.width = backgroundTexture.width*0.05f;
     entityData[PLAYER].texture.height = backgroundTexture.width*0.05f;
 
     player.position.x = backgroundTexture.width*0.5f-entityData[PLAYER].texture.width*0.5f;
     player.position.y = backgroundTexture.height*0.9f-entityData[PLAYER].texture.height;
 
-    bulletSpeed = backgroundTexture.height*0.006f;
+    bulletSpeed = 0.6f;
 
     HayBCMD::CVARStorage::setCvar("bullet_speed",
         [](const std::string& value){
@@ -331,12 +331,8 @@ int main(int, char**)
             entityData[PLAYER].texture.width *= ratio.x;
             entityData[PLAYER].texture.height *= ratio.y;
 
-            bulletSpeed *= ratio.y;
             bulletSize.x *= ratio.x;
             bulletSize.y *= ratio.y;
-
-            player.speed.x *= ratio.x;
-            player.speed.y *= ratio.y;
 
             for (auto& enemy : enemies) {
                 enemy.position.x *= ratio.x;
@@ -349,7 +345,7 @@ int main(int, char**)
         ClearBackground(BLACK);
         DrawTexture(backgroundTexture, 0,0, WHITE);
 
-        float dt = GetFrameTime()*100;
+        float dt = GetFrameTime();
         consoleUI.update();
 
         Meatball::Input::update(consoleUI.visible);
@@ -359,7 +355,7 @@ int main(int, char**)
 
         BeginDrawing();
 
-        player.update(dt);
+        player.update(dt, backgroundTexture.width, backgroundTexture.height);
         player.draw();
 
         Rectangle playerRect = {player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height};
