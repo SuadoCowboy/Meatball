@@ -47,7 +47,7 @@ Meatball::Config::ConfigData* Meatball::Config::ifContainsGet(std::unordered_map
 
 std::unordered_map<std::string, Meatball::Config::ConfigData*> Meatball::Config::loadData(const std::filesystem::path& path) {
     if (!std::filesystem::exists(path) || std::filesystem::is_directory(path) || path.extension().string() != ".meatdata") {
-        Console::printf(HayBCMD::OutputLevel::ERROR, "could not load data: \"{}\" is not compatible or does not exist\n", path.string());
+        Console::printf(HayBCMD::ERROR, "could not load data: \"{}\" is not compatible or does not exist\n", path.string());
         return {};
     }
 
@@ -103,7 +103,7 @@ std::unordered_map<std::string, Meatball::Config::ConfigData*> Meatball::Config:
         }
 
         else {
-            Console::printf(HayBCMD::OutputLevel::ERROR, "could not load data: missing TYPE in line {}\n", lineIdx);
+            Console::printf(HayBCMD::ERROR, "could not load data: missing TYPE in line {}\n", lineIdx);
             clearData(data);
             return data;
         }
@@ -112,4 +112,58 @@ std::unordered_map<std::string, Meatball::Config::ConfigData*> Meatball::Config:
     }
 
     return data;
+}
+
+bool Meatball::Config::saveData(const std::filesystem::path& path, std::unordered_map<std::string, ConfigData*>& dataMap) {
+    if (std::filesystem::is_directory(path)) {
+        Console::printf(HayBCMD::ERROR, "could not save data because path \"{}\" is a directory", path.string());
+        return false;
+    }
+
+    std::ofstream file(path);
+
+    if (!file) {
+        Console::printf(HayBCMD::ERROR, "could not open file \"{}\"", path.string());
+        return false;
+    }
+
+    std::stringstream out;
+    for (auto& data : dataMap) {
+        out << data.first << " ";
+        switch (data.second->type) {
+        case ConfigType::BOOL:
+            out << "BOOL " << getConfig<bool>(data.second)->value;
+            break;
+        case ConfigType::DOUBLE:
+            out << "DOUBLE " << getConfig<double>(data.second)->value;
+            break;
+        case ConfigType::FLOAT:
+            out << "FLOAT " << getConfig<float>(data.second)->value;
+            break;
+        case ConfigType::INT:
+            out << "INT " << getConfig<int>(data.second)->value;
+            break;
+        case ConfigType::STRING:
+            out << "STRING " << getConfig<std::string>(data.second)->value;
+            break;
+        case ConfigType::UNSIGNED_CHAR:
+            out << "UNSIGNED_CHAR " << getConfig<unsigned char>(data.second)->value;
+            break;
+        case ConfigType::COLOR:
+            Color color = getConfig<Color>(data.second)->value;
+            out << "COLOR "
+                << color.r << ","
+                << color.g << ","
+                << color.b;
+            if (color.a != 255)
+                out << "," << color.a;
+            break;
+        }
+
+        out << "\n";
+    }
+
+    file << out.str();
+
+    return true;
 }

@@ -50,4 +50,7 @@ namespace Meatball::Config {
     /// @return data unless if something went wrong, then returns a empty unordered_map
     /// @warning do not forget to use clearData function to delete data afterwards
     std::unordered_map<std::string, ConfigData*> loadData(const std::filesystem::path& path);
+
+    /// @brief saves data as a meatdata file
+    bool saveData(const std::filesystem::path& path, std::unordered_map<std::string, ConfigData*>& dataMap);
 }
