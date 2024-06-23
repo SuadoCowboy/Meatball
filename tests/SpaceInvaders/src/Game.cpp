@@ -238,7 +238,7 @@ void render(ConsoleUIScene& consoleUI) {
     }
 
     DrawFPS(0, 0);
-    DrawText(HayBCMD::formatString("TPS: {}", tps).c_str(), 0, 25, 25, GREEN);
+    DrawText(HayBCMD::formatString("{} TPS", tps).c_str(), 0, 21, 20, LIME);
     consoleUI.draw();
 
     EndDrawing();
