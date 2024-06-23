@@ -17,7 +17,11 @@
 #include "Bullet.h"
 #include "Enemy.h"
 
-bool shouldQuit = false;
+/*
+shouldQuit = 1,
+saveSettings = 2
+*/
+unsigned char conditionFlags = 0;
 
 using namespace Meatball;
 
@@ -84,8 +88,6 @@ ConsoleUIScene init(int windowWidth, int windowHeight) {
     Input::mapKeyboardKeys();
     Input::mapMouseKeys();
 
-    tickHandler = TickHandler(20);
-
     backgroundTexture = LoadTexture("data/images/background.png");
     backgroundTexture.width = GetRenderWidth();
     backgroundTexture.height = GetRenderHeight();
@@ -98,6 +100,10 @@ ConsoleUIScene init(int windowWidth, int windowHeight) {
     player.position.y = backgroundTexture.height * 0.9f - entityData[PLAYER].texture.height;
 
     bulletSpeed = 0.6f;
+
+    tickHandler = TickHandler(20);
+
+    conditionFlags |= 2;
 
     HayBCMD::CVARStorage::setCvar("bullet_speed",
         [](const std::string& value) {
@@ -132,6 +138,15 @@ ConsoleUIScene init(int windowWidth, int windowHeight) {
         },
         [](){ return std::to_string(1.0f/tickHandler.tickInterval); },
         "tick_rate should be between [0, 255]");
+
+    HayBCMD::CVARStorage::setCvar("save_settings",
+        [](const std::string& str) {
+            bool value = (bool)std::stoi(str);
+            if (value) conditionFlags |= 2;
+            else conditionFlags &= ~2;
+        },
+        [](){ return std::to_string((bool)(conditionFlags & 2)); },
+        "if should save the changed settings in .meatdata");
 
     HayBCMD::execConfigFile("data/cfg/autoexec.cfg", Console::variables);
     HayBCMD::execConfigFile("data/cfg/config.cfg", Console::variables);
@@ -179,7 +194,6 @@ unsigned char ticks = 0;
 float secondCount = 0.0f; // dt + dt + dt + dt + ... = 1.0f = 1 second passed
 
 void render(ConsoleUIScene& consoleUI) {
-    ClearBackground(BLACK);
     DrawTexture(backgroundTexture, 0, 0, WHITE);
 
     float dt = GetFrameTime();
@@ -191,15 +205,14 @@ void render(ConsoleUIScene& consoleUI) {
         if (secondCount >= 1.0f) {
             tps = ticks;
             ticks = 0;
-            secondCount = 0.0f;
+            secondCount -= 1.0f;
         }
     }
-    DrawText(HayBCMD::formatString("TPS: {}", tps).c_str(), 0, 25, 25, GREEN);
 
     consoleUI.update();
     Input::update(consoleUI.visible);
     HayBCMD::handleLoopAliasesRunning(Console::variables);
-    if (WindowShouldClose()) shouldQuit = true;
+    if (WindowShouldClose()) conditionFlags |= 1;
 
     player.update(dt, backgroundTexture.width, backgroundTexture.height);
 
@@ -225,9 +238,25 @@ void render(ConsoleUIScene& consoleUI) {
     }
 
     DrawFPS(0, 0);
+    DrawText(HayBCMD::formatString("TPS: {}", tps).c_str(), 0, 25, 25, GREEN);
     consoleUI.draw();
 
     EndDrawing();
+}
+
+void save(const std::string& path) {
+    if (!(conditionFlags & 2)) return;
+
+    std::unordered_map<std::string, Meatball::Config::ConfigData*> dataMap;
+
+    dataMap["windowWidth"] = new Meatball::Config::ConfigTypeData(GetScreenWidth());
+    dataMap["windowWidth"]->type = Meatball::Config::ConfigType::INT;
+
+    dataMap["windowHeight"] = new Meatball::Config::ConfigTypeData(GetScreenHeight());
+    dataMap["windowHeight"]->type = Meatball::Config::ConfigType::INT;
+
+    Meatball::Config::saveData(path, dataMap);
+    Meatball::Config::clearData(dataMap);
 }
 
 void cleanup() {
@@ -236,7 +265,7 @@ void cleanup() {
 }
 
 void loadCommands(ConsoleUIScene& consoleUI) {
-    HayBCMD::Command("quit", 0, 0, [](void*, const std::vector<std::string>&){ shouldQuit = true; }, "- closes the window");
+    HayBCMD::Command("quit", 0, 0, [](void*, const std::vector<std::string>&){ conditionFlags |= 1; }, "- closes the window");
     HayBCMD::Command("+moveup", 0, 0, [](void*, const std::vector<std::string>&) { player.direction.y--; },
         "- moves up");
     HayBCMD::Command("+movedown", 0, 0, [](void*, const std::vector<std::string>&) { player.direction.y++; },

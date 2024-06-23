@@ -65,24 +65,13 @@ Meatball::ConsoleUIScene loadSettingsAndInit() {
 int main(int, char**) {
     auto consoleUI = loadSettingsAndInit();
 
-    while (!shouldQuit) {
+    while (!(conditionFlags & 1)) {
         if (IsWindowResized())
             resize(consoleUI);
 
         render(consoleUI);
     }
 
-    std::unordered_map<std::string, Meatball::Config::ConfigData*> dataMap;
-
-    dataMap["windowWidth"] = new Meatball::Config::ConfigTypeData(GetScreenWidth());
-    dataMap["windowWidth"]->type = Meatball::Config::ConfigType::INT;
-
-    dataMap["windowHeight"] = new Meatball::Config::ConfigTypeData(GetScreenHeight());
-    dataMap["windowHeight"]->type = Meatball::Config::ConfigType::INT;
-
-    Meatball::Config::saveData(SETTINGS_PATH, dataMap);
-
-    Meatball::Config::clearData(dataMap);
-
+    save(SETTINGS_PATH);
     cleanup();
 }
