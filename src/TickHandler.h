@@ -4,14 +4,14 @@ namespace Meatball {
     class TickHandler {
     public:
         TickHandler();
-        TickHandler(unsigned char tickRate);
+        TickHandler(float tickRate);
+
+        void update(const float& dt);
+        bool shouldTick();
+        
+        float tickInterval = 1.0f;
     
-        bool shouldTick(const float& dt);
-    
-        unsigned short getTickInterval();
-        void setTickRate(unsigned char tickRate);
     private:
-        unsigned short tickInterval = 1000;
-        unsigned short delta = 0; // time passed since last tick
+        float delta = 0.0f; // time passed since last tick
     };
 }
