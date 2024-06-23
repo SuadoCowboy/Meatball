@@ -1,18 +1,88 @@
+#include <unordered_map>
+#include <string>
+#include <vector>
+
+#include <HayBCMD.h>
+
+#include <Console.h>
+#include <Config.h>
+
 #include "Game.h"
 
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
+#define SETTINGS_PATH "data/meatdata/Settings.meatdata"
+#define DEFAULT_WINDOW_WIDTH 1280
+#define DEFAULT_WINDOW_HEIGHT 720
+
+Meatball::ConsoleUIScene loadSettingsAndInit() {
+    Meatball::ConsoleUIScene consoleUI = init(
+        DEFAULT_WINDOW_WIDTH,
+        DEFAULT_WINDOW_HEIGHT);
+    
+    auto dataMap = Meatball::Config::loadData(SETTINGS_PATH);
+
+    bool shouldRecreateFile = dataMap.size() == 0;
+    if (!shouldRecreateFile) {
+        std::vector<std::pair<std::string, Meatball::Config::ConfigType>> defaultDataVector = {
+            {"windowWidth", Meatball::Config::ConfigType::INT},
+            {"windowHeight", Meatball::Config::ConfigType::INT}
+        };
+
+        for (auto& data : defaultDataVector)
+            if (dataMap.count(data.first) == 0 || dataMap[data.first]->type != data.second) {
+                shouldRecreateFile = true;
+                break;
+            }
+    }
+
+    if (shouldRecreateFile) {
+        Meatball::Console::printf(HayBCMD::WARNING, "\"{}\" not found or corrupt. Creating one\n", SETTINGS_PATH);
+        
+        dataMap["windowWidth"] = new Meatball::Config::ConfigTypeData(DEFAULT_WINDOW_WIDTH);
+        dataMap["windowWidth"]->type = Meatball::Config::ConfigType::INT;
+
+        dataMap["windowHeight"] = new Meatball::Config::ConfigTypeData(DEFAULT_WINDOW_HEIGHT);
+        dataMap["windowHeight"]->type = Meatball::Config::ConfigType::INT;
+        
+        Meatball::Config::saveData(SETTINGS_PATH, dataMap);
+    }
+
+    int windowWidth = Meatball::Config::getConfig<int>(dataMap["windowWidth"])->value;
+    int windowHeight = Meatball::Config::getConfig<int>(dataMap["windowHeight"])->value;
+
+    if (windowWidth != GetScreenWidth() || windowHeight != GetScreenHeight()) {
+        SetWindowSize(windowWidth, windowHeight);
+    
+        resize(consoleUI);
+        reloadFonts(consoleUI);
+    }
+    
+
+    Meatball::Config::clearData(dataMap);
+
+    return consoleUI;
+}
 
 int main(int, char**) {
-    auto consoleUI = init(WINDOW_WIDTH, WINDOW_HEIGHT);
+    auto consoleUI = loadSettingsAndInit();
 
     while (!shouldQuit) {
-        if (IsWindowResized()) {
+        if (IsWindowResized())
             resize(consoleUI);
-        }
-        
+
         render(consoleUI);
     }
+
+    std::unordered_map<std::string, Meatball::Config::ConfigData*> dataMap;
+
+    dataMap["windowWidth"] = new Meatball::Config::ConfigTypeData(GetScreenWidth());
+    dataMap["windowWidth"]->type = Meatball::Config::ConfigType::INT;
+
+    dataMap["windowHeight"] = new Meatball::Config::ConfigTypeData(GetScreenHeight());
+    dataMap["windowHeight"]->type = Meatball::Config::ConfigType::INT;
+
+    Meatball::Config::saveData(SETTINGS_PATH, dataMap);
+
+    Meatball::Config::clearData(dataMap);
 
     cleanup();
 }
