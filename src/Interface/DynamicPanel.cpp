@@ -18,7 +18,7 @@ void Meatball::DynamicPanel::update() {
     Vector2 mousePos = GetMousePosition();
     
     /*
-    conditions:
+    conditionFlags:
     1 = dragging
     2 = resizing
     4 = resizingFromN
@@ -26,24 +26,24 @@ void Meatball::DynamicPanel::update() {
     16 = hovered
     */
 
-    if ((!(conditions & 1) && !(conditions & 2) && !CheckCollisionPointRec(mousePos, {rect.x, rect.y, rect.width, rect.height})) || !IsWindowFocused()) {
-        if (conditions & 16) {
+    if ((!(conditionFlags & 1) && !(conditionFlags & 2) && !CheckCollisionPointRec(mousePos, {rect.x, rect.y, rect.width, rect.height})) || !IsWindowFocused()) {
+        if (conditionFlags & 16) {
             // what if two dynamic panels intersects? TODO: test this case
             resetCursor(MouseCursorPriorityLevel::DYNAMIC_PANEL);
-            conditions &= ~16;
+            conditionFlags &= ~16;
         }
         return;
     }
     
-    conditions |= 16;
+    conditionFlags |= 16;
 
-    if (!(conditions & 1) && !(conditions & 2)) {
+    if (!(conditionFlags & 1) && !(conditionFlags & 2)) {
     
     if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y+2, rect.width-4, config->grabHeight})) {
         setCursor(MOUSE_CURSOR_POINTING_HAND, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.y};
-            conditions |= 1;
+            conditionFlags |= 1;
         }
     }
 
@@ -52,8 +52,8 @@ void Meatball::DynamicPanel::update() {
         setCursor(MOUSE_CURSOR_RESIZE_NS, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {-1, GetMouseY()-rect.y};
-            conditions |= 2;
-            conditions |= 4;
+            conditionFlags |= 2;
+            conditionFlags |= 4;
         }
     }
 
@@ -62,8 +62,8 @@ void Meatball::DynamicPanel::update() {
         setCursor(MOUSE_CURSOR_RESIZE_EW, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, -1};
-            conditions |= 2;
-            conditions |= 8;
+            conditionFlags |= 2;
+            conditionFlags |= 8;
         }
     }
 
@@ -72,7 +72,7 @@ void Meatball::DynamicPanel::update() {
         setCursor(MOUSE_CURSOR_RESIZE_NS, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {-1, GetMouseY()-rect.height};
-            conditions |= 2;
+            conditionFlags |= 2;
         }
     }
 
@@ -81,7 +81,7 @@ void Meatball::DynamicPanel::update() {
         setCursor(MOUSE_CURSOR_RESIZE_EW, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.width, -1};
-            conditions |= 2;
+            conditionFlags |= 2;
         }
     }
 
@@ -90,8 +90,8 @@ void Meatball::DynamicPanel::update() {
         setCursor(MOUSE_CURSOR_RESIZE_NESW, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.height};
-            conditions |= 2;
-            conditions |= 8;
+            conditionFlags |= 2;
+            conditionFlags |= 8;
         }
     }
     
@@ -100,9 +100,9 @@ void Meatball::DynamicPanel::update() {
         setCursor(MOUSE_CURSOR_RESIZE_NWSE, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.y};
-            conditions |= 2;
-            conditions |= 4;
-            conditions |= 8;
+            conditionFlags |= 2;
+            conditionFlags |= 4;
+            conditionFlags |= 8;
         }
     }
 
@@ -111,8 +111,8 @@ void Meatball::DynamicPanel::update() {
         setCursor(MOUSE_CURSOR_RESIZE_NESW, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.width, GetMouseY()-rect.y};
-            conditions |= 2;
-            conditions |= 4;
+            conditionFlags |= 2;
+            conditionFlags |= 4;
         }
     }
 
@@ -121,7 +121,7 @@ void Meatball::DynamicPanel::update() {
         setCursor(MOUSE_CURSOR_RESIZE_NWSE, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.width, GetMouseY()-rect.height};
-            conditions |= 2;
+            conditionFlags |= 2;
         }
     }
     else
@@ -129,17 +129,17 @@ void Meatball::DynamicPanel::update() {
     } // if (!resizing && !dragging)
 
     if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-        conditions &= ~1;
-        if (onResizeStop && (conditions & 2)) onResizeStop();
-        conditions &= ~2;
-        conditions &= ~4;
-        conditions &= ~8;
+        conditionFlags &= ~1;
+        if (onResizeStop && (conditionFlags & 2)) onResizeStop();
+        conditionFlags &= ~2;
+        conditionFlags &= ~4;
+        conditionFlags &= ~8;
     }
 
     Vector2 minPos{6-rect.width, 0};
     Vector2 maxPos{6, 6};
 
-    if (conditions & 1) {
+    if (conditionFlags & 1) {
         float oldX = rect.x;
         float oldY = rect.y;
         rect.x = mousePos.x-offset.x;
@@ -149,14 +149,14 @@ void Meatball::DynamicPanel::update() {
 
         if (onMove && (rect.x != oldX || oldY != rect.y)) onMove();
     
-    } else if (conditions & 2) {
+    } else if (conditionFlags & 2) {
         float oldX = rect.x;
         float oldY = rect.y;
         float oldWidth = rect.width;
         float oldHeight = rect.height;
 
         if (offset.x != -1) {
-            if (conditions & 8) {
+            if (conditionFlags & 8) {
                 rect.x = mousePos.x-offset.x;
                 
                 if (rect.width-rect.x+oldX > config->minSize.x)
@@ -170,7 +170,7 @@ void Meatball::DynamicPanel::update() {
         }
         
         if (offset.y != -1 && mousePos.y > minPos.y) {
-            if (conditions & 4) {
+            if (conditionFlags & 4) {
                 rect.y = mousePos.y-offset.y;
 
                 if (rect.height-rect.y+oldY > config->minSize.y)
@@ -194,5 +194,5 @@ void Meatball::DynamicPanel::update() {
 }
 
 bool Meatball::DynamicPanel::isAnyConditionActive() {
-    return conditions == 0? false : true;
+    return conditionFlags == 0? false : true;
 }
