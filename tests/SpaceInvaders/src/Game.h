@@ -5,6 +5,8 @@
 #include <ConsoleUI.h>
 
 Meatball::ConsoleUIScene init(int windowWidth, int windowHeight);
+
+void reloadFonts(Meatball::ConsoleUIScene& consoleUI);
 void resize(Meatball::ConsoleUIScene& consoleUI);
 /// @brief also updates
 void render(Meatball::ConsoleUIScene& consoleUI);
