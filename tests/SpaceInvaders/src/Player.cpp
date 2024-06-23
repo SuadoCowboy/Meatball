@@ -11,9 +11,9 @@ Player::Player(const Vector2& position, const Vector2& speed) : position(positio
     health = 100;
 }
 
-void Player::update(float dt, int renderWidth, int renderHeight) {
-    position.x += (((short)direction.x) - 1) * dt * speed.x * renderWidth;
-    position.y += (((short)direction.y) - 1) * dt * speed.y * renderHeight;
+void Player::update(int renderWidth, int renderHeight) {
+    position.x += (((short)direction.x) - 1) * speed.x * renderWidth;
+    position.y += (((short)direction.y) - 1) * speed.y * renderHeight;
 }
 
 void Player::draw() {

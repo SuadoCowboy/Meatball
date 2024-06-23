@@ -92,14 +92,14 @@ ConsoleUIScene init(int windowWidth, int windowHeight) {
     backgroundTexture.width = GetRenderWidth();
     backgroundTexture.height = GetRenderHeight();
 
-    player = {{.0f, .0f}, {0.4f, 0.6f}};
+    player = {{.0f, .0f}, {0.02f, 0.04f}};
     entityData[PLAYER].texture.width = backgroundTexture.width * 0.05f;
     entityData[PLAYER].texture.height = backgroundTexture.width * 0.05f;
 
     player.position.x = backgroundTexture.width * 0.5f - entityData[PLAYER].texture.width * 0.5f;
     player.position.y = backgroundTexture.height * 0.9f - entityData[PLAYER].texture.height;
 
-    bulletSpeed = 0.6f;
+    bulletSpeed = 0.02f;
 
     tickHandler = TickHandler(20);
 
@@ -194,10 +194,16 @@ unsigned char ticks = 0;
 float secondCount = 0.0f; // dt + dt + dt + dt + ... = 1.0f = 1 second passed
 
 void render(ConsoleUIScene& consoleUI) {
+    BeginDrawing();
     DrawTexture(backgroundTexture, 0, 0, WHITE);
 
     float dt = GetFrameTime();
     secondCount += dt;
+
+    consoleUI.update();
+    Input::update(consoleUI.visible);
+    HayBCMD::handleLoopAliasesRunning(Console::variables);
+    if (WindowShouldClose()) conditionFlags |= 1;
 
     tickHandler.update(dt);
     while (tickHandler.shouldTick()) {
@@ -207,35 +213,31 @@ void render(ConsoleUIScene& consoleUI) {
             ticks = 0;
             secondCount -= 1.0f;
         }
-    }
 
-    consoleUI.update();
-    Input::update(consoleUI.visible);
-    HayBCMD::handleLoopAliasesRunning(Console::variables);
-    if (WindowShouldClose()) conditionFlags |= 1;
+        player.update(backgroundTexture.width, backgroundTexture.height);
 
-    player.update(dt, backgroundTexture.width, backgroundTexture.height);
-
-    BeginDrawing();
-
-    player.draw();
-
-    Rectangle playerRect = { player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height };
-    for (size_t i = 0; i < enemies.size(); ++i) {
-        if (CheckCollisionRecs(playerRect, { enemies[i].position.x, enemies[i].position.y, (float)entityData[enemies[i].type].texture.width, (float)entityData[enemies[i].type].texture.height })) {
-            player.health -= enemies[i].health;
-            enemies.erase(enemies.begin() + i);
-            --i;
-            continue;
+        Rectangle playerRect = { player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height };
+        for (size_t i = 0; i < enemies.size(); ++i) {
+            if (CheckCollisionRecs(playerRect, { enemies[i].position.x, enemies[i].position.y, (float)entityData[enemies[i].type].texture.width, (float)entityData[enemies[i].type].texture.height })) {
+                player.health -= enemies[i].health;
+                enemies.erase(enemies.begin() + i);
+                --i;
+                continue;
+            }
         }
 
-        enemies[i].draw();
+        for (size_t bulletIdx = 0; bulletIdx < bullets.size();)
+            if (handleBullet(bulletIdx))
+                ++bulletIdx;
     }
+    
+    player.draw();
 
-    for (size_t bulletIdx = 0; bulletIdx < bullets.size();) {
-        if (handleBullet(bulletIdx, dt))
-            ++bulletIdx;
-    }
+    for (auto& enemy : enemies)
+        enemy.draw();
+
+    for (auto& bullet : bullets)
+        DrawRectangle(bullet.position.x, bullet.position.y, bulletSize.x, bulletSize.y, entityData[bullet.ownerType].color);
 
     DrawFPS(0, 0);
     DrawText(HayBCMD::formatString("{} TPS", tps).c_str(), 0, 21, 20, LIME);
@@ -304,9 +306,9 @@ void loadCommands(ConsoleUIScene& consoleUI) {
     Input::allowedUiCommands.push_back("quit");
 }
 
-bool handleBullet(size_t& bulletIdx, const float& dt) {
+bool handleBullet(size_t& bulletIdx) {
     Rectangle rect = { bullets[bulletIdx].position.x, bullets[bulletIdx].position.y, bulletSize.x, bulletSize.y };
-    float movement = (bulletSpeed * backgroundTexture.height * dt);
+    float movement = (bulletSpeed * backgroundTexture.height);
     
     unsigned int substeps = std::ceil(movement / bulletSize.y);
     float substepMovement = movement / substeps;
@@ -347,10 +349,8 @@ bool handleBullet(size_t& bulletIdx, const float& dt) {
                 return false;
             }
         }
-
     }
 
     bullets[bulletIdx].position.y = rect.y;
-    DrawRectangle(rect.x, rect.y, rect.width, rect.height, entityData[bullets[bulletIdx].ownerType].color);
     return true;
 }

@@ -8,7 +8,7 @@ class Player {
 public:
     Player();
     Player(const Vector2& position, const Vector2& speed);
-    void update(float dt, int renderWidth, int renderHeight);
+    void update(int renderWidth, int renderHeight);
     void draw();
     
     Vector2 position;
