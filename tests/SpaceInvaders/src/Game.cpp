@@ -10,6 +10,7 @@
 #include <MouseCursor.h>
 #include <Input.h>
 #include <Config.h>
+#include <TickHandler.h>
 
 #include "Entity.h"
 #include "Player.h"
@@ -21,6 +22,8 @@ bool shouldQuit = false;
 using namespace Meatball;
 
 Texture2D backgroundTexture;
+
+TickHandler tickHandler;
 
 void reloadFonts(ConsoleUIScene& consoleUI) {
     FontsHandler::clear();
@@ -81,6 +84,8 @@ ConsoleUIScene init(int windowWidth, int windowHeight) {
     Input::mapKeyboardKeys();
     Input::mapMouseKeys();
 
+    tickHandler = TickHandler(20);
+
     backgroundTexture = LoadTexture("data/images/background.png");
     backgroundTexture.width = GetRenderWidth();
     backgroundTexture.height = GetRenderHeight();
@@ -116,6 +121,17 @@ ConsoleUIScene init(int windowWidth, int windowHeight) {
         []() {
             return std::to_string(player.speed.y);
         }, "");
+
+    HayBCMD::CVARStorage::setCvar("tick_rate",
+        [](const std::string& str) {
+            float value = std::stof(str);
+            
+            if (value <= 0.0f) return;
+            
+            tickHandler.tickInterval = 1.0f / value;
+        },
+        [](){ return std::to_string(1.0f/tickHandler.tickInterval); },
+        "tick_rate should be between [0, 255]");
 
     HayBCMD::execConfigFile("data/cfg/autoexec.cfg", Console::variables);
     HayBCMD::execConfigFile("data/cfg/config.cfg", Console::variables);
@@ -158,11 +174,27 @@ void resize(ConsoleUIScene& consoleUI) {
     }
 }
 
+unsigned short tps = 0;
+unsigned char ticks = 0;
+float secondCount = 0.0f; // dt + dt + dt + dt + ... = 1.0f = 1 second passed
+
 void render(ConsoleUIScene& consoleUI) {
     ClearBackground(BLACK);
     DrawTexture(backgroundTexture, 0, 0, WHITE);
 
     float dt = GetFrameTime();
+    secondCount += dt;
+
+    tickHandler.update(dt);
+    while (tickHandler.shouldTick()) {
+        ticks++;
+        if (secondCount >= 1.0f) {
+            tps = ticks;
+            ticks = 0;
+            secondCount = 0.0f;
+        }
+    }
+    DrawText(HayBCMD::formatString("TPS: {}", tps).c_str(), 0, 25, 25, GREEN);
 
     consoleUI.update();
     Input::update(consoleUI.visible);
