@@ -114,7 +114,7 @@ void Meatball::Defaults::loadConsoleFonts(ConsoleUIScene& consoleUI, const std::
 
 Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& rect, const std::string &meatdataPath) {
     std::vector<std::pair<std::string, HayBCMD::OutputLevel>> texts;
-    HayBCMD::Output::setPrintFunction([&](const HayBCMD::OutputLevel &level, const std::string &text) {
+    HayBCMD::Output::setPrintFunction([&texts](const HayBCMD::OutputLevel &level, const std::string &text) {
         texts.push_back({text, level});
     });
     
@@ -178,7 +178,7 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
 
     Config::clearData(consoleData);
 
-    Console::init([&](const HayBCMD::OutputLevel &level, const std::string &text) {
+    Console::init([&consoleUI](const HayBCMD::OutputLevel &level, const std::string &text) {
         size_t spaceIdxBefore = 0;
         size_t currentSpaceIdx = text.find('\n');
         
