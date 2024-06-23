@@ -1,9 +1,9 @@
 #pragma once
 
-namespace Meatball::Time {
-    class Tick {
+namespace Meatball {
+    class TickHandler {
     public:
-        Tick(unsigned char tickRate);
+        TickHandler(unsigned char tickRate);
     
         bool shouldTick(const float& dt);
     

@@ -1,9 +1,9 @@
-#include "TimeSystem.h"
+#include "TickHandler.h"
 
-Meatball::Time::Tick::Tick(unsigned char tickRate)
+Meatball::TickHandler::TickHandler(unsigned char tickRate)
     : tickInterval((1.0f / (float)tickRate)*1000) {}
 
-bool Meatball::Time::Tick::shouldTick(const float& dt) {
+bool Meatball::TickHandler::shouldTick(const float& dt) {
     delta += dt;
     if (delta >= tickInterval) {
         delta = 0;
