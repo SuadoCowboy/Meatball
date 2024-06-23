@@ -43,11 +43,13 @@ namespace Meatball {
     private:
         Vector2 offset = {0,0}; // this is used for dragging and resizing
 
+        /*
+        dragging = 1
+        resizing = 2
+        resizingFromN = 4
+        resizingFromW = 8
+        hovered = 16
+        */
         unsigned char conditionFlags = 0;
-        // dragging = 1
-        // resizing = 2
-        // resizingFromN = 4
-        // resizingFromW = 8
-        // hovered = 16
     };
 }
