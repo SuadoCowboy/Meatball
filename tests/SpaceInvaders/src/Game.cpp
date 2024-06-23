@@ -22,6 +22,19 @@ using namespace Meatball;
 
 Texture2D backgroundTexture;
 
+void reloadFonts(ConsoleUIScene& consoleUI) {
+    FontsHandler::clear();
+    FontsHandler::add(0, GetFontDefault());
+
+    auto consoleData = Config::loadData("data/meatdata/Console.meatdata");
+
+    auto data = Config::ifContainsGet(consoleData, "font");
+    std::string path;
+    if (data) Defaults::loadConsoleFonts(consoleUI, ((Config::ConfigTypeData<std::string>*)data)->value);
+
+    Config::clearData(consoleData);
+}
+
 ConsoleUIScene init(int windowWidth, int windowHeight) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(windowWidth, windowHeight, "Console Build In Progress");
@@ -217,16 +230,7 @@ void loadCommands(ConsoleUIScene& consoleUI) {
     Console::variables["-fire"] = " ";
 
     HayBCMD::Command("reload_fonts", 0, 0, [&](void*, const std::vector<std::string>&) {
-        FontsHandler::clear();
-        FontsHandler::add(0, GetFontDefault());
-
-        auto consoleData = Config::loadData("data/meatdata/Console.meatdata");
-
-        auto data = Config::ifContainsGet(consoleData, "font");
-        std::string path;
-        if (data) Defaults::loadConsoleFonts(consoleUI, ((Config::ConfigTypeData<std::string>*)data)->value);
-
-        Config::clearData(consoleData);
+        reloadFonts(consoleUI);
     }, "- reloads all text fonts.");
 
     HayBCMD::Command("toggle_local_console", 0, 0, [&](void*, const std::vector<std::string>&) {
