@@ -2,10 +2,11 @@
 - because sizeof(Color) is below 16(which is shared_ptr size), it's better cloning it or using a reference than actually using a pointer or shared_ptr.
 
 # TODOS
-- Make meatdata better with variables, comments and default color definitions
-
 - Test multiple dynamic panels together
 
+- Create tasks system, the console commands will run through tasks and then the players will be able to use the wait command(also add wait_ticks which waits ticks instead of milliseconds)
+
+# FUTURE TODOS:
 - The UI with Lua thing
 
 # User Interface with Lua
@@ -43,13 +44,8 @@ if a required objectName is not defined in the end: tell user and stop running
 ]]--
 ```
 
-- Create tasks system, the console commands will run through tasks and then the players will be able to use the wait command(also add wait_ticks which waits ticks instead of milliseconds)
-
-# FUTURE TODOS:
-- optimize code and use the right data structures;
 - use threads with locks, atomic and mutex;
-- every data structure that is needed in alot of places should be shared_ptr;
-- update function descriptions and anything else related to reading;
+- optimize code and use the right data structures;
 
 # THINKING:
 - The developers could make their draw functions instead of the classes drawing, because then they could use the same classes but with different styles whether they want. All that the classes could make is giving specific drawing functions for stuff that requires a complexity level or private/protected-access.
