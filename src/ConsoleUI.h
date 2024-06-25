@@ -41,9 +41,10 @@ namespace Meatball {
 
     class ConsoleUIScene : public Scene {
     public:
-
         /// @param visible if scene is visible or not(only this class uses this)
-        ConsoleUIScene(const Rectangle &rect, const std::shared_ptr<Config::ConsoleUI> &config, bool visible = true);
+        ConsoleUIScene(const Rectangle &rect, const std::shared_ptr<Config::ConsoleUI> &config, bool visible = false);
+
+        virtual ~ConsoleUIScene() {};
 
         /// @brief appends text to outputTextbox
         void print(const HayBCMD::OutputLevel &level, const std::string &text) {
