@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include <thread>
 
 #include <HayBCMD.h>
 
@@ -13,8 +14,8 @@
 #define DEFAULT_WINDOW_WIDTH 1280
 #define DEFAULT_WINDOW_HEIGHT 720
 
-Meatball::ConsoleUIScene loadSettingsAndInit() {
-    Meatball::ConsoleUIScene consoleUI = init(
+void loadSettingsAndInit() {
+    init(
         DEFAULT_WINDOW_WIDTH,
         DEFAULT_WINDOW_HEIGHT);
     
@@ -52,26 +53,24 @@ Meatball::ConsoleUIScene loadSettingsAndInit() {
     if (windowWidth != GetScreenWidth() || windowHeight != GetScreenHeight()) {
         SetWindowSize(windowWidth, windowHeight);
     
-        resize(consoleUI);
-        reloadFonts(consoleUI);
+        resize();
+        reloadFonts();
     }
     
 
     Meatball::Config::clearData(dataMap);
-
-    return consoleUI;
 }
 
 int main(int, char**) {
-    auto consoleUI = loadSettingsAndInit();
+    loadSettingsAndInit();
 
+    std::thread updateThread(update);
     while (!(conditionFlags & 1)) {
-        if (IsWindowResized())
-            resize(consoleUI);
-
-        render(consoleUI);
+        render();
     }
 
     save(SETTINGS_PATH);
     cleanup();
+
+    delete consoleUI;
 }
