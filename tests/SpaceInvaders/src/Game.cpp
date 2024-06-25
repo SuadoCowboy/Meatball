@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <thread>
+#include <chrono>
 
 #include <Console.h>
 #include <Utils/Defaults.h>
@@ -17,19 +19,24 @@
 #include "Bullet.h"
 #include "Enemy.h"
 
+using namespace Meatball;
+
+Meatball::ConsoleUIScene* consoleUI = nullptr;
+std::mutex gameMutex;
+
+Texture2D backgroundTexture;
+
 /*
 shouldQuit = 1,
 saveSettings = 2
 */
 unsigned char conditionFlags = 0;
 
-using namespace Meatball;
-
-Texture2D backgroundTexture;
-
 TickHandler tickHandler;
 
-void reloadFonts(ConsoleUIScene& consoleUI) {
+void reloadFonts() {
+    std::lock_guard<std::mutex> lock(gameMutex);
+
     FontsHandler::clear();
     FontsHandler::add(0, GetFontDefault());
 
@@ -37,14 +44,14 @@ void reloadFonts(ConsoleUIScene& consoleUI) {
 
     auto data = Config::ifContainsGet(consoleData, "font");
     std::string path;
-    if (data) Defaults::loadConsoleFonts(consoleUI, ((Config::ConfigTypeData<std::string>*)data)->value);
+    if (data) Defaults::loadConsoleFonts(*consoleUI, ((Config::ConfigTypeData<std::string>*)data)->value);
 
     Config::clearData(consoleData);
 }
 
-ConsoleUIScene init(int windowWidth, int windowHeight) {
+void init(int windowWidth, int windowHeight) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(windowWidth, windowHeight, "Console Build In Progress");
+    InitWindow(windowWidth, windowHeight, "Space Invaders");
     SetExitKey(KEY_NULL); // disable exit key
 
     SetWindowMinSize(windowWidth * 0.5, windowHeight * 0.5);
@@ -57,11 +64,12 @@ ConsoleUIScene init(int windowWidth, int windowHeight) {
     consoleUIRect.x = windowWidth * 0.5f - consoleUIRect.width * 0.5;
     consoleUIRect.y = windowHeight * 0.5f - consoleUIRect.height * 0.5;
 
-    auto consoleUI = Defaults::initLocalConsole(
+    if (consoleUI != nullptr) delete consoleUI;
+    consoleUI = new ConsoleUIScene(Defaults::initLocalConsole(
         consoleUIRect,
-        "data/meatdata/Console.meatdata");
+        "data/meatdata/Console.meatdata"));
 
-    consoleUI.visible = false;
+    consoleUI->visible = false;
 
     entityData[PLAYER] = {10, 90, {255, 255, 0, 255}, LoadTexture("data/images/player.png")};
     entityData[ENEMY_WEAK] = {10, 30, {0, 0, 255, 255}, LoadTexture("data/images/enemy0.png")};
@@ -83,7 +91,7 @@ ConsoleUIScene init(int windowWidth, int windowHeight) {
 
     Config::clearData(dataMap);
 
-    loadCommands(consoleUI);
+    loadCommands();
     Input::registerCommands();
     Input::mapKeyboardKeys();
     Input::mapMouseKeys();
@@ -106,14 +114,14 @@ ConsoleUIScene init(int windowWidth, int windowHeight) {
     conditionFlags |= 2;
 
     HayBCMD::CVARStorage::setCvar("bullet_speed",
-        [](const std::string& value) {
-            bulletSpeed = std::stof(value);
-            if (bulletSpeed < 0.0f)
-                bulletSpeed = 0.0f;
+        [](const std::string& str) {
+            float value = std::stof(str);
+            if (value < 0.0f) return;
+            bulletSpeed = value;
         },
         []() { return std::to_string(bulletSpeed); }, "");
     HayBCMD::CVARStorage::setCvar("player_health",
-        [](const std::string& value) { player.health = (unsigned char)std::stoi(value); },
+        [](const std::string& value) { player.health = (short)std::stoi(value); },
         []() { return std::to_string(player.health); }, "");
 
     HayBCMD::CVARStorage::setCvar("player_speed_x",
@@ -155,15 +163,15 @@ ConsoleUIScene init(int windowWidth, int windowHeight) {
 
     bulletSize.x = backgroundTexture.width * 0.01f;
     bulletSize.y = backgroundTexture.height * 0.04f;
-
-    return consoleUI;
 }
 
-void resize(ConsoleUIScene& consoleUI) {
+void resize() {
+    std::lock_guard<std::mutex> lock(gameMutex);
+
     int newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
     Vector2 ratio = { (float)newScreenWidth / backgroundTexture.width, (float)newScreenHeight / backgroundTexture.height };
 
-    consoleUI.onResize(ratio.x, ratio.y);
+    consoleUI->onResize(ratio.x, ratio.y);
 
     backgroundTexture.width = newScreenWidth;
     backgroundTexture.height = newScreenHeight;
@@ -193,44 +201,71 @@ unsigned short tps = 0;
 unsigned char ticks = 0;
 float secondCount = 0.0f; // dt + dt + dt + dt + ... = 1.0f = 1 second passed
 
-void render(ConsoleUIScene& consoleUI) {
-    BeginDrawing();
-    DrawTexture(backgroundTexture, 0, 0, WHITE);
-
-    float dt = GetFrameTime();
-    secondCount += dt;
-
-    consoleUI.update();
-    Input::update(consoleUI.visible);
-    HayBCMD::handleLoopAliasesRunning(Console::variables);
-    if (WindowShouldClose()) conditionFlags |= 1;
-
-    tickHandler.update(dt);
-    while (tickHandler.shouldTick()) {
-        ticks++;
-        if (secondCount >= 1.0f) {
-            tps = ticks;
-            ticks = 0;
-            secondCount -= 1.0f;
-        }
-
-        player.update(backgroundTexture.width, backgroundTexture.height);
-
-        Rectangle playerRect = { player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height };
-        for (size_t i = 0; i < enemies.size(); ++i) {
-            if (CheckCollisionRecs(playerRect, { enemies[i].position.x, enemies[i].position.y, (float)entityData[enemies[i].type].texture.width, (float)entityData[enemies[i].type].texture.height })) {
-                player.health -= enemies[i].health;
-                enemies.erase(enemies.begin() + i);
-                --i;
-                continue;
-            }
-        }
-
-        for (size_t bulletIdx = 0; bulletIdx < bullets.size();)
-            if (handleBullet(bulletIdx))
-                ++bulletIdx;
+void update() {
+    bool running;
+    {
+        std::lock_guard<std::mutex> lock(gameMutex);
+        running = (conditionFlags & 2);
     }
+    while (running) {
+        float dt = GetFrameTime();
+        secondCount += dt;
+        {
+            std::lock_guard<std::mutex> lock(gameMutex);
+            tickHandler.update(GetFrameTime());
+        }
+        
+        while (tickHandler.shouldTick()) {
+            std::lock_guard<std::mutex> lock(gameMutex);
+
+            if (IsWindowResized())
+                resize();
+
+            consoleUI->update();
+            Input::update(consoleUI->visible);
+            
+            HayBCMD::handleLoopAliasesRunning(Console::variables);
+            if (WindowShouldClose()) conditionFlags |= 1;
+            running = (conditionFlags & 2);
+
+            ticks++;
+            if (secondCount >= 1.0f) {
+                tps = ticks;
+                ticks = 0;
+                secondCount -= 1.0f;
+            }
+
+            player.update(backgroundTexture.width, backgroundTexture.height);
+
+            Rectangle playerRect = { player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height };
+
+            for (size_t i = 0; i < enemies.size(); ++i) {
+                if (CheckCollisionRecs(playerRect, { enemies[i].position.x, enemies[i].position.y, (float)entityData[enemies[i].type].texture.width, (float)entityData[enemies[i].type].texture.height })) {
+                    player.health -= enemies[i].health;
+                    enemies.erase(enemies.begin() + i);
+                    --i;
+                    continue;
+                }
+            }
+
+            for (size_t bulletIdx = 0; bulletIdx < bullets.size();)
+                if (handleBullet(bulletIdx))
+                    ++bulletIdx;
+        }
+    }
+}
+
+void render() {
+    BeginDrawing();
     
+    Vector2 renderSize;
+    {
+        std::lock_guard<std::mutex> lock(gameMutex);
+        renderSize = {(float)backgroundTexture.width, (float)backgroundTexture.height};
+        
+        DrawTexture(backgroundTexture, 0, 0, WHITE);
+    }
+
     player.draw();
 
     for (auto& enemy : enemies)
@@ -238,10 +273,10 @@ void render(ConsoleUIScene& consoleUI) {
 
     for (auto& bullet : bullets)
         DrawRectangle(bullet.position.x, bullet.position.y, bulletSize.x, bulletSize.y, entityData[bullet.ownerType].color);
-
+    
     DrawFPS(0, 0);
     DrawText(HayBCMD::formatString("{} TPS", tps).c_str(), 0, 21, 20, LIME);
-    consoleUI.draw();
+    consoleUI->draw();
 
     EndDrawing();
 }
@@ -266,7 +301,7 @@ void cleanup() {
     CloseWindow();
 }
 
-void loadCommands(ConsoleUIScene& consoleUI) {
+void loadCommands() {
     HayBCMD::Command("quit", 0, 0, [](void*, const std::vector<std::string>&){ conditionFlags |= 1; }, "- closes the window");
     HayBCMD::Command("+moveup", 0, 0, [](void*, const std::vector<std::string>&) { player.direction.y--; },
         "- moves up");
@@ -292,13 +327,23 @@ void loadCommands(ConsoleUIScene& consoleUI) {
 
     Console::variables["-fire"] = " ";
 
+    HayBCMD::Command("wait", 1, 1, [](void*, const std::vector<std::string>& args) {
+        try {
+            unsigned int value = (unsigned int)std::stoi(args[0]);
+            std::this_thread::sleep_for(std::chrono::milliseconds(value));
+        } catch (...) {
+            Meatball::Console::print(HayBCMD::ERROR, "value is not a valid integer or duration type");
+            return;
+        }
+    }, "- waits in milliseconds");
+
     HayBCMD::Command("reload_fonts", 0, 0, [&](void*, const std::vector<std::string>&) {
-        reloadFonts(consoleUI);
+        reloadFonts();
     }, "- reloads all text fonts.");
 
     HayBCMD::Command("toggle_local_console", 0, 0, [&](void*, const std::vector<std::string>&) {
-        consoleUI.visible = not consoleUI.visible;
-        if (!consoleUI.visible)
+        consoleUI->visible = not consoleUI->visible;
+        if (!consoleUI->visible)
             resetCursor(MouseCursorPriorityLevel::INPUT_TEXT_BOX);
     }, "- toggles the console ui visibility");
 

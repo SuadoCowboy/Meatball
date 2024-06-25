@@ -1,20 +1,25 @@
 #pragma once
 
+#include <mutex>
+
 #include <raylib.h>
 
 #include <ConsoleUI.h>
 
-Meatball::ConsoleUIScene init(int windowWidth, int windowHeight);
+void init(int windowWidth, int windowHeight);
 
-void reloadFonts(Meatball::ConsoleUIScene& consoleUI);
-void resize(Meatball::ConsoleUIScene& consoleUI);
+void reloadFonts();
+void resize();
 /// @brief also updates
-void render(Meatball::ConsoleUIScene& consoleUI);
+void update();
+void render();
 void save(const std::string& path);
 void cleanup();
 
-void loadCommands(Meatball::ConsoleUIScene& consoleUI);
+void loadCommands();
 bool handleBullet(size_t& bulletIdx);
 
+extern Meatball::ConsoleUIScene* consoleUI;
+extern std::mutex gameMutex;
 extern Texture2D backgroundTexture;
 extern unsigned char conditionFlags;
