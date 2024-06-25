@@ -6,10 +6,8 @@ Player player;
 
 Player::Player() {}
 
-Player::Player(const Vector2& position, const Vector2& speed) : position(position), direction({ 0,0 }), speed(speed) {
-    direction = { 1, 1 };
-    health = 100;
-}
+Player::Player(const Vector2& position, const Vector2& speed)
+    : position(position), direction({ 1, 1 }), speed(speed) {}
 
 void Player::update(int renderWidth, int renderHeight) {
     position.x += (((short)direction.x) - 1) * speed.x * renderWidth;
