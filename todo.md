@@ -4,9 +4,10 @@
 # TODOS
 - Test multiple dynamic panels together
 
+- Create another library for network stuff. Meatball can be used to test with it but it's not built-in in meatball unless necessary
+
 - Create tasks system, the console commands will run through tasks and then the players will be able to use the wait command(also add wait_ticks which waits ticks instead of milliseconds)
 
-# FUTURE TODOS:
 - The UI with Lua thing
 
 # User Interface with Lua
@@ -44,7 +45,8 @@ if a required objectName is not defined in the end: tell user and stop running
 ]]--
 ```
 
-- use threads with locks, atomic and mutex;
+# FUTURE TODOS:
+- use threads with locks, atomic and mutex; (maybe not needed or worse)
 - optimize code and use the right data structures;
 
 # THINKING:
