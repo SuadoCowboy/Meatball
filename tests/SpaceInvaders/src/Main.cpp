@@ -1,7 +1,6 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
-#include <thread>
 
 #include <HayBCMD.h>
 
@@ -64,8 +63,9 @@ void loadSettingsAndInit() {
 int main(int, char**) {
     loadSettingsAndInit();
 
-    std::thread updateThread(update);
     while (!(conditionFlags & 1)) {
+        float dt = GetFrameTime();
+        update(dt);
         render();
     }
 

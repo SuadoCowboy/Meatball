@@ -3,8 +3,6 @@
 #include <string>
 #include <vector>
 #include <cmath>
-#include <thread>
-#include <chrono>
 
 #include <Console.h>
 #include <Utils/Defaults.h>
@@ -12,7 +10,6 @@
 #include <MouseCursor.h>
 #include <Input.h>
 #include <Config.h>
-#include <TickHandler.h>
 
 #include "Entity.h"
 #include "Player.h"
@@ -22,7 +19,6 @@
 using namespace Meatball;
 
 Meatball::ConsoleUIScene* consoleUI = nullptr;
-std::mutex gameMutex;
 
 Texture2D backgroundTexture;
 
@@ -31,23 +27,6 @@ shouldQuit = 1,
 saveSettings = 2
 */
 unsigned char conditionFlags = 0;
-
-TickHandler tickHandler;
-
-void reloadFonts() {
-    std::lock_guard<std::mutex> lock(gameMutex);
-
-    FontsHandler::clear();
-    FontsHandler::add(0, GetFontDefault());
-
-    auto consoleData = Config::loadData("data/meatdata/Console.meatdata");
-
-    auto data = Config::ifContainsGet(consoleData, "font");
-    std::string path;
-    if (data) Defaults::loadConsoleFonts(*consoleUI, ((Config::ConfigTypeData<std::string>*)data)->value);
-
-    Config::clearData(consoleData);
-}
 
 void init(int windowWidth, int windowHeight) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -100,16 +79,14 @@ void init(int windowWidth, int windowHeight) {
     backgroundTexture.width = GetRenderWidth();
     backgroundTexture.height = GetRenderHeight();
 
-    player = {{.0f, .0f}, {0.02f, 0.04f}};
+    player = {{.0f, .0f}, {0.6f, 0.8f}};
     entityData[PLAYER].texture.width = backgroundTexture.width * 0.05f;
     entityData[PLAYER].texture.height = backgroundTexture.width * 0.05f;
 
     player.position.x = backgroundTexture.width * 0.5f - entityData[PLAYER].texture.width * 0.5f;
     player.position.y = backgroundTexture.height * 0.9f - entityData[PLAYER].texture.height;
 
-    bulletSpeed = 0.02f;
-
-    tickHandler = TickHandler(20);
+    bulletSpeed = 0.8f;
 
     conditionFlags |= 2;
 
@@ -136,17 +113,6 @@ void init(int windowWidth, int windowHeight) {
             return std::to_string(player.speed.y);
         }, "");
 
-    HayBCMD::CVARStorage::setCvar("tick_rate",
-        [](const std::string& str) {
-            float value = std::stof(str);
-            
-            if (value <= 0.0f) return;
-            
-            tickHandler.tickInterval = 1.0f / value;
-        },
-        [](){ return std::to_string(1.0f/tickHandler.tickInterval); },
-        "tick_rate should be between [0, 255]");
-
     HayBCMD::CVARStorage::setCvar("save_settings",
         [](const std::string& str) {
             bool value = (bool)std::stoi(str);
@@ -165,9 +131,20 @@ void init(int windowWidth, int windowHeight) {
     bulletSize.y = backgroundTexture.height * 0.04f;
 }
 
-void resize() {
-    std::lock_guard<std::mutex> lock(gameMutex);
+void reloadFonts() {
+    FontsHandler::clear();
+    FontsHandler::add(0, GetFontDefault());
 
+    auto consoleData = Config::loadData("data/meatdata/Console.meatdata");
+
+    auto data = Config::ifContainsGet(consoleData, "font");
+    std::string path;
+    if (data) Defaults::loadConsoleFonts(*consoleUI, ((Config::ConfigTypeData<std::string>*)data)->value);
+
+    Config::clearData(consoleData);
+}
+
+void resize() {
     int newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
     Vector2 ratio = { (float)newScreenWidth / backgroundTexture.width, (float)newScreenHeight / backgroundTexture.height };
 
@@ -197,85 +174,47 @@ void resize() {
     }
 }
 
-unsigned short tps = 0;
-unsigned char ticks = 0;
-float secondCount = 0.0f; // dt + dt + dt + dt + ... = 1.0f = 1 second passed
+void update(const float& dt) {
+    consoleUI->update();
+    Input::update(consoleUI->visible);
 
-void update() {
-    bool running;
-    {
-        std::lock_guard<std::mutex> lock(gameMutex);
-        running = (conditionFlags & 2);
-    }
-    while (running) {
-        float dt = GetFrameTime();
-        secondCount += dt;
-        {
-            std::lock_guard<std::mutex> lock(gameMutex);
-            tickHandler.update(GetFrameTime());
-        }
-        
-        while (tickHandler.shouldTick()) {
-            std::lock_guard<std::mutex> lock(gameMutex);
+    if (WindowShouldClose()) conditionFlags |= 1;
+    if (IsWindowResized())
+        resize();
 
-            if (IsWindowResized())
-                resize();
+    HayBCMD::handleLoopAliasesRunning(Console::variables);
 
-            consoleUI->update();
-            Input::update(consoleUI->visible);
-            
-            HayBCMD::handleLoopAliasesRunning(Console::variables);
-            if (WindowShouldClose()) conditionFlags |= 1;
-            running = (conditionFlags & 2);
+    player.update(backgroundTexture.width, backgroundTexture.height, dt);
 
-            ticks++;
-            if (secondCount >= 1.0f) {
-                tps = ticks;
-                ticks = 0;
-                secondCount -= 1.0f;
-            }
+    Rectangle playerRect = { player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height };
 
-            player.update(backgroundTexture.width, backgroundTexture.height);
-
-            Rectangle playerRect = { player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height };
-
-            for (size_t i = 0; i < enemies.size(); ++i) {
-                if (CheckCollisionRecs(playerRect, { enemies[i].position.x, enemies[i].position.y, (float)entityData[enemies[i].type].texture.width, (float)entityData[enemies[i].type].texture.height })) {
-                    player.health -= enemies[i].health;
-                    enemies.erase(enemies.begin() + i);
-                    --i;
-                    continue;
-                }
-            }
-
-            for (size_t bulletIdx = 0; bulletIdx < bullets.size();)
-                if (handleBullet(bulletIdx))
-                    ++bulletIdx;
+    for (size_t i = 0; i < enemies.size(); ++i) {
+        if (CheckCollisionRecs(playerRect, { enemies[i].position.x, enemies[i].position.y, (float)entityData[enemies[i].type].texture.width, (float)entityData[enemies[i].type].texture.height })) {
+            player.health -= enemies[i].health;
+            enemies.erase(enemies.begin() + i);
+            --i;
+            continue;
         }
     }
+
+    for (size_t bulletIdx = 0; bulletIdx < bullets.size();)
+        if (handleBullet(bulletIdx, dt))
+            ++bulletIdx;
 }
 
 void render() {
     BeginDrawing();
-    
-    Vector2 renderSize;
-    {
-        std::lock_guard<std::mutex> lock(gameMutex);
-        renderSize = {(float)backgroundTexture.width, (float)backgroundTexture.height};
-        
-        DrawTexture(backgroundTexture, 0, 0, WHITE);
-    }
+    DrawTexture(backgroundTexture, 0, 0, WHITE);
 
-    player.draw();
+    for (auto& bullet : bullets)
+        DrawRectangle(bullet.position.x, bullet.position.y, bulletSize.x, bulletSize.y, entityData[bullet.ownerType].color);
 
     for (auto& enemy : enemies)
         enemy.draw();
 
-    for (auto& bullet : bullets)
-        DrawRectangle(bullet.position.x, bullet.position.y, bulletSize.x, bulletSize.y, entityData[bullet.ownerType].color);
+    player.draw();
     
     DrawFPS(0, 0);
-    DrawText(HayBCMD::formatString("{} TPS", tps).c_str(), 0, 21, 20, LIME);
     consoleUI->draw();
 
     EndDrawing();
@@ -327,16 +266,6 @@ void loadCommands() {
 
     Console::variables["-fire"] = " ";
 
-    HayBCMD::Command("wait", 1, 1, [](void*, const std::vector<std::string>& args) {
-        try {
-            unsigned int value = (unsigned int)std::stoi(args[0]);
-            std::this_thread::sleep_for(std::chrono::milliseconds(value));
-        } catch (...) {
-            Meatball::Console::print(HayBCMD::ERROR, "value is not a valid integer or duration type");
-            return;
-        }
-    }, "- waits in milliseconds");
-
     HayBCMD::Command("reload_fonts", 0, 0, [&](void*, const std::vector<std::string>&) {
         reloadFonts();
     }, "- reloads all text fonts.");
@@ -351,9 +280,9 @@ void loadCommands() {
     Input::allowedUiCommands.push_back("quit");
 }
 
-bool handleBullet(size_t& bulletIdx) {
+bool handleBullet(size_t& bulletIdx, const float& dt) {
     Rectangle rect = { bullets[bulletIdx].position.x, bullets[bulletIdx].position.y, bulletSize.x, bulletSize.y };
-    float movement = (bulletSpeed * backgroundTexture.height);
+    float movement = bulletSpeed * backgroundTexture.height * dt;
     
     unsigned int substeps = std::ceil(movement / bulletSize.y);
     float substepMovement = movement / substeps;
