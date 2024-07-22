@@ -29,6 +29,11 @@ Meatball::Config::ConsoleUI::ConsoleUI()
 
 Meatball::ConsoleUIScene::ConsoleUIScene(const Rectangle &rect, const std::shared_ptr<Config::ConsoleUI> &_config, bool visible)
  : Scene(), config(_config), visible(visible), mainPanel(rect) {
+	// Because console interface SHOULD always exist, it's a good idea to get the default
+	// config from here. any other interface that the default config is not defined in the
+	// console interface should be handled by YOUR program. You could just make a config
+	// outside any object so whenever a object that uses that config is created, you get
+	// that outside config.
 	mainPanel.config = std::make_shared<Config::DynamicPanel>(Defaults::dynamicPanelConfig);
 	outputBox.config = std::make_shared<Config::ScrollTextBox>(Defaults::scrollTextBoxConfig);
     inputBox.config = std::make_shared<Config::InputTextBox>(Defaults::inputTextBoxConfig);
