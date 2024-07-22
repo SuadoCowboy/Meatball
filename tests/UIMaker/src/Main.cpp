@@ -16,6 +16,7 @@ int main(int argc, char** argv) {
         std::cout << msg;
     });
     
+    Meatball::Input::registerCommands();
     Meatball::Input::mapKeyboardKeys();
     Meatball::Input::mapMouseKeys();
 
