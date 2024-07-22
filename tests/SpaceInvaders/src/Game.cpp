@@ -40,8 +40,8 @@ void init(int windowWidth, int windowHeight) {
     Defaults::init("data/meatdata/Init.meatdata");
 
     Rectangle consoleUIRect = { 0, 0, windowWidth * 0.5f, windowHeight * 0.75f };
-    consoleUIRect.x = windowWidth * 0.5f - consoleUIRect.width * 0.5;
-    consoleUIRect.y = windowHeight * 0.5f - consoleUIRect.height * 0.5;
+    consoleUIRect.x = windowWidth * 0.5f - consoleUIRect.width * 0.5f;
+    consoleUIRect.y = windowHeight * 0.5f - consoleUIRect.height * 0.5f;
 
     if (consoleUI != nullptr) delete consoleUI;
     consoleUI = new ConsoleUIScene(Defaults::initLocalConsole(
