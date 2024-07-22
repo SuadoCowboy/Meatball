@@ -35,6 +35,7 @@ namespace Meatball {
 		static void unBindCommand(void*, const std::vector<std::string>& args);
 		static void unBindAllCommand(void*, const std::vector<std::string>& args);
 		
+		/// @brief register bind, unbind and unbindall commands
 		static void registerCommands();
 
 		/// @brief maps the keys of a US keyboard layout
