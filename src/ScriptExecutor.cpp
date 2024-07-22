@@ -10,11 +10,10 @@ int scriptBind(lua_State* L) {
     if (!lua_isstring(L, 1) || !lua_isstring(L, 2))
         return luaL_error(L, "Incorrect data type. Expected string on both parameters.");
     
-    const char* name = lua_tostring(L, 1);
+    const char* key = lua_tostring(L, 1);
     const char* callback = lua_tostring(L, 2);
 
-    Meatball::Input::bind(name, callback);
-    
+    Meatball::Input::bind(key, callback);
     return 0;
 }
 
@@ -24,16 +23,15 @@ lua_State* Meatball::Script::createLuaState() {
 
     lua_newtable(L); // Meatball 1
     
-    lua_pushstring(L, "Input"); // 2
-    lua_newtable(L); // Input 3
+    lua_newtable(L); // Input 2
 
-    lua_pushstring(L, "bind"); // 4
-    lua_pushcfunction(L, scriptBind); // 5
-    lua_settable(L, 3); // 2[4] = 5; pop(5, 4);
+    lua_pushcfunction(L, scriptBind); // 3
+    lua_setfield(L, -2, "bind");
 
-    lua_settable(L, 1); // 1[2] = 3; pop(3, 2);
-
+    lua_setfield(L, -2, "Input");
+    
     lua_setglobal(L, "Meatball");
+    
     return L;
 }
 

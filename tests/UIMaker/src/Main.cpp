@@ -16,9 +16,14 @@ int main(int argc, char** argv) {
         std::cout << msg;
     });
     
+    Meatball::Input::mapKeyboardKeys();
+    Meatball::Input::mapMouseKeys();
+
     lua_State* L = Meatball::Script::createLuaState();
-    if (!Meatball::Script::loadFile(L, argv[1]))
+    if (!Meatball::Script::loadFile(L, argv[1])) {
+        lua_close(L);
         return 1;
+    }
 
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
     InitWindow(1280, 600, "Meatball's Interface Creator");
@@ -32,4 +37,6 @@ int main(int argc, char** argv) {
 
         EndDrawing();
     }
+
+    lua_close(L);
 }
