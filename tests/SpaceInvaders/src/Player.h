@@ -9,7 +9,7 @@ public:
     Player();
     Player(const Vector2& position, const Vector2& speed);
 
-    void update(int renderWidth, int renderHeight);
+    void update(int renderWidth, int renderHeight, const float& dt);
     void draw();
 
     Vector2 position;
