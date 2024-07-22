@@ -56,7 +56,7 @@ float Meatball::measureTextWidth(const Font &font, float height, const char *tex
     Vector2 textSize = MeasureTextEx(font, text, height, textSpacing);
     return textSize.x;
 }
-    
+
 float Meatball::measureTextHeight(const Font &font, float height, const char *text) {
     SetTextLineSpacing(height);
     Vector2 textSize = MeasureTextEx(font, text, height, textSpacing);
