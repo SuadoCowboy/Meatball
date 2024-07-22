@@ -20,6 +20,6 @@ set_target_properties(Meatball PROPERTIES
 
 target_include_directories(Meatball PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
 
-target_link_libraries(Meatball -L${PROJECT_SOURCE_DIR}/libs -lHayBCMD -lraylib)
+target_link_libraries(Meatball -L${PROJECT_SOURCE_DIR}/bin -lHayBCMD -lraylib)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/tests)
