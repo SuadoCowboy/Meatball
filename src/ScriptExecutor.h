@@ -49,26 +49,44 @@
     lua_pushnumber(L, a); \
     lua_setfield(L, -2, "a")
 
-#define SCRIPT_GET_RECT(L, idx, rect) \
-    SCRIPT_GET_FIELD(L, idx, rect.x, "x", lua_tonumber); \
-    SCRIPT_GET_FIELD(L, idx, rect.y, "y", lua_tonumber); \
-    SCRIPT_GET_FIELD(L, idx, rect.width, "width", lua_tonumber); \
-    SCRIPT_GET_FIELD(L, idx, rect.height, "height", lua_tonumber)
+#define SCRIPT_GET_RECT(L, idx, rect, name, objectName) \
+    lua_getfield(L, idx, name); \
+    if (!Meatball::Script::isRect(L, -1)) \
+        luaL_error(L, "%s is not a rect.", objectName); \
+    SCRIPT_GET_FIELD(L, -1, rect.x, "x", lua_tonumber); \
+    SCRIPT_GET_FIELD(L, -1, rect.y, "y", lua_tonumber); \
+    SCRIPT_GET_FIELD(L, -1, rect.width, "width", lua_tonumber); \
+    SCRIPT_GET_FIELD(L, -1, rect.height, "height", lua_tonumber); \
+    lua_pop(L, 1);
 
-#define SCRIPT_GET_COLOR(L, idx, color) \
-    SCRIPT_GET_FIELD(L, idx, color.r, "r", lua_tonumber); \
-    SCRIPT_GET_FIELD(L, idx, color.g, "g", lua_tonumber); \
-    SCRIPT_GET_FIELD(L, idx, color.b, "b", lua_tonumber); \
-    SCRIPT_GET_FIELD(L, idx, color.a, "a", lua_tonumber)
+#define SCRIPT_GET_VEC2(L, idx, vec2, name, objectName) \
+    lua_getfield(L, idx, name); \
+    if (!Meatball::Script::isVec2(L, -1)) \
+        luaL_error(L, "%s is not a vec2.", objectName); \
+    SCRIPT_GET_FIELD(L, -1, vec2.x, "x", lua_tonumber); \
+    SCRIPT_GET_FIELD(L, -1, vec2.y, "y", lua_tonumber); \
+    lua_pop(L, 1)
+
+#define SCRIPT_GET_COLOR(L, idx, color, name, objectName) \
+    lua_getfield(L, idx, name); \
+    if (!Meatball::Script::isColor(L, -1)) \
+        luaL_error(L, "%s is not a rect.", objectName); \
+    SCRIPT_GET_FIELD(L, -1, color.r, "r", lua_tonumber); \
+    SCRIPT_GET_FIELD(L, -1, color.g, "g", lua_tonumber); \
+    SCRIPT_GET_FIELD(L, -1, color.b, "b", lua_tonumber); \
+    SCRIPT_GET_FIELD(L, -1, color.a, "a", lua_tonumber); \
+    lua_pop(L, 1)
 
 #pragma endregion
 
-#define SCRIPT_UI_LAYOUTTYPES_CONSOLE 0
+#define SCRIPT_UI_LAYOUT_TYPES_CONSOLE 0
 
 #define SCRIPT_UI_TYPE_BUTTON 0
+#define SCRIPT_UI_TYPE_DYNAMIC_PANEL 1
 
 namespace Meatball::Script {
     bool isRect(lua_State* L, int index);
+    bool isVec2(lua_State* L, int index);
     bool isColor(lua_State* L, int index);
 
     /// @brief initializes lua_State while also adding default Meatball variables

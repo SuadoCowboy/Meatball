@@ -32,6 +32,23 @@ bool Meatball::Script::isRect(lua_State* L, int index) {
     return true;
 }
 
+bool Meatball::Script::isVec2(lua_State* L, int index) {
+    if (!lua_istable(L, index))
+        return false;
+
+    lua_getfield(L, index, "x");
+    if (lua_type(L, -1) != LUA_TNUMBER)
+        return false;
+    lua_pop(L, 1);
+
+    lua_getfield(L, index, "y");
+    if (lua_type(L, -1) != LUA_TNUMBER)
+        return false;
+    lua_pop(L, 1);
+
+    return true;
+}
+
 bool Meatball::Script::isColor(lua_State* L, int index) {
     if (!lua_istable(L, index))
         return false;
@@ -189,7 +206,7 @@ lua_State* Meatball::Script::createLuaState() {
         lua_newtable(L); // LayoutTypes
             // If you're looking to add your own type, just get the Meatball
             // table in your code and set from there
-            lua_pushinteger(L, SCRIPT_UI_LAYOUTTYPES_CONSOLE);
+            lua_pushinteger(L, SCRIPT_UI_LAYOUT_TYPES_CONSOLE);
             lua_setfield(L, -2, "CONSOLE");
         lua_setfield(L, -2, "LayoutTypes");
 
