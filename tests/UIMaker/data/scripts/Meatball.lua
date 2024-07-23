@@ -8,8 +8,8 @@ Meatball = {
     Console = {},
     UI = {
         LayoutTypes = {
-            NONE = 1,
-            CONSOLE = 2,
+            CONSOLE = 0,
+            NONE = -1, -- NONE = #LayoutTypes
         },
         Types = {
             BUTTON = 1
