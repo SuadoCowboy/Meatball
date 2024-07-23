@@ -1,0 +1,9 @@
+outputBoxColor COLOR 10,10,10,200
+outputBoxTextColor COLOR 255,255,255
+
+autoCompleteColor COLOR 15,15,15,255
+autoCompleteTextColor COLOR 255,255,255
+autoCompleteHightlightedTextColor COLOR 0,255,255
+autoCompleteSelectedTextColor COLOR 255,0,255
+
+font STRING data/fonts/Cooper Hewitt/CooperHewitt-Medium.otf
