@@ -2,6 +2,20 @@
 -- also add a button that changes the color to the specified in the text box and a output box
 -- giving the history of all the color changes
 
+local function randomColor(colorBefore)
+    local color = Meatball.color(math.random(0, 255), math.random(0, 255), math.random(0, 255), 255)
+    
+    while color.r+color.g+color.b == 0 or
+          color.r+color.g+color.b == 765 or
+          (color.r == colorBefore.r and
+          color.g == colorBefore.g and
+          color.b == colorBefore.b) do
+        color = Meatball.color(math.random(0, 255), math.random(0, 255), math.random(0, 255), 255)
+    end
+
+    return color
+end
+
 local interface = {
     printHailoButton = nil,
     kysButton = nil,
@@ -19,6 +33,9 @@ interface.printHailoButton.config.hoveredColor = Meatball.color(40, 40, 40, 255)
 
 interface.printHailoButton.onRelease = function()
     Meatball.Console.run("echo Hailooo >.<")
+    interface.panel.config.color = randomColor(interface.panel.config.color)
+
+    return interface
 end
 
 interface.kysButton = Meatball.UI.button()
@@ -74,19 +91,6 @@ local dir = Meatball.vec2(1, 1)
 local velocity = Meatball.vec2(300, 200)
 
 local color = Meatball.color(255,0,0,255)
-
-local function randomColor(colorBefore)
-    color = Meatball.color(math.random(0, 1) * 255, math.random(0, 1) * 255, math.random(0, 1) * 255, 255)
-    while color.r+color.g+color.b == 0 or
-          color.r+color.g+color.b == 765 or
-          (color.r == colorBefore.r and
-          color.g == colorBefore.g and
-          color.b == colorBefore.b) do
-        color = Meatball.color(math.random(0, 1) * 255, math.random(0, 1) * 255, math.random(0, 1) * 255, 255)
-    end
-
-    return color
-end
 
 function OnResize(ratio)
     velocity.x = velocity.x * ratio.x
