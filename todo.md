@@ -23,21 +23,37 @@
 -- THIS IS STILL ON THINKING, THINGS MIGHT NOT BE LIKE THIS ON RELEASE OF THE FIRST VERSION
 
 -- params: x y width height style color hoveredColor
-closeButton = createButton(x, y, width, height, STYLES.STYLE_X, COLORS.LIGHTGRAY, COLORS.WHITE)
+local consoleUI = {
+    closeButton=nil,
+    mainPanel=nil,
+    inputBox=nil,
+    outputBox=nil
+}
 
--- params: x y width height borderRadius color
-mainPanel = createDynamicPanel(x, y, width, height, 0, {10,10,10,255})
+consoleUI.closeButton = Meatball.UI.button(Meatball.rect(x, y, width, height), Meatball.UI.BUTTON_STYLES.STYLE_X, Meatball.COLORS.LIGHT_GRAY, Meatball.COLORS.WHITE)
+
+consoleUI.closeButton.onHover = function() 
+    print("closeButton.onHover called")
+end
+
+consoleUI.closeButton.onRelease = function() 
+    print("closeButton.onRelease called")
+end
+
+-- params: rect borderRadius color
+consoleUI.mainPanel = Meatball.UI.dynamicPanel(Meatball.rect(x, y, width, height), 0, {10,10,10,255})
 
 -- Optional stuff: we don't declare
--- params: x, y, width, height, text
---sendButton = createTextButton(x, y, width, height, "Send")
+-- params: rect, text
+--sendButton = createTextButton(Meatball.rect(x, y, width, height), "Send")
 
--- params: x y width height defaultText color
-inputBox = createInputTextBox(x, y, width, height, "default text written in input box", {20,20,20,255})
+-- params: rect defaultText color
+consoleUI.inputBox = Meatball.UI.inputTextBox(Meatball.rect(x, y, width, height), "default text written in input box", {20,20,20,255})
 
--- params: x y width height color
-outputBox = createScrollTextBox(x, y, width, height, {20, 20, 20, 255})
+-- params: rect color
+consoleUI.outputBox = Meatball.UI.scrollTextBox(Meatball.rect(x, y, width, height), Meatball.color(20, 20, 20, 255))
 
+return Meatball.UI.TYPES.Console, consoleUI -- The type first and then the table
 --[[ TODOS:
 if game does not recognize objectName: tell user
 if type is not allowed for objectName: tell user and stop running
