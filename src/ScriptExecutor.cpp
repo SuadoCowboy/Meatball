@@ -5,55 +5,61 @@
 #include "Input.h"
 #include "Console.h"
 
-#pragma region Macros
-#define INCORRECT_TYPE(L, x) luaL_error(L, "Incorrect data type. Expected " #x ".")
-#define INCORRECT_NARGS(L, expected, received) luaL_error(L, "Incorrect number of arguments. Expected " #expected ", got " #received ".")
+bool Meatball::Script::isRect(lua_State* L, int index) {
+    if (!lua_istable(L, index))
+        return false;
 
-#define CHECK_NARGS(L, expected)    \
-    int nargs = lua_gettop(L);      \
-    if (nargs != expected)          \
-        return INCORRECT_NARGS(L, expected, nargs)
+    lua_getfield(L, index, "x");
+    if (lua_type(L, -1) != LUA_TNUMBER)
+        return false;
+    lua_pop(L, 1);
 
-#define GET_FIELD(L, idx, val, name, convertFunc) \
-    lua_getfield(L, idx, name); \
-    val = convertFunc(L, -1); \
-    lua_pop(L, idx)
+    lua_getfield(L, index, "y");
+    if (lua_type(L, -1) != LUA_TNUMBER)
+        return false;
+    lua_pop(L, 1);
 
-#pragma endregion
+    lua_getfield(L, index, "width");
+    if (lua_type(L, -1) != LUA_TNUMBER)
+        return false;
+    lua_pop(L, 1);
+
+    lua_getfield(L, index, "height");
+    if (lua_type(L, -1) != LUA_TNUMBER)
+        return false;
+    lua_pop(L, 1);
+    
+    return true;
+}
+
+bool Meatball::Script::isColor(lua_State* L, int index) {
+    if (!lua_istable(L, index))
+        return false;
+
+    lua_getfield(L, index, "r");
+    if (lua_type(L, -1) != LUA_TNUMBER)
+        return false;
+    lua_pop(L, 1);
+
+    lua_getfield(L, index, "g");
+    if (lua_type(L, -1) != LUA_TNUMBER)
+        return false;
+    lua_pop(L, 1);
+
+    lua_getfield(L, index, "b");
+    if (lua_type(L, -1) != LUA_TNUMBER)
+        return false;
+    lua_pop(L, 1);
+
+    lua_getfield(L, index, "a");
+    if (lua_type(L, -1) != LUA_TNUMBER)
+        return false;
+    lua_pop(L, 1);
+    
+    return true;
+}
 
 namespace ScriptFunctions {
-    bool isRect(lua_State* L, int idx) {
-        if (!lua_istable(L, idx))
-            return false;
-
-        if (lua_getfield(L, idx, "x") != LUA_TNUMBER)
-            return false;
-        if (lua_getfield(L, idx, "y") != LUA_TNUMBER)
-            return false;
-        if (lua_getfield(L, idx, "width") != LUA_TNUMBER)
-            return false;
-        if (lua_getfield(L, idx, "height") != LUA_TNUMBER)
-            return false;
-        
-        return true;
-    }
-
-    bool isColor(lua_State* L, int idx) {
-        if (!lua_istable(L, idx))
-            return false;
-
-        if (lua_getfield(L, idx, "r") != LUA_TNUMBER)
-            return false;
-        if (lua_getfield(L, idx, "g") != LUA_TNUMBER)
-            return false;
-        if (lua_getfield(L, idx, "b") != LUA_TNUMBER)
-            return false;
-        if (lua_getfield(L, idx, "a") != LUA_TNUMBER)
-            return false;
-        
-        return true;
-    }
-
     int luaPrintFunction(lua_State* L) {
         int n = lua_gettop(L);  // Number of arguments
         std::stringstream out;
@@ -76,10 +82,10 @@ namespace ScriptFunctions {
 
 #pragma region Input
     int bind(lua_State* L) {
-        CHECK_NARGS(L, 2);
+        SCRIPT_CHECK_NARGS(L, 2);
 
         if (!lua_isstring(L, 1) || !lua_isstring(L, 2))
-            INCORRECT_TYPE(L, string);
+            SCRIPT_INCORRECT_TYPE(L, string);
         
         const char* key = lua_tostring(L, 1);
         const char* callback = lua_tostring(L, 2);
@@ -89,10 +95,10 @@ namespace ScriptFunctions {
     }
 
     int unbind(lua_State* L) {
-        CHECK_NARGS(L, 1);
+        SCRIPT_CHECK_NARGS(L, 1);
 
         if (!lua_isstring(L, 1))
-            return INCORRECT_TYPE(L, string);
+            return SCRIPT_INCORRECT_TYPE(L, string);
         
         const char* key = lua_tostring(L, 1);
 
@@ -103,10 +109,10 @@ namespace ScriptFunctions {
     
 #pragma region Console
     int run(lua_State* L) {
-        CHECK_NARGS(L, 1);
+        SCRIPT_CHECK_NARGS(L, 1);
 
         if (!lua_isstring(L, 1))
-            return INCORRECT_TYPE(L, string);
+            return SCRIPT_INCORRECT_TYPE(L, string);
         
         const char* input = lua_tostring(L, 1);
 
@@ -115,34 +121,48 @@ namespace ScriptFunctions {
     }
 #pragma endregion
 
-#pragma region Utils
-    int drawRect(lua_State* L) {
-        CHECK_NARGS(L, 2);
+#pragma region UI
+    int button(lua_State* L) {
+        /*
+        Button = {
+            rect,
+            config = {
+                color,
+                hoveredColor
+            },
+            onHover,
+            onRelease
+            type = TYPE_BUTTON
+        }
+        */
+        lua_newtable(L);
+        SCRIPT_CREATE_RECT(L, 0,0, 0,0);
+        lua_setfield(L, -2, "rect");
 
-        if (!isRect(L, 1))
-            return INCORRECT_TYPE(L, rect);
-        if (!isColor(L, 2))
-            return INCORRECT_TYPE(L, color);
+        lua_pushnil(L);
+        lua_setfield(L, -2, "config");
 
-        int x,y,width,height;
-        GET_FIELD(L, 1, x, "x", lua_tonumber);
-        GET_FIELD(L, 1, y, "y", lua_tonumber);
-        GET_FIELD(L, 1, width, "width", lua_tonumber);
-        GET_FIELD(L, 1, height, "height", lua_tonumber);
+        lua_pushnil(L);
+        lua_setfield(L, -2, "onHover");
 
-        Color color;
+        lua_pushnil(L);
+        lua_setfield(L, -2, "onRelease");
 
-        GET_FIELD(L, 2, color.r, "r", lua_tointeger);
-        GET_FIELD(L, 2, color.g, "g", lua_tointeger);
-        GET_FIELD(L, 2, color.b, "b", lua_tointeger);
-        GET_FIELD(L, 2, color.a, "a", lua_tointeger);
-        
-        DrawRectangle(x, y, width, height, color);
+        lua_newtable(L); // config
+            SCRIPT_CREATE_COLOR(L, 0,0,0,255);
+            lua_setfield(L, -2, "color");
+            SCRIPT_CREATE_COLOR(L, 0,0,0,255);
+            lua_setfield(L, -2, "hoveredColor");
+        lua_setfield(L, -2, "config");
 
-        return 0;
+        lua_pushinteger(L, SCRIPT_UI_TYPE_BUTTON);
+        lua_setfield(L, -2, "type");
+
+        return 1;
     }
 #pragma endregion
 }
+
 lua_State* Meatball::Script::createLuaState() {
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
@@ -164,11 +184,23 @@ lua_State* Meatball::Script::createLuaState() {
         lua_pushcfunction(L, ScriptFunctions::run);
         lua_setfield(L, -2, "run");
     lua_setfield(L, -2, "Console");
-    
-    lua_newtable(L);
-        lua_pushcfunction(L, ScriptFunctions::drawRect);
-        lua_setfield(L, -2, "drawRect");
-    lua_setfield(L, -2, "Utils");
+
+    lua_newtable(L); // UI
+        lua_newtable(L); // LayoutTypes
+            // If you're looking to add your own type, just get the Meatball
+            // table in your code and set from there
+            lua_pushinteger(L, SCRIPT_UI_LAYOUTTYPES_CONSOLE);
+            lua_setfield(L, -2, "CONSOLE");
+        lua_setfield(L, -2, "LayoutTypes");
+
+        lua_newtable(L); // Types
+            lua_pushinteger(L, SCRIPT_UI_TYPE_BUTTON);
+            lua_setfield(L, -2, "BUTTON");
+        lua_setfield(L, -2, "Types");
+
+        lua_pushcfunction(L, ScriptFunctions::button);
+        lua_setfield(L, -2, "button");
+    lua_setfield(L, -2, "UI");
 
     lua_setglobal(L, "Meatball");
 
