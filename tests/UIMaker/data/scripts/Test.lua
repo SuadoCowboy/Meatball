@@ -2,43 +2,69 @@
 -- also add a button that changes the color to the specified in the text box and a output box
 -- giving the history of all the color changes
 
--- CURRENT TODO: create a working button
-
 local interface = {
-    myButton1 = nil,
-    myButton2 = nil
+    printHailoButton = nil,
+    kysButton = nil,
+    panel = nil,
 }
 
-interface.myButton1 = Meatball.UI.button()
-
 -- Using 800x600 as base
-interface.myButton1.rect.width = Game.viewport.x * 0.06 -- 48px
-interface.myButton1.rect.height = Game.viewport.y * 0.02 -- 12px
+interface.panel = Meatball.UI.dynamicPanel()
+interface.panel.rect = Meatball.rect(0, 0, Game.viewport.x, Game.viewport.y)
+interface.panel.config.color = Meatball.color(10, 10, 10, 255)
 
-interface.myButton1.rect.x = (Game.viewport.x - interface.myButton1.rect.width) * 0.5
-interface.myButton1.rect.y = (Game.viewport.y - interface.myButton1.rect.height) * 0.5
-interface.myButton1.onRelease = function() print("onRelease called on myButton1!") end
-interface.myButton1.onHover = function() print("onHover called on myButton1!") end
+interface.printHailoButton = Meatball.UI.button()
+interface.printHailoButton.config.color = Meatball.color(20, 20, 20, 255)
+interface.printHailoButton.config.hoveredColor = Meatball.color(40, 40, 40, 255)
 
-interface.myButton1.config.color = Meatball.color(20, 20, 20, 255)
-interface.myButton1.config.hoveredColor = Meatball.color(40, 40, 40, 255)
+interface.printHailoButton.onRelease = function()
+    Meatball.Console.run("echo Hailooo >.<")
+end
 
-interface.myButton1.rect.width = Game.viewport.x * 0.06 -- 48px
-interface.myButton1.rect.height = Game.viewport.y * 0.04 -- 24px
+interface.kysButton = Meatball.UI.button()
+interface.kysButton.config.color = Meatball.color(255, 0, 0, 255)
+interface.kysButton.config.hoveredColor = Meatball.color(0, 255, 0, 255)
 
-interface.myButton2 = Meatball.UI.button()
+interface.kysButton.onRelease = function()
+    Meatball.Console.run("toggle_local_console 1; echo keep yourself safe!");
+end
 
-interface.myButton2.rect.width = interface.myButton1.rect.width
-interface.myButton2.rect.height = interface.myButton1.rect.height
+interface.panel.onResize = function()
+    interface.panel.config.grabHeight = interface.panel.rect.height * 0.004
+    if interface.panel.config.grabHeight < 0 then
+        interface.panel.config.grabHeight = 1
+    end
 
-interface.myButton2.rect.x = interface.myButton1.rect.x
-interface.myButton2.rect.y = interface.myButton1.rect.y + interface.myButton1.rect.height + 1
+    interface.printHailoButton.rect.width = interface.panel.rect.width * 0.06 -- 48px
+    interface.printHailoButton.rect.height = interface.panel.rect.height * 0.02 -- 12px
 
-interface.myButton2.onRelease = function() print("onRelease called on myButton2!") end
-interface.myButton2.onHover = function() print("onHover called on myButton2!") end
+    interface.kysButton.rect.width = interface.printHailoButton.rect.width
+    interface.kysButton.rect.height = interface.printHailoButton.rect.height
 
-interface.myButton2.config.color = Meatball.color(255, 0, 0, 255)
-interface.myButton2.config.hoveredColor = Meatball.color(0, 255, 0, 255)
+    interface.panel.onMove()
+
+    interface.panel.config.minSize.x = -- get the furthest x position in the panel
+        interface.printHailoButton.rect.x+
+        interface.printHailoButton.rect.width
+
+    interface.panel.config.minSize.y = -- get the furthest y position in the panel
+        interface.kysButton.rect.y+
+        interface.kysButton.rect.height
+
+    return interface
+end
+
+interface.panel.onMove = function()
+    interface.printHailoButton.rect.x = interface.panel.rect.x + (interface.panel.rect.width - interface.printHailoButton.rect.width) * 0.5
+    interface.printHailoButton.rect.y = interface.panel.rect.y + (interface.panel.rect.height - interface.printHailoButton.rect.height) * 0.5
+
+    interface.kysButton.rect.x = interface.printHailoButton.rect.x
+    interface.kysButton.rect.y = interface.printHailoButton.rect.y + interface.printHailoButton.rect.height + 1
+
+    return interface
+end
+
+interface.panel.onResize()
 
 return Meatball.UI.LayoutTypes.NONE, interface
 --[[

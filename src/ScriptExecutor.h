@@ -20,15 +20,13 @@
     val = convertFunc(L, -1); \
     lua_pop(L, 1)
 
-#define SCRIPT_CREATE_VEC2(L, x, y) \
-    lua_newtable(L); \
+#define SCRIPT_SET_VEC2(L, x, y) \
     lua_pushnumber(L, x); \
     lua_setfield(L, -2, "x"); \
     lua_pushnumber(L, y); \
     lua_setfield(L, -2, "y")
 
-#define SCRIPT_CREATE_RECT(L, x, y, w, h) \
-    lua_newtable(L); \
+#define SCRIPT_SET_RECT(L, x, y, w, h) \
     lua_pushnumber(L, x); \
     lua_setfield(L, -2, "x"); \
     lua_pushnumber(L, y); \
@@ -38,8 +36,9 @@
     lua_pushnumber(L, h); \
     lua_setfield(L, -2, "height")
 
-#define SCRIPT_CREATE_COLOR(L, r, g, b, a) \
-    lua_newtable(L); \
+#define SCRIPT_SET_RECT2(L, rect) SCRIPT_SET_RECT(L, rect.x, rect.y, rect.width, rect.height)
+
+#define SCRIPT_SET_COLOR(L, r, g, b, a) \
     lua_pushnumber(L, r); \
     lua_setfield(L, -2, "r"); \
     lua_pushnumber(L, g); \

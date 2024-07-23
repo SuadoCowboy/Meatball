@@ -152,12 +152,11 @@ namespace ScriptFunctions {
             type = TYPE_BUTTON
         }
         */
-        lua_newtable(L);
-        SCRIPT_CREATE_RECT(L, 0,0, 0,0);
-        lua_setfield(L, -2, "rect");
+        lua_newtable(L); // Button
 
-        lua_pushnil(L);
-        lua_setfield(L, -2, "config");
+        lua_newtable(L);
+        SCRIPT_SET_RECT(L, 0,0, 0,0);
+        lua_setfield(L, -2, "rect");
 
         lua_pushnil(L);
         lua_setfield(L, -2, "onHover");
@@ -166,13 +165,51 @@ namespace ScriptFunctions {
         lua_setfield(L, -2, "onRelease");
 
         lua_newtable(L); // config
-            SCRIPT_CREATE_COLOR(L, 0,0,0,255);
+            lua_newtable(L); // color
+            SCRIPT_SET_COLOR(L, 0,0,0,255);
             lua_setfield(L, -2, "color");
-            SCRIPT_CREATE_COLOR(L, 0,0,0,255);
+
+            lua_newtable(L); // hoveredColor
+            SCRIPT_SET_COLOR(L, 0,0,0,255);
             lua_setfield(L, -2, "hoveredColor");
         lua_setfield(L, -2, "config");
 
         lua_pushinteger(L, SCRIPT_UI_TYPE_BUTTON);
+        lua_setfield(L, -2, "type");
+
+        return 1;
+    }
+
+    int dynamicPanel(lua_State* L) {
+        lua_newtable(L); // dynamicPanel
+
+        lua_newtable(L); // rect
+        SCRIPT_SET_RECT(L, 0,0, 0,0);
+        lua_setfield(L, -2, "rect");
+
+        lua_pushnil(L);
+        lua_setfield(L, -2, "onMove");
+
+        lua_pushnil(L);
+        lua_setfield(L, -2, "onResize");
+
+        lua_pushnil(L);
+        lua_setfield(L, -2, "onResizeStop");
+
+        lua_newtable(L); // config
+            lua_newtable(L); // color
+            SCRIPT_SET_COLOR(L, 0,0,0,255);
+            lua_setfield(L, -2, "color");
+
+            lua_pushnumber(L, 2);
+            lua_setfield(L, -2, "grabHeight");
+
+            lua_newtable(L); // minSize
+            SCRIPT_SET_VEC2(L, 4, 4);
+            lua_setfield(L, -2, "minSize");
+        lua_setfield(L, -2, "config");
+
+        lua_pushinteger(L, SCRIPT_UI_TYPE_DYNAMIC_PANEL);
         lua_setfield(L, -2, "type");
 
         return 1;
@@ -213,10 +250,16 @@ lua_State* Meatball::Script::createLuaState() {
         lua_newtable(L); // Types
             lua_pushinteger(L, SCRIPT_UI_TYPE_BUTTON);
             lua_setfield(L, -2, "BUTTON");
+
+            lua_pushinteger(L, SCRIPT_UI_TYPE_DYNAMIC_PANEL);
+            lua_setfield(L, -2, "DYNAMIC_PANEL");
         lua_setfield(L, -2, "Types");
 
         lua_pushcfunction(L, ScriptFunctions::button);
         lua_setfield(L, -2, "button");
+
+        lua_pushcfunction(L, ScriptFunctions::dynamicPanel);
+        lua_setfield(L, -2, "dynamicPanel");
     lua_setfield(L, -2, "UI");
 
     lua_setglobal(L, "Meatball");

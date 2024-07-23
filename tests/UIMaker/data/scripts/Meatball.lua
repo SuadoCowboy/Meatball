@@ -12,7 +12,8 @@ Meatball = {
             NONE = -1, -- NONE = #LayoutTypes
         },
         Types = {
-            BUTTON = 1
+            BUTTON = 0,
+            DYNAMIC_PANEL = 1
         }
     }
 }
@@ -31,7 +32,7 @@ function Meatball.Input.unbind(name) end
 function Meatball.Console.run(input) end
 
 function Meatball.UI.button() return {rect=Rect, config={color=Color,hoveredColor=Color}, onHover=nil, onRelease=nil} end
-function Meatball.UI.dynamicPanel() end
+function Meatball.UI.dynamicPanel() return {rect=Rect, config={color=Color, grabHeight=2, minSize=Vec2}, onMove=nil, onResize=nil, onResizeStop=nil} end
 function Meatball.UI.inputTextBox() end
 function Meatball.UI.scrollBar() end
 function Meatball.UI.scrollTextBox() end
