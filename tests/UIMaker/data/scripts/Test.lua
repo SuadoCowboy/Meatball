@@ -1,6 +1,22 @@
--- MAIN TODO: create a dynamic panel that have a random color every time we run.
--- also add a button that changes the color to the specified in the text box and a output box
+-- MAIN TODO: add a button that changes the color to the specified in the text box and a output box
 -- giving the history of all the color changes
+
+--[[
+The way this works uses too much memory and probably cpu when we could make it use less.
+TODO: Look for better possibilities and change how this works.
+
+For now I'm thinking that having the event functions are going to take too much.
+Because they have a logic defined by their name, like onResize we know it will be used
+when resizing the panel, what we could do is: event of type onResize takes a table of names
+and a lua string, whose would be get on the C-side and every object that contains that name
+will be updated with that lua string that all it does is get that object and pass to the lua
+string with a fixed name and what the string returns is the new value of the object position.
+
+Makes sense? I think I wrote some nonsense but I'm too tired to do anything now.
+
+HOWEVER, WE WILL NOT GIVE UP ON LUA! It's a fun idea to have a fully customizable interface
+and even the event functions being able to be changed if the user wants to add/remove something
+]]
 
 local function randomColor(colorBefore)
     local color = Meatball.color(math.random(0, 255), math.random(0, 255), math.random(0, 255), 255)
@@ -17,7 +33,7 @@ local function randomColor(colorBefore)
 end
 
 local interface = {
-    printHailoButton = nil,
+    changeColorButton = nil,
     kysButton = nil,
     panel = nil,
 }
@@ -25,15 +41,15 @@ local interface = {
 -- Using 800x600 as base
 interface.panel = Meatball.UI.dynamicPanel()
 interface.panel.rect = Meatball.rect(0, 0, Game.viewport.x, Game.viewport.y)
-interface.panel.config.color = Meatball.color(10, 10, 10, 255)
+interface.panel.config.color = randomColor(Meatball.color(0,0,0,255))
 
-interface.printHailoButton = Meatball.UI.button()
-interface.printHailoButton.config.color = Meatball.color(20, 20, 20, 255)
-interface.printHailoButton.config.hoveredColor = Meatball.color(40, 40, 40, 255)
+interface.changeColorButton = Meatball.UI.button()
+interface.changeColorButton.config.color = Meatball.color(20, 20, 20, 255)
+interface.changeColorButton.config.hoveredColor = Meatball.color(40, 40, 40, 255)
 
-interface.printHailoButton.onRelease = function()
-    Meatball.Console.run("echo Hailooo >.<")
+interface.changeColorButton.onRelease = function()
     interface.panel.config.color = randomColor(interface.panel.config.color)
+    --interface.panel.config.color = stringToColor(interface.colorInputBox.getText())
 
     return interface
 end
@@ -52,17 +68,17 @@ interface.panel.onResize = function()
         interface.panel.config.grabHeight = 1
     end
 
-    interface.printHailoButton.rect.width = interface.panel.rect.width * 0.06 -- 48px
-    interface.printHailoButton.rect.height = interface.panel.rect.height * 0.02 -- 12px
+    interface.changeColorButton.rect.width = interface.panel.rect.width * 0.06 -- 48px
+    interface.changeColorButton.rect.height = interface.panel.rect.height * 0.02 -- 12px
 
-    interface.kysButton.rect.width = interface.printHailoButton.rect.width
-    interface.kysButton.rect.height = interface.printHailoButton.rect.height
+    interface.kysButton.rect.width = interface.changeColorButton.rect.width
+    interface.kysButton.rect.height = interface.changeColorButton.rect.height
 
     interface.panel.onMove()
 
     interface.panel.config.minSize.x = -- get the furthest x position in the panel
-        interface.printHailoButton.rect.x+
-        interface.printHailoButton.rect.width
+        interface.changeColorButton.rect.x+
+        interface.changeColorButton.rect.width
 
     interface.panel.config.minSize.y = -- get the furthest y position in the panel
         interface.kysButton.rect.y+
@@ -72,11 +88,11 @@ interface.panel.onResize = function()
 end
 
 interface.panel.onMove = function()
-    interface.printHailoButton.rect.x = interface.panel.rect.x + (interface.panel.rect.width - interface.printHailoButton.rect.width) * 0.5
-    interface.printHailoButton.rect.y = interface.panel.rect.y + (interface.panel.rect.height - interface.printHailoButton.rect.height) * 0.5
+    interface.changeColorButton.rect.x = interface.panel.rect.x + (interface.panel.rect.width - interface.changeColorButton.rect.width) * 0.5
+    interface.changeColorButton.rect.y = interface.panel.rect.y + (interface.panel.rect.height - interface.changeColorButton.rect.height) * 0.5
 
-    interface.kysButton.rect.x = interface.printHailoButton.rect.x
-    interface.kysButton.rect.y = interface.printHailoButton.rect.y + interface.printHailoButton.rect.height + 1
+    interface.kysButton.rect.x = interface.changeColorButton.rect.x
+    interface.kysButton.rect.y = interface.changeColorButton.rect.y + interface.changeColorButton.rect.height + 1
 
     return interface
 end
