@@ -62,7 +62,7 @@ unsigned char setLuaVariables(lua_State* L) {
 /// @brief stack idx -1 = table with button content
 /// @warning lua_State should not end while button's events are used
 /// @return new ButtonStruct()
-ButtonStruct* createButton(lua_State* L) {
+ButtonStruct* createButton(lua_State*& L) {
     lua_getfield(L, -1, "rect");
         if (!Meatball::Script::isRect(L, -1))
             luaL_error(L, "Button.rect is not a rect.");
@@ -86,7 +86,7 @@ ButtonStruct* createButton(lua_State* L) {
     lua_getfield(L, -1, "onHover");
     if (lua_isfunction(L, -1)) {
         pButton->onHoverFuncRef = luaL_ref(L, LUA_REGISTRYINDEX);
-        pButton->button.onHover = [L, pButton]() {
+        pButton->button.onHover = [&L, pButton]() {
             lua_rawgeti(L, LUA_REGISTRYINDEX, pButton->onHoverFuncRef);
 
             if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
@@ -101,7 +101,7 @@ ButtonStruct* createButton(lua_State* L) {
     lua_getfield(L, -1, "onRelease");
     if (lua_isfunction(L, -1)) {
         pButton->onReleaseFuncRef = luaL_ref(L, LUA_REGISTRYINDEX);
-        pButton->button.onRelease = [L, pButton]() {
+        pButton->button.onRelease = [&L, pButton]() {
             lua_rawgeti(L, LUA_REGISTRYINDEX, pButton->onReleaseFuncRef);
 
             if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
@@ -116,7 +116,7 @@ ButtonStruct* createButton(lua_State* L) {
     return pButton;
 }
 
-void handleNoneLayoutType(lua_State* L, std::vector<ButtonStruct*>& buttons) {
+void handleNoneLayoutType(lua_State*& L, std::vector<ButtonStruct*>& buttons) {
     lua_pushnil(L); // push the first key
     while (lua_next(L, 2) != 0) {
         // FUTURE TODO: name could be used to see what is what in the window
