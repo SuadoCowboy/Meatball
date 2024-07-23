@@ -121,7 +121,7 @@ void updateInterface(lua_State*& L, std::vector<ButtonStruct*>& buttons, std::ve
 /// @param name is used to throw errors with more precision
 /// @warning lua_State should not end while button's events are used
 /// @return new ButtonStruct()
-ButtonStruct* createButton(lua_State*& L, const std::string& name) {
+ButtonStruct* createButton(lua_State*& L, const std::string& name, std::vector<ButtonStruct*>& buttons, std::vector<DynamicPanelStruct*>& dynamicPanels) {
     Rectangle rect;
     SCRIPT_GET_RECT(L, -1, rect, "rect", name + ".rect");
 
@@ -140,31 +140,34 @@ ButtonStruct* createButton(lua_State*& L, const std::string& name) {
 
     lua_getfield(L, -1, "onHover");
     if (lua_isfunction(L, -1))
-        pButton->button.onHover = [&L, pButton]() {
+        pButton->button.onHover = [&L, pButton, &buttons, &dynamicPanels]() {
             lua_rawgeti(L, LUA_REGISTRYINDEX, pButton->ref);
 
             lua_getfield(L, -1, "onHover");
-            if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+            if (lua_pcall(L, 0, 1, 0) != LUA_OK) {
                 Meatball::Console::printf(HayBCMD::ERROR, "error calling onHover script: {}\n", lua_tostring(L, -1));
                 lua_pop(L, 1);
                 return;
             }
 
+            updateInterface(L, buttons, dynamicPanels);
             lua_pop(L, 1);
         };
     lua_pop(L, 1);
     
     lua_getfield(L, -1, "onRelease");
     if (lua_isfunction(L, -1))
-        pButton->button.onRelease = [&L, pButton]() {
+        pButton->button.onRelease = [&L, pButton, &buttons, &dynamicPanels]() {
             lua_rawgeti(L, LUA_REGISTRYINDEX, pButton->ref);
 
             lua_getfield(L, -1, "onRelease");
-            if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+            if (lua_pcall(L, 0, 1, 0) != LUA_OK) {
                 Meatball::Console::printf(HayBCMD::ERROR, "error calling onRelease script: {}\n", lua_tostring(L, -1));
                 lua_pop(L, 1);
                 return;
             }
+
+            updateInterface(L, buttons, dynamicPanels);
 
             lua_pop(L, 1);
         };
@@ -280,7 +283,7 @@ void handleNoneLayoutType(lua_State*& L, int tableIndex, std::vector<ButtonStruc
 
         switch (objectType) {
             case SCRIPT_UI_TYPE_BUTTON: {
-                ButtonStruct* pButton = createButton(L, name);
+                ButtonStruct* pButton = createButton(L, name, buttons, dynamicPanels);
                 buttons.emplace_back(pButton);
                 break;
             }
