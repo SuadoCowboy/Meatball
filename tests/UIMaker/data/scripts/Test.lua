@@ -5,22 +5,40 @@
 -- CURRENT TODO: create a working button
 
 local interface = {
-    myButton = nil
+    myButton1 = nil,
+    myButton2 = nil
 }
 
-interface.myButton = Meatball.UI.button()
+interface.myButton1 = Meatball.UI.button()
 
 -- Using 800x600 as base
-interface.myButton.rect.width = Game.viewport.x * 0.06 -- 48px
-interface.myButton.rect.height = Game.viewport.y * 0.04 -- 24px
+interface.myButton1.rect.width = Game.viewport.x * 0.06 -- 48px
+interface.myButton1.rect.height = Game.viewport.y * 0.02 -- 12px
 
-interface.myButton.rect.x = (Game.viewport.x - interface.myButton.rect.width) * 0.5
-interface.myButton.rect.y = (Game.viewport.y - interface.myButton.rect.height) * 0.5
-interface.myButton.onRelease = function() print("onRelease called!") end
-interface.myButton.onHover = function() print("onHover called!") end
+interface.myButton1.rect.x = (Game.viewport.x - interface.myButton1.rect.width) * 0.5
+interface.myButton1.rect.y = (Game.viewport.y - interface.myButton1.rect.height) * 0.5
+interface.myButton1.onRelease = function() print("onRelease called on myButton1!") end
+interface.myButton1.onHover = function() print("onHover called on myButton1!") end
 
-interface.myButton.config.color = Meatball.color(20, 20, 20, 255)
-interface.myButton.config.hoveredColor = Meatball.color(40, 40, 40, 255)
+interface.myButton1.config.color = Meatball.color(20, 20, 20, 255)
+interface.myButton1.config.hoveredColor = Meatball.color(40, 40, 40, 255)
+
+interface.myButton1.rect.width = Game.viewport.x * 0.06 -- 48px
+interface.myButton1.rect.height = Game.viewport.y * 0.04 -- 24px
+
+interface.myButton2 = Meatball.UI.button()
+
+interface.myButton2.rect.width = interface.myButton1.rect.width
+interface.myButton2.rect.height = interface.myButton1.rect.height
+
+interface.myButton2.rect.x = interface.myButton1.rect.x
+interface.myButton2.rect.y = interface.myButton1.rect.y + interface.myButton1.rect.height + 1
+
+interface.myButton2.onRelease = function() print("onRelease called on myButton2!") end
+interface.myButton2.onHover = function() print("onHover called on myButton2!") end
+
+interface.myButton2.config.color = Meatball.color(255, 0, 0, 255)
+interface.myButton2.config.hoveredColor = Meatball.color(0, 255, 0, 255)
 
 return Meatball.UI.LayoutTypes.NONE, interface
 --[[

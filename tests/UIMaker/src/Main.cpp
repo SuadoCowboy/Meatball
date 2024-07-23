@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
                     lua_getfield(L, -1, "onHover");
                     if (lua_isfunction(L, -1)) {
                         pButton->onHoverFuncRef = luaL_ref(L, LUA_REGISTRYINDEX);
-                        pButton->button.onHover = [&L, &pButton]() {
+                        pButton->button.onHover = [&L, pButton]() {
                             lua_rawgeti(L, LUA_REGISTRYINDEX, pButton->onHoverFuncRef);
 
                             if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
                     lua_getfield(L, -1, "onRelease");
                     if (lua_isfunction(L, -1)) {
                         pButton->onReleaseFuncRef = luaL_ref(L, LUA_REGISTRYINDEX);
-                        pButton->button.onRelease = [&L, &pButton]() {
+                        pButton->button.onRelease = [&L, pButton]() {
                             lua_rawgeti(L, LUA_REGISTRYINDEX, pButton->onReleaseFuncRef);
 
                             if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
@@ -139,7 +139,9 @@ int main(int argc, char** argv) {
                 }
             }
         }
+        lua_pop(L, 1);
     }
+    lua_pop(L, 2);
 
     Vector2 viewport = {(float)GetRenderWidth(), (float)GetRenderHeight()};
 
@@ -195,6 +197,15 @@ int main(int argc, char** argv) {
 
         EndDrawing();
     }
+
+    for (auto& obj : buttons) {
+        if (obj->onHoverFuncRef != 0)
+            luaL_unref(L, LUA_REGISTRYINDEX, obj->onHoverFuncRef);
+        if (obj->onReleaseFuncRef != 0)
+            luaL_unref(L, LUA_REGISTRYINDEX, obj->onReleaseFuncRef);
+        delete obj;
+    }
+    buttons.clear();
 
     lua_close(L);
 }
