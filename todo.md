@@ -19,46 +19,40 @@
 - ConsoleUI: Try implementing a optional draw lua function so that the creator of the UI can draw the way he wants to. (this way they could also make stupid things, which is fun). If this is implemented, it would be nice to give lua variables the delta time and stuff related to game.
 
 - Example: for Console, the user have some options: mainPanel, closeButton, sendButton(optional), inputBox and OutputTextBox. They also can modify events that the Console allowed, like: mainPanel::onMove, mainPanel::onResize and mainPanel::onResizeStop. The rest of the events are handled by the ConsoleUI code. closeButton::onRelease can not be changed because by default it should set ConsoleUI.visible to false. sendButton is the same thing, it should always send to the output and clear the input text. It would be something like this in lua:
-```lua
--- THIS IS STILL ON THINKING, THINGS MIGHT NOT BE LIKE THIS ON RELEASE OF THE FIRST VERSION
+```c++
+// THIS IS STILL ON THINKING, THINGS MIGHT NOT BE LIKE THIS ON RELEASE OF THE FIRST VERSION
+// Also add something related to resizing. Something like a anchor (see how game engines work).
 
--- params: x y width height style color hoveredColor
-local consoleUI = {
-    closeButton=nil,
-    mainPanel=nil,
-    inputBox=nil,
-    outputBox=nil
-}
+// params: name x y width height color hoveredColor BUTTON_STYLE(number)
+ui_create_button "closeButton" x y width height 235 235 235 255 255 255 255 255 1
 
-consoleUI.closeButton = Meatball.UI.button(Meatball.rect(x, y, width, height), Meatball.UI.BUTTON_STYLES.STYLE_X, Meatball.COLORS.LIGHT_GRAY, Meatball.COLORS.WHITE)
+ui_set_event "closeButton" "onRelease" "echo close button hovered"
 
-consoleUI.closeButton.onHover = function() 
-    print("closeButton.onHover called")
-end
+// params: name x y width height color borderRadius
+ui_create_dynamic_panel "mainPanel" x y width height 10 10 10 255 0
 
-consoleUI.closeButton.onRelease = function() 
-    print("closeButton.onRelease called")
-end
+// params: name x y width height color textColor hoveredColor hoveredTextColor text
+//ui_create_text_button "sendButton" x y width height r g b a (x4) "Send"
 
--- params: rect borderRadius color
-consoleUI.mainPanel = Meatball.UI.dynamicPanel(Meatball.rect(x, y, width, height), 0, {10,10,10,255})
+ui_create_input_text_box "inputBox" x y width height 20 20 20 255 "default text"
 
--- Optional stuff: we don't declare
--- params: rect, text
---sendButton = createTextButton(Meatball.rect(x, y, width, height), "Send")
+ui_create_scroll_text_box name x y width height 20 20 20 255
+// OR
+// OBS: This method might need to create a math interpreter but it might not bee too hard to do and maybe even the HayBCMD could have already implemented
+// where inputBox is specified, it means that it gets which parameter it is(ex: xPosition) and get the member of that object that matches the parameter
+ui_create_scroll_text_box name "inputBox" "inputBox - 30" "inputBox" "inputBox"
 
--- params: rect defaultText color
-consoleUI.inputBox = Meatball.UI.inputTextBox(Meatball.rect(x, y, width, height), "default text written in input box", {20,20,20,255})
+// and then if someone wants to add a random button non-related to ConsoleUI:
+ui_create_text_button "smiteAllButton" x y width height r g b a
 
--- params: rect color
-consoleUI.outputBox = Meatball.UI.scrollTextBox(Meatball.rect(x, y, width, height), Meatball.color(20, 20, 20, 255))
+ui_finish "ConsoleUI"
+// this line gather all objects created by the ui_create commands and create a complete interface with a name that the game might look for and pop from the ui storage and set a defined object using that. Makes sense? I think it's pretty simple to do this. By the way, known objects have to use a specific name so that the game that uses that interface knows who is who
 
-return Meatball.UI.TYPES.Console, consoleUI -- The type first and then the table
---[[ TODOS:
+/*TODOS: (those are old todos that was made for the lua project. Don't know if it's still useful now)
 if game does not recognize objectName: tell user
 if type is not allowed for objectName: tell user and stop running
 if a required objectName is not defined in the end: tell user and stop running
-]]--
+*/
 ```
 
 # FUTURE TODOS:
