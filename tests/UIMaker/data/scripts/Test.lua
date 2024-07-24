@@ -5,17 +5,9 @@
 The way this works uses too much memory and probably cpu when we could make it use less.
 TODO: Look for better possibilities and change how this works.
 
-For now I'm thinking that having the event functions are going to take too much.
-Because they have a logic defined by their name, like onResize we know it will be used
-when resizing the panel, what we could do is: event of type onResize takes a table of names
-and a lua string, whose would be get on the C-side and every object that contains that name
-will be updated with that lua string that all it does is get that object and pass to the lua
-string with a fixed name and what the string returns is the new value of the object position.
-
-Makes sense? I think I wrote some nonsense but I'm too tired to do anything now.
-
-HOWEVER, WE WILL NOT GIVE UP ON LUA! It's a fun idea to have a fully customizable interface
-and even the event functions being able to be changed if the user wants to add/remove something
+BEST APPROACH: NO FUCKING LUA! Lua is not going to help in performance.
+Create console commands to create UI but before that make a UI System to make it easy
+to implement in any ways possible to implement
 ]]
 
 local function randomColor(colorBefore)
