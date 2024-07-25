@@ -8,13 +8,8 @@
 
 - Create tasks system, the console commands will run through tasks and then the players will be able to use the wait command(also add wait_ticks which waits ticks instead of milliseconds)
 
-- The UI with Lua thing
-
-# User Interface with Lua
-- Use lua language to create UI. Should also make a way so that users can test their interfaces without joining the game everytime.
-- Also set a macro to define its actual version because it could change alot in the future
-
-- It would also require to implement the events related to specific classes for example DynamicPanel events like onMove, onResize, onResizeStop, and other classes that might have events and stuff. My idea is: make it in lua :D, It's just the UI in lua and later will be used in C++ so it will be fine I guess.
+- Implement UI commands
+- 
 
 - ConsoleUI: Try implementing a optional draw lua function so that the creator of the UI can draw the way he wants to. (this way they could also make stupid things, which is fun). If this is implemented, it would be nice to give lua variables the delta time and stuff related to game.
 
