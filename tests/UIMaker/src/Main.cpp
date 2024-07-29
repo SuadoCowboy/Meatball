@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
         c.pData = &c;
     }
 
-    Vector2 viewport = {(float)GetRenderWidth(), (float)GetRenderHeight()};
+    //Vector2 viewport = {(float)GetRenderWidth(), (float)GetRenderHeight()};
     
     std::vector<UIObject*> uiObjects;
     
