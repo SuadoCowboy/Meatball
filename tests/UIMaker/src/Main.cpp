@@ -19,6 +19,8 @@
 #define UI_TYPE_BUTTON 0
 #define UI_TYPE_DYNAMIC_PANEL 1
 
+Font consoleGeneralFont, consoleLabelFont, defaultFont;
+
 struct UIObject {
     void* object = nullptr;
     const char* name;
@@ -35,10 +37,14 @@ Meatball::ConsoleUIScene* init(int width, int height) {
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
     InitWindow(width, height, "Meatball's Interface Creator");
 
-    Meatball::Defaults::init("data/meatdata/Init.meatdata");
+    defaultFont = GetFontDefault();
+
+    Meatball::Defaults::init("data/meatdata/Init.meatdata", defaultFont);
     auto consoleUI = new Meatball::ConsoleUIScene(Meatball::Defaults::initLocalConsole(
         {0, 0, 800 * 0.5f, 600 * 0.75f},
-        "data/meatdata/Console.meatdata"
+        "data/meatdata/Console.meatdata",
+        consoleGeneralFont,
+        consoleLabelFont
     ));
 
     Meatball::Input::registerCommands();
@@ -82,7 +88,7 @@ int main(int argc, char** argv) {
         c.pData = &c;
     }
 
-    Vector2 viewport = {GetRenderWidth(), GetRenderHeight()};
+    Vector2 viewport = {(float)GetRenderWidth(), (float)GetRenderHeight()};
     
     std::vector<UIObject*> uiObjects;
     
@@ -103,7 +109,7 @@ int main(int argc, char** argv) {
 
     float optionsMinWidth = 0.0f;
     for (auto& option : options) {
-        float width = Meatball::measureTextWidth(*option.font, option.font->baseSize, option.text);
+        float width = Meatball::measureTextWidth(option.font, option.font.baseSize, option.text);
         if (width > optionsMinWidth) optionsMinWidth = width;
     }
 
@@ -120,7 +126,7 @@ int main(int argc, char** argv) {
 
         if (IsWindowResized()) {
             float newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
-            Vector2 ratio = { newScreenWidth / viewport.x, newScreenHeight / viewport.y };
+            //Vector2 ratio = { newScreenWidth / viewport.x, newScreenHeight / viewport.y };
 
             viewport.x = newScreenWidth;
             viewport.y = newScreenHeight;
@@ -139,9 +145,9 @@ int main(int argc, char** argv) {
             Vector2 mousePos = GetMousePosition();
             unsigned char i = 0;
             for (; i < options.size(); ++i) {
-                Meatball::drawText(*optionsFont, optionsFont->baseSize, options[i].text, mousePos.x, mousePos.y+i*optionsFont->baseSize, optionsTextColor);
+                Meatball::drawText(optionsFont, optionsFont.baseSize, options[i].text, mousePos.x, mousePos.y+i*optionsFont.baseSize, optionsTextColor);
             }
-            DrawRectangle(mousePos.x, mousePos.y, optionsMinWidth, i*optionsFont->baseSize, optionsColor);
+            DrawRectangle(mousePos.x, mousePos.y, optionsMinWidth, i*optionsFont.baseSize, optionsColor);
         }
 
         consoleUI->update();
