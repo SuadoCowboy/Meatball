@@ -9,7 +9,7 @@
 - Create tasks system, the console commands will run through tasks and then the players will be able to use the wait command(also add wait_ticks which waits ticks instead of milliseconds)
 
 - Implement UI commands
-- 
+- FontsHandler still a piece of shit. Fix it.
 
 - ConsoleUI: Try implementing a optional draw lua function so that the creator of the UI can draw the way he wants to. (this way they could also make stupid things, which is fun). If this is implemented, it would be nice to give lua variables the delta time and stuff related to game.
 
@@ -18,13 +18,26 @@
 // THIS IS STILL ON THINKING, THINGS MIGHT NOT BE LIKE THIS ON RELEASE OF THE FIRST VERSION
 // Also add something related to resizing. Something like a anchor (see how game engines work).
 
-// params: name x y width height color hoveredColor BUTTON_STYLE(number)
-ui_create_button "closeButton" x y width height 235 235 235 255 255 255 255 255 1
-
-ui_set_event "closeButton" "onRelease" "echo close button hovered"
-
+// BETTER IDEA: It works like Lua's stack. It adds all the data needed and then we call ui_create_button <name> and the data is popped. Any data that is not needed or not recognized, a error is printed but it will still be popped to not ruin any other possible ui object.
 // params: name x y width height color borderRadius
-ui_create_dynamic_panel "mainPanel" x y width height 10 10 10 255 0
+ui_color 10 10 10 255
+ui_border_radius 0
+ui_rect_min 0 0 10 10 // for mainPanel, (x,y) are used to determine where mainPanel can be dragged or resized to
+ui_rect_max_percent width height w h // [w,width] = renderWidth; [h,height] = renderHeight
+ui_create_dynamic_panel "mainPanel"
+
+// params: name x y width height color hoveredColor BUTTON_STYLE(number)
+//ui_create_button "closeButton" x y width height 235 235 235 255 255 255 255 255 1
+ui_color 235 235 235 255
+ui_hovered_color 255 255 255 255
+// x% y% width% height%
+ui_anchor "mainPanel" // mainPanel should be defined before closeButton
+ui_rect_min_percent 0 0 1 1
+ui_rect_max_percent 0 0 3 3 
+ui_draw x // it means that we will use drawX function
+ui_create_button "closeButton"
+
+ui_set_event "closeButton" "onRelease" toggle_local_console
 
 // params: name x y width height color textColor hoveredColor hoveredTextColor text
 //ui_create_text_button "sendButton" x y width height r g b a (x4) "Send"
@@ -74,4 +87,4 @@ if a required objectName is not defined in the end: tell user and stop running
 - 3D map maker and loader
 - take source engine movement(Bhop, ABH, Strafe, etc)
 - good Collision Detection(AABB? Search more about it)
-- A* path finding for AI
+- NPC base class
