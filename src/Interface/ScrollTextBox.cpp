@@ -132,7 +132,7 @@ const std::list<std::pair<std::string, const Color&>> &Meatball::ScrollTextBox::
     return text;
 }
 
-const unsigned int &Meatball::ScrollTextBox::getContentHeight() const {
+unsigned int Meatball::ScrollTextBox::getContentHeight() const {
     return contentHeight;
 }
 

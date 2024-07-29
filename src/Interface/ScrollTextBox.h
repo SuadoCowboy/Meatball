@@ -33,7 +33,7 @@ namespace Meatball {
         ScrollTextBox(const Rectangle& rect);
 
         const Rectangle& getRect() const;
-        const unsigned int &getContentHeight() const;
+        unsigned int getContentHeight() const;
         ScrollBar &getScrollBar();
 
         void appendText(std::string text, Color& color);

@@ -7,7 +7,7 @@
 
 unsigned char Meatball::ConsoleUIScene::margin = 4;
 
-static void handleInputHistoryPos(Meatball::InputTextBox &inputBox, std::string *inputHistory, const unsigned char &inputHistorySize, unsigned char &inputHistoryPos) {
+static void handleInputHistoryPos(Meatball::InputTextBox &inputBox, std::string *inputHistory, unsigned char inputHistorySize, unsigned char &inputHistoryPos) {
     if ((IsKeyPressed(KEY_UP) || IsKeyPressedRepeat(KEY_UP)) && inputHistoryPos != 0)
         --inputHistoryPos;
     
