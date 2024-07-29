@@ -128,8 +128,8 @@ int main(int argc, char** argv) {
             float newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
             //Vector2 ratio = { newScreenWidth / viewport.x, newScreenHeight / viewport.y };
 
-            viewport.x = newScreenWidth;
-            viewport.y = newScreenHeight;
+            //viewport.x = newScreenWidth;
+            //viewport.y = newScreenHeight;
         }
 
         Meatball::Input::update(false);
