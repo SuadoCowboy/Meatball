@@ -13,7 +13,7 @@ namespace Meatball {
         struct ScrollTextBox {
             ScrollTextBox();
 
-            std::shared_ptr<Font> font;
+            Font* font;
             unsigned short fontSize;
 
             Color color;
@@ -32,7 +32,7 @@ namespace Meatball {
         ScrollTextBox();
         ScrollTextBox(const Rectangle& rect);
 
-        const Rectangle &getRect() const;
+        const Rectangle& getRect() const;
         const unsigned int &getContentHeight() const;
         ScrollBar &getScrollBar();
 

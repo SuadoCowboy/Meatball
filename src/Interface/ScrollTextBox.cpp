@@ -35,7 +35,7 @@ static float _getContentHeight(const std::list<std::pair<std::string, const Colo
     return lineIdx*fontSize; // contentHeight
 }
 
-static inline void handleTextWrapping(std::list<std::pair<std::string, const Color&>> &textList, const std::string &text, Color& color, std::shared_ptr<Font> font, float maxWidth) {
+static inline void handleTextWrapping(std::list<std::pair<std::string, const Color&>> &textList, const std::string &text, Color& color, Font* font, float maxWidth) {
     textList.push_back({"", color});
     std::string newText = text;
 
@@ -98,7 +98,7 @@ void Meatball::ScrollTextBox::updateTextWrap() {
     scrollBar.visible = contentHeight > rect.height;
 }
 
-void Meatball::ScrollTextBox::appendText(std::string newText, Color &color) {
+void Meatball::ScrollTextBox::appendText(std::string newText, Color& color) {
     if (newText.size() == 0) return;
     
     if (Meatball::measureTextWidth(*config->font, config->fontSize, newText.c_str()) < rect.width-scrollBar.getRect().width) {
@@ -136,7 +136,7 @@ const unsigned int &Meatball::ScrollTextBox::getContentHeight() const {
     return contentHeight;
 }
 
-const Rectangle &Meatball::ScrollTextBox::getRect() const {
+const Rectangle& Meatball::ScrollTextBox::getRect() const {
     return rect;
 }
 

@@ -30,7 +30,7 @@ void Meatball::ScrollBar::setSize(float width, float height) {
     rect.height = height;
 }
 
-const float& Meatball::ScrollBar::getScrollValue() const {
+float Meatball::ScrollBar::getScrollValue() const {
     return scrollValue;
 }
 
@@ -51,7 +51,7 @@ void Meatball::ScrollBar::draw() {
     DrawRectangle(rect.x, rect.y+thumbY, rect.width, thumbHeight, *actualScrollColor);
 }
 
-void Meatball::ScrollBar::update(const Rectangle &parentRect) {
+void Meatball::ScrollBar::update(const Rectangle& parentRect) {
     Vector2 mousePosition = GetMousePosition();
     
     barHovered = CheckCollisionPointRec(mousePosition, rect);
@@ -89,7 +89,7 @@ void Meatball::ScrollBar::update(const Rectangle &parentRect) {
     scrollValue = thumbY / thumbHeight;
 }
 
-const Rectangle &Meatball::ScrollBar::getRect() {
+const Rectangle& Meatball::ScrollBar::getRect() {
     return rect;
 }
 

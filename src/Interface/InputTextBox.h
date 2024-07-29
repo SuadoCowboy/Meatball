@@ -13,7 +13,7 @@ namespace Meatball {
         struct InputTextBox {
             InputTextBox();
 
-            std::shared_ptr<Font> font;
+            Font* font;
             unsigned short fontSize;
 
             Color color, textColor, cursorColor, selectionColor;
@@ -27,7 +27,7 @@ namespace Meatball {
     class InputTextBox {
     public:
         InputTextBox();
-        InputTextBox(const Rectangle &rect);
+        InputTextBox(const Rectangle& rect);
 
         void draw();
         void update();

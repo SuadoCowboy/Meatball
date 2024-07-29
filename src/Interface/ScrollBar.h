@@ -30,11 +30,11 @@ namespace Meatball {
         ScrollBar(const Rectangle& rect, bool visible = true);
         
         /// @param parentRect to check if the mouse is between parent's boundaries to use mouse wheel 
-        void update(const Rectangle &parentRect);
+        void update(const Rectangle& parentRect);
 
         void draw();
 
-        const float& getScrollValue() const;
+        float getScrollValue() const;
         void setScrollValue(float value);
 
         /// @param viewHeight basically, the height of the parent
@@ -45,7 +45,7 @@ namespace Meatball {
         /// @warning should call updateThumbHeight and update after calling this function or else things might break
         void setSize(float width, float height);
         
-        const Rectangle &getRect();
+        const Rectangle& getRect();
 
         std::shared_ptr<Config::ScrollBar> config;
         

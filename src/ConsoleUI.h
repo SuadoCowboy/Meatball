@@ -26,7 +26,7 @@ namespace Meatball {
         struct ConsoleUI {
             ConsoleUI();
             
-            std::shared_ptr<Font> labelFont; // used only for label
+            Font* labelFont; // used only for label
 
             Color autoCompleteColor; // color of the rect
             Color autoCompleteTextColor;
@@ -35,14 +35,14 @@ namespace Meatball {
 
             Color labelTextColor;
 
-            const char *labelText;
+            const char* labelText;
         };
     }
 
     class ConsoleUIScene : public Scene {
     public:
         /// @param visible if scene is visible or not(only this class uses this)
-        ConsoleUIScene(const Rectangle &rect, const std::shared_ptr<Config::ConsoleUI> &config, bool visible = false);
+        ConsoleUIScene(const Rectangle& rect, const std::shared_ptr<Config::ConsoleUI> &config, bool visible = false);
 
         virtual ~ConsoleUIScene() {};
 

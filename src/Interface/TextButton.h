@@ -12,7 +12,7 @@ namespace Meatball {
         struct TextButton {
             TextButton();
 
-            std::shared_ptr<Font> font;
+            Font* font;
             unsigned short fontSize;
 
             Color color;

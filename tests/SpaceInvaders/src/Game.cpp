@@ -6,7 +6,6 @@
 
 #include <Console.h>
 #include <Utils/Defaults.h>
-#include <FontsHandler.h>
 #include <MouseCursor.h>
 #include <Input.h>
 #include <Config.h>
@@ -19,6 +18,12 @@
 using namespace Meatball;
 
 Meatball::ConsoleUIScene* consoleUI = nullptr;
+struct ConsoleFonts {
+    Font label;
+    Font inputBox;
+    Font outputBox;
+};
+ConsoleFonts consoleFonts;
 
 Texture2D backgroundTexture;
 
@@ -27,6 +32,8 @@ shouldQuit = 1,
 saveSettings = 2
 */
 unsigned char conditionFlags = 0;
+
+Font consoleGeneralFont, consoleLabelFont;
 
 void init(int windowWidth, int windowHeight) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -37,7 +44,8 @@ void init(int windowWidth, int windowHeight) {
     int currentMonitorId = GetCurrentMonitor();
     SetWindowMaxSize(GetMonitorWidth(currentMonitorId), GetMonitorHeight(currentMonitorId));
 
-    Defaults::init("data/meatdata/Init.meatdata");
+    Font defaultFont = GetFontDefault();
+    Defaults::init("data/meatdata/Init.meatdata", defaultFont);
 
     Rectangle consoleUIRect = { 0, 0, windowWidth * 0.5f, windowHeight * 0.75f };
     consoleUIRect.x = windowWidth * 0.5f - consoleUIRect.width * 0.5f;
@@ -46,7 +54,9 @@ void init(int windowWidth, int windowHeight) {
     if (consoleUI != nullptr) delete consoleUI;
     consoleUI = new ConsoleUIScene(Defaults::initLocalConsole(
         consoleUIRect,
-        "data/meatdata/Console.meatdata"));
+        "data/meatdata/Console.meatdata",
+        consoleGeneralFont,
+        consoleLabelFont));
 
     consoleUI->visible = false;
 
@@ -132,14 +142,11 @@ void init(int windowWidth, int windowHeight) {
 }
 
 void reloadFonts() {
-    FontsHandler::clear();
-    FontsHandler::add(0, GetFontDefault());
-
     auto consoleData = Config::loadData("data/meatdata/Console.meatdata");
 
     auto data = Config::ifContainsGet(consoleData, "font");
     std::string path;
-    if (data) Defaults::loadConsoleFonts(*consoleUI, ((Config::ConfigTypeData<std::string>*)data)->value);
+    if (data) Defaults::loadConsoleFonts(*consoleUI, ((Config::ConfigTypeData<std::string>*)data)->value, consoleGeneralFont, consoleLabelFont);
 
     Config::clearData(consoleData);
 }
@@ -174,7 +181,7 @@ void resize() {
     }
 }
 
-void update(const float& dt) {
+void update(float dt) {
     consoleUI->update();
     Input::update(consoleUI->visible);
 
@@ -236,7 +243,9 @@ void save(const std::string& path) {
 }
 
 void cleanup() {
-    FontsHandler::clear();
+    UnloadFont(consoleFonts.label);
+    UnloadFont(consoleFonts.inputBox);
+    UnloadFont(consoleFonts.outputBox);
     CloseWindow();
 }
 
@@ -280,7 +289,7 @@ void loadCommands() {
     Input::allowedUiCommands.push_back("quit");
 }
 
-bool handleBullet(size_t& bulletIdx, const float& dt) {
+bool handleBullet(size_t& bulletIdx, float dt) {
     Rectangle rect = { bullets[bulletIdx].position.x, bullets[bulletIdx].position.y, bulletSize.x, bulletSize.y };
     float movement = bulletSpeed * backgroundTexture.height * dt;
     

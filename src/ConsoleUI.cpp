@@ -27,7 +27,7 @@ Meatball::Config::ConsoleUI::ConsoleUI()
  autoCompleteHighlightedTextColor(YELLOW), autoCompleteSelectedTextColor(PURPLE),
  labelTextColor(WHITE) {}
 
-Meatball::ConsoleUIScene::ConsoleUIScene(const Rectangle &rect, const std::shared_ptr<Config::ConsoleUI> &_config, bool visible)
+Meatball::ConsoleUIScene::ConsoleUIScene(const Rectangle& rect, const std::shared_ptr<Config::ConsoleUI> &_config, bool visible)
  : Scene(), config(_config), visible(visible), mainPanel(rect) {
 	// Because console interface SHOULD always exist, it's a good idea to get the default
 	// config from here. any other interface that the default config is not defined in the

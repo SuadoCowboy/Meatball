@@ -25,7 +25,7 @@ namespace Meatball {
     class DynamicPanel {
     public:
         DynamicPanel();
-        DynamicPanel(const Rectangle &rect);
+        DynamicPanel(const Rectangle& rect);
 
         void update();
 

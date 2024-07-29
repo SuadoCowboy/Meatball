@@ -7,7 +7,6 @@
 #include "Console.h"
 
 #include "Config.h"
-#include "FontsHandler.h"
 
 #include "Interface/DynamicPanel.h"
 #include "Interface/Button.h"
@@ -18,10 +17,8 @@
 #include "OutputColors.h"
 #include "Utils/Utils.h"
 
-void Meatball::Defaults::init(const std::string& meatdataPath) {
+void Meatball::Defaults::init(const std::string& meatdataPath, Font& defaultFont) {
     auto initData = Config::loadData(meatdataPath);
-    
-    FontsHandler::add(0, GetFontDefault());
 
     Meatball::Config::ConfigData* data;
     dynamicPanelConfig = Config::DynamicPanel();
@@ -41,7 +38,7 @@ void Meatball::Defaults::init(const std::string& meatdataPath) {
 
     textButtonConfig = Config::TextButton();
     {
-        textButtonConfig.font = FontsHandler::get(0,0);
+        textButtonConfig.font = &defaultFont;
 
         data = Config::ifContainsGet(initData, "textButtonColor");
         if (data) textButtonConfig.color = Config::getConfig<Color>(data)->value;
@@ -58,7 +55,7 @@ void Meatball::Defaults::init(const std::string& meatdataPath) {
 
     inputTextBoxConfig = Config::InputTextBox();
     {
-        inputTextBoxConfig.font = FontsHandler::get(0,0);
+        inputTextBoxConfig.font = &defaultFont;
         inputTextBoxConfig.fontSize = inputTextBoxConfig.font->baseSize;
 
         data = Config::ifContainsGet(initData, "inputTextBoxColor");
@@ -91,7 +88,7 @@ void Meatball::Defaults::init(const std::string& meatdataPath) {
 
     scrollTextBoxConfig = Config::ScrollTextBox();
     {
-        scrollTextBoxConfig.font = FontsHandler::get(0,0);
+        scrollTextBoxConfig.font = &defaultFont;
 
         data = Config::ifContainsGet(initData, "color");
         if (data) scrollTextBoxConfig.color = ((Config::ConfigTypeData<Color>*)data)->value;
@@ -100,19 +97,19 @@ void Meatball::Defaults::init(const std::string& meatdataPath) {
     Config::clearData(initData);
 }
 
-void Meatball::Defaults::loadConsoleFonts(ConsoleUIScene& consoleUI, const std::filesystem::path& fontPath) {
+void Meatball::Defaults::loadConsoleFonts(ConsoleUIScene& consoleUI, const std::filesystem::path& fontPath, Font& outGeneralFont, Font& outLabelFont) {
     int size = (int)consoleUI.inputBox.rect.height - 2 + (int)consoleUI.inputBox.rect.height % 2;
-    if (Meatball::loadFont(fontPath, 1, size, nullptr, 0))
-        consoleUI.inputBox.config->font = consoleUI.outputBox.config->font = FontsHandler::get(1, size);
+    if (Meatball::loadFont(fontPath, size, nullptr, 0, outGeneralFont))
+        consoleUI.inputBox.config->font = consoleUI.outputBox.config->font = &outGeneralFont;
 
     size = consoleUI.inputBox.rect.height*0.5;
-    if (Meatball::loadFont(fontPath, 1, size, nullptr, 0))
-        consoleUI.config->labelFont = FontsHandler::get(1, size);
+    if (Meatball::loadFont(fontPath, size, nullptr, 0, outLabelFont))
+        consoleUI.config->labelFont = &outLabelFont;
     
     consoleUI.onResize(1, 1);
 }
 
-Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& rect, const std::string &meatdataPath) {
+Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& rect, const std::string &meatdataPath, Font& outGeneralFont, Font& outLabelFont) {
     std::vector<std::pair<std::string, HayBCMD::OutputLevel>> texts;
     HayBCMD::Output::setPrintFunction([&texts](const HayBCMD::OutputLevel &level, const std::string &text) {
         texts.push_back({text, level});
@@ -152,7 +149,7 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
     data = Config::ifContainsGet(consoleData, "labelColor");
     if (data) consoleConfig->labelTextColor = Config::getConfig<Color>(data)->value;
 
-    consoleConfig->labelFont = FontsHandler::get(0,0);
+    consoleConfig->labelFont = &outLabelFont;
     consoleConfig->labelText = "Local Console";
 
     auto consoleUI = Meatball::ConsoleUIScene({rect.x, rect.y, rect.width, rect.height}, std::move(consoleConfig));
@@ -166,7 +163,8 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
     else consoleUI.closeButton.config->hoveredColor = {255,255,255,255};
 
     data = Config::ifContainsGet(consoleData, "font");
-    if (data) loadConsoleFonts(consoleUI, {Config::getConfig<std::string>(data)->value});
+    if (data) loadConsoleFonts(consoleUI, {Config::getConfig<std::string>(data)->value}, outGeneralFont, outLabelFont);
+    else outGeneralFont = outLabelFont = GetFontDefault();
 
     // TODO: if ConsoleUI data contains changes related to static
     // configs, create a new shared ptr and use std::swap(old, new) and maybe std::move if something goes wrong?

@@ -11,7 +11,7 @@ Meatball::Config::DynamicPanel::DynamicPanel()
 Meatball::DynamicPanel::DynamicPanel()
  : rect({0,0,0,0}) {}
 
-Meatball::DynamicPanel::DynamicPanel(const Rectangle &rect)
+Meatball::DynamicPanel::DynamicPanel(const Rectangle& rect)
  : rect(rect) {}
 
 void Meatball::DynamicPanel::update() {

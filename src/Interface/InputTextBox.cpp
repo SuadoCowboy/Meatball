@@ -11,14 +11,14 @@ Meatball::Config::InputTextBox::InputTextBox()
   : font(nullptr), fontSize(0), color({40,40,40,255}), textColor(WHITE), cursorColor(WHITE),
     selectionColor({100,100,100,50}) {}
 
-static float getRealCursorPos(unsigned int cursorPos, const std::shared_ptr<Font>& font, float fontHeight, const std::string& text) {
+static float getRealCursorPos(unsigned int cursorPos, Font*& font, float fontHeight, const std::string& text) {
     return Meatball::measureTextWidth(*font, fontHeight, text.substr(0, cursorPos).c_str())+1;
 }
 
 Meatball::InputTextBox::InputTextBox()
  : rect({0,0,0,0}) {}
 
-Meatball::InputTextBox::InputTextBox(const Rectangle &rect)
+Meatball::InputTextBox::InputTextBox(const Rectangle& rect)
  : rect(rect) {}
 
 void Meatball::InputTextBox::draw() {
@@ -146,7 +146,7 @@ void Meatball::InputTextBox::update() {
                 selectedTextStartIdx = selectedTextFinalIdx = textMaxSize+1;
             }
 
-            const char *clipboard = GetClipboardText();
+            const char* clipboard = GetClipboardText();
             for (size_t i = 0; clipboard[i] != '\0'; ++i) {
                 if (textSize >= textMaxSize) break;
                 
