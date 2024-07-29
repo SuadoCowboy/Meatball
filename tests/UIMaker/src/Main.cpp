@@ -124,13 +124,13 @@ int main(int argc, char** argv) {
         if (dt > 0.016)
             dt = 0.016;
 
-        if (IsWindowResized()) {
+        /*if (IsWindowResized()) {
             float newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
-            //Vector2 ratio = { newScreenWidth / viewport.x, newScreenHeight / viewport.y };
+            Vector2 ratio = { newScreenWidth / viewport.x, newScreenHeight / viewport.y };
 
-            //viewport.x = newScreenWidth;
-            //viewport.y = newScreenHeight;
-        }
+            viewport.x = newScreenWidth;
+            viewport.y = newScreenHeight;
+        }*/
 
         Meatball::Input::update(false);
 
