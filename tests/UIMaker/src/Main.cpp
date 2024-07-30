@@ -25,12 +25,30 @@ struct UIObject {
     void* object = nullptr;
     const char* name;
     unsigned char type;
-    Meatball::VoidFunc& update;
-    std::function<void(void*)> draw;
+    std::function<void()> update, draw;
 
     UIObject(void* object, const char* name, unsigned char type,
-            Meatball::VoidFunc& update, const std::function<void(void*)>& draw)
+            const std::function<void()>& update, const std::function<void()>& draw)
         : object(object), name(name), type(type), update(update), draw(draw) {}
+    
+    ~UIObject() {
+        switch (type) {
+            case UI_TYPE_BUTTON:
+                delete (Meatball::Button*)object;
+                break;
+            case UI_TYPE_DYNAMIC_PANEL:
+                delete (Meatball::DynamicPanel*)object;
+                break;
+        }
+    }
+};
+
+struct UIOption {
+    const char* text;
+    Font& font;
+    unsigned char type;
+
+    UIOption(const char* text, Font& font, unsigned char type) : text(text), font(font), type(type) {}
 };
 
 Meatball::ConsoleUIScene* init(int width, int height) {
@@ -54,12 +72,27 @@ Meatball::ConsoleUIScene* init(int width, int height) {
     return consoleUI;
 }
 
-struct UIOption {
-    const char* text;
-    Font& font;
+void createUIObject(std::vector<UIObject*>& uiObjects, const Vector2& optionsPosition, unsigned char type) {
+    switch (type) {
+    case UI_TYPE_BUTTON: {
+        Meatball::Button* button = new Meatball::Button((Rectangle){optionsPosition.x, optionsPosition.y, 40.0f, 15.0f});
+        button->config = std::make_shared<Meatball::Config::Button>(Meatball::Defaults::buttonConfig);
 
-    UIOption(const char* text, Font& font) : text(text), font(font) {}
-};
+        UIObject* object = new UIObject(
+                button,
+                HayBCMD::formatString("Item{}", uiObjects.size()).c_str(),
+                type,
+                [button](){button->update();},
+                [button](){
+                Meatball::drawRect(button->rect, button->isHovered()? button->config->hoveredColor : button->config->color);
+        });
+
+        uiObjects.push_back(object);
+        break;
+    }
+    };
+
+}
 
 int main(int argc, char** argv) {
     argc = 2;
@@ -91,8 +124,6 @@ int main(int argc, char** argv) {
     //Vector2 viewport = {(float)GetRenderWidth(), (float)GetRenderHeight()};
     
     std::vector<UIObject*> uiObjects;
-    
-    HayBCMD::execConfigFile("data/cfg/config.cfg", Meatball::Console::variables);
 
     bool drawOptions = false;
     // TODO: fully customizable program in the future :D
@@ -103,19 +134,24 @@ int main(int argc, char** argv) {
     // options background color
     Color optionsColor = {20, 20, 20, 255};
     Color optionsTextColor = WHITE;
+    Color optionsHoveredTextColor = LIGHTGRAY;
     Font optionsFont = GetFontDefault();
+    Vector2 optionsPosition = {0,0};
 
-    options.push_back({"Create Button", optionsFont});
+    options.push_back({"Create Button", optionsFont, UI_TYPE_BUTTON});
 
     float optionsMinWidth = 0.0f;
     for (auto& option : options) {
         float width = Meatball::measureTextWidth(option.font, option.font.baseSize, option.text);
-        if (width > optionsMinWidth) optionsMinWidth = width;
+        if (width > optionsMinWidth) optionsMinWidth = width+4;
     }
 
-    HayBCMD::Command("ui_draw_options", 1, 1, [&drawOptions](void*, const std::vector<std::string>& args) {
+    HayBCMD::Command("ui_draw_options", 1, 1, [&drawOptions, &optionsPosition](void*, const std::vector<std::string>& args) {
         drawOptions = std::stoi(args[0]);
+        optionsPosition = GetMousePosition();
     }, "<draw> - draw options where mouse position is at");
+
+    HayBCMD::execConfigFile("data/cfg/config.cfg", Meatball::Console::variables);
 
     while (!WindowShouldClose()) {
         ClearBackground(RAYWHITE);
@@ -138,16 +174,23 @@ int main(int argc, char** argv) {
 
         for (auto& obj : uiObjects) {
             obj->update();
-            obj->draw(obj->object);
+            obj->draw();
         }
 
         if (drawOptions) {
-            Vector2 mousePos = GetMousePosition();
             unsigned char i = 0;
+            DrawRectangle(optionsPosition.x, optionsPosition.y, optionsMinWidth, options.size()*optionsFont.baseSize, optionsColor);
             for (; i < options.size(); ++i) {
-                Meatball::drawText(optionsFont, optionsFont.baseSize, options[i].text, mousePos.x, mousePos.y+i*optionsFont.baseSize, optionsTextColor);
+                if (CheckCollisionPointRec(GetMousePosition(), {optionsPosition.x, optionsPosition.y, optionsMinWidth, (float)optionsFont.baseSize})) {
+                    Meatball::drawText(optionsFont, optionsFont.baseSize, options[i].text, optionsPosition.x+2, optionsPosition.y+i*optionsFont.baseSize, optionsHoveredTextColor);
+                
+                    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+                        drawOptions = false;
+                        createUIObject(uiObjects, optionsPosition, options[i].type);
+                    }
+                } else
+                    Meatball::drawText(optionsFont, optionsFont.baseSize, options[i].text, optionsPosition.x+2, optionsPosition.y+i*optionsFont.baseSize, optionsTextColor);
             }
-            DrawRectangle(mousePos.x, mousePos.y, optionsMinWidth, i*optionsFont.baseSize, optionsColor);
         }
 
         consoleUI->update();
