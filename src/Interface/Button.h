@@ -24,7 +24,7 @@ namespace Meatball {
     class Button {
     public:
         Button();
-        Button(Rectangle& rect);
+        Button(const Rectangle& rect);
         
         void update();
         bool isHovered();

@@ -11,7 +11,7 @@ Meatball::Config::Button::Button()
 Meatball::Button::Button()
  : rect({0,0,0,0}) {}
 
-Meatball::Button::Button(Rectangle& rect)
+Meatball::Button::Button(const Rectangle& rect)
  : rect(rect) {}
 
 void Meatball::Button::update() {
