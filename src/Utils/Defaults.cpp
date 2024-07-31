@@ -25,15 +25,18 @@ void Meatball::Defaults::init(const std::string& meatdataPath, Font& defaultFont
     {
         data = Config::ifContainsGet(initData, "mainPanelColor");
         if (data) dynamicPanelConfig.color = Config::getConfig<Color>(data)->value;
+        else dynamicPanelConfig.color = BLACK;
     }
 
     buttonConfig = Config::Button();
     {
         data = Config::ifContainsGet(initData, "buttonColor");
         if (data) buttonConfig.color = Config::getConfig<Color>(data)->value;
+        else buttonConfig.color = BLACK;
 
         data = Config::ifContainsGet(initData, "buttonHoveredColor");
         if (data) buttonConfig.hoveredColor = Config::getConfig<Color>(data)->value;
+        else buttonConfig.hoveredColor = BLACK;
     }
 
     textButtonConfig = Config::TextButton();
@@ -42,15 +45,19 @@ void Meatball::Defaults::init(const std::string& meatdataPath, Font& defaultFont
 
         data = Config::ifContainsGet(initData, "textButtonColor");
         if (data) textButtonConfig.color = Config::getConfig<Color>(data)->value;
+        else textButtonConfig.color = BLACK;
 
         data = Config::ifContainsGet(initData, "textButtonTextColor");
         if (data) textButtonConfig.textColor = Config::getConfig<Color>(data)->value;
+        else textButtonConfig.textColor = WHITE;
 
         data = Config::ifContainsGet(initData, "textButtonHoveredColor");
         if (data) textButtonConfig.hoveredColor = Config::getConfig<Color>(data)->value;
+        else textButtonConfig.hoveredColor = BLACK;
 
         data = Config::ifContainsGet(initData, "textButtonHoveredTextColor");
         if (data) textButtonConfig.hoveredTextColor = Config::getConfig<Color>(data)->value;
+        else textButtonConfig.hoveredTextColor = WHITE;
     }
 
     inputTextBoxConfig = Config::InputTextBox();
@@ -72,18 +79,23 @@ void Meatball::Defaults::init(const std::string& meatdataPath, Font& defaultFont
     {
         data = Config::ifContainsGet(initData, "scrollBarColor");
         if (data) scrollBarConfig.barColor = Config::getConfig<Color>(data)->value;
-
-        data = Config::ifContainsGet(initData, "scrollBarThumbColor");
-        if (data) scrollBarConfig.thumbColor = Config::getConfig<Color>(data)->value;
+        else scrollBarConfig.barColor = BLACK;
 
         data = Config::ifContainsGet(initData, "scrollBarHoveredColor");
         if (data) scrollBarConfig.barHoveredColor = Config::getConfig<Color>(data)->value;
+        else scrollBarConfig.barHoveredColor = BLACK;
+
+        data = Config::ifContainsGet(initData, "scrollBarThumbColor");
+        if (data) scrollBarConfig.thumbColor = Config::getConfig<Color>(data)->value;
+        else scrollBarConfig.thumbColor = WHITE;
 
         data = Config::ifContainsGet(initData, "scrollBarThumbHoveredColor1");
         if (data) scrollBarConfig.thumbHoveredColor1 = Config::getConfig<Color>(data)->value;
+        else scrollBarConfig.thumbHoveredColor1 = WHITE;
 
         data = Config::ifContainsGet(initData, "scrollBarThumbHoveredColor2");
         if (data) scrollBarConfig.thumbHoveredColor2 = Config::getConfig<Color>(data)->value;
+        else scrollBarConfig.thumbHoveredColor2 = WHITE;
     }
 
     scrollTextBoxConfig = Config::ScrollTextBox();
@@ -92,6 +104,7 @@ void Meatball::Defaults::init(const std::string& meatdataPath, Font& defaultFont
 
         data = Config::ifContainsGet(initData, "color");
         if (data) scrollTextBoxConfig.color = ((Config::ConfigTypeData<Color>*)data)->value;
+        else scrollTextBoxConfig.color = BLACK;
     }
 
     Config::clearData(initData);
