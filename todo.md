@@ -4,6 +4,8 @@
 # TODOS
 - Test multiple dynamic panels together
 
+- Make custom folder work for every current and future projects so that if a file with a recognized name is placed in a folder called "custom", it will replace the default data with that custom data without modifying the original default file
+
 - Create another library for network stuff. Meatball can be used to test with it but it's not built-in in meatball unless necessary
 
 - Create tasks system, the console commands will run through tasks and then the players will be able to use the wait command(also add wait_ticks which waits ticks instead of milliseconds)
