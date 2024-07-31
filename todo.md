@@ -2,6 +2,8 @@
 - because sizeof(Color) is below 16(which is shared_ptr size), it's better cloning it or using a reference than actually using a pointer or shared_ptr.
 
 # TODOS
+- UIMaker: There should be something like a editor mode and a run mode. Editor mode can move, resize, anchor, set events that calls a command prompt string, and run mode is self explanatory
+
 - Test multiple dynamic panels together
 
 - Make custom folder work for every current and future projects so that if a file with a recognized name is placed in a folder called "custom", it will replace the default data with that custom data without modifying the original default file
