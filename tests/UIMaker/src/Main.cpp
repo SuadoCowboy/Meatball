@@ -133,8 +133,8 @@ int main(int argc, char** argv) {
     std::vector<UIOption> options;
     // options background color
     Color optionsColor = {20, 20, 20, 255};
-    Color optionsTextColor = WHITE;
-    Color optionsHoveredTextColor = LIGHTGRAY;
+    Color optionsTextColor = LIGHTGRAY;
+    Color optionsHoveredTextColor = WHITE;
     Font optionsFont = GetFontDefault();
     Vector2 optionsPosition = {0,0};
 
