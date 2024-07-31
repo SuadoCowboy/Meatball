@@ -72,10 +72,10 @@ Meatball::ConsoleUIScene* init(int width, int height) {
     return consoleUI;
 }
 
-void createUIObject(std::vector<UIObject*>& uiObjects, const Vector2& optionsPosition, unsigned char type) {
+void createUIObject(std::vector<UIObject*>& uiObjects, const Vector2& optionsPosition, unsigned char type, const Vector2& renderSize) {
     switch (type) {
     case UI_TYPE_BUTTON: {
-        Meatball::Button* button = new Meatball::Button((Rectangle){optionsPosition.x, optionsPosition.y, 40.0f, 15.0f});
+        Meatball::Button* button = new Meatball::Button((Rectangle){optionsPosition.x, optionsPosition.y, renderSize.x*0.1f, renderSize.y*0.06f});
         button->config = std::make_shared<Meatball::Config::Button>(Meatball::Defaults::buttonConfig);
 
         UIObject* object = new UIObject(
@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
         c.pData = &c;
     }
 
-    //Vector2 viewport = {(float)GetRenderWidth(), (float)GetRenderHeight()};
+    Vector2 viewport = {(float)GetRenderWidth(), (float)GetRenderHeight()};
     
     std::vector<UIObject*> uiObjects;
 
@@ -160,13 +160,13 @@ int main(int argc, char** argv) {
         if (dt > 0.016)
             dt = 0.016;
 
-        /*if (IsWindowResized()) {
+        if (IsWindowResized()) {
             float newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
-            Vector2 ratio = { newScreenWidth / viewport.x, newScreenHeight / viewport.y };
+            //Vector2 ratio = { newScreenWidth / viewport.x, newScreenHeight / viewport.y };
 
             viewport.x = newScreenWidth;
             viewport.y = newScreenHeight;
-        }*/
+        }
 
         Meatball::Input::update(false);
 
@@ -178,16 +178,17 @@ int main(int argc, char** argv) {
         }
 
         if (drawOptions) {
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                drawOptions = false;
+
             unsigned char i = 0;
             DrawRectangle(optionsPosition.x, optionsPosition.y, optionsMinWidth, options.size()*optionsFont.baseSize, optionsColor);
             for (; i < options.size(); ++i) {
                 if (CheckCollisionPointRec(GetMousePosition(), {optionsPosition.x, optionsPosition.y, optionsMinWidth, (float)optionsFont.baseSize})) {
                     Meatball::drawText(optionsFont, optionsFont.baseSize, options[i].text, optionsPosition.x+2, optionsPosition.y+i*optionsFont.baseSize, optionsHoveredTextColor);
                 
-                    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-                        drawOptions = false;
-                        createUIObject(uiObjects, optionsPosition, options[i].type);
-                    }
+                    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                        createUIObject(uiObjects, optionsPosition, options[i].type, viewport);
                 } else
                     Meatball::drawText(optionsFont, optionsFont.baseSize, options[i].text, optionsPosition.x+2, optionsPosition.y+i*optionsFont.baseSize, optionsTextColor);
             }
