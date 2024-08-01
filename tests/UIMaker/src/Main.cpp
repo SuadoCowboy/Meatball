@@ -21,6 +21,49 @@
 
 Font consoleGeneralFont, consoleLabelFont, defaultFont;
 
+#pragma region macros
+
+#define CREATE_TOGGLE_CVAR(name, boolVar, description) \
+    HayBCMD::CVARStorage::setCvar( \
+        name, \
+        [&](const std::string& s) { \
+            int i = 0; \
+            if (!stringToInt(s, i)) return; \
+            boolVar = (bool)i; \
+        }, \
+        [&]() { \
+            if (boolVar) \
+                return std::string("1"); \
+            else \
+                return std::string("0"); \
+        }, description)
+
+#define CREATE_TOGGLE_CVAR_BITWISE(name, flags, bitToToggle, description) \
+    HayBCMD::CVARStorage::setCvar( \
+        name, \
+        [&flags](const std::string& s) { \
+            int i = 0; \
+            if (!stringToInt(s, i)) return; \
+            if (i == 0) \
+                flags &= ~bitToToggle; \
+            else \
+                flags |= bitToToggle; \
+        }, \
+        [&flags](){ \
+            return std::to_string(flags & bitToToggle); \
+        }, description)
+
+#pragma endregion
+
+bool stringToInt(const std::string& str, int& buffer) {
+    try {
+        buffer = std::stoi(str);
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
 struct UIObject {
     void* object = nullptr;
     const char* name;
@@ -94,32 +137,34 @@ void createUIObject(std::vector<UIObject*>& uiObjects, const Vector2& optionsPos
 
 }
 
-int main(int argc, char** argv) {
-    argc = 2;
-    if (argc < 2) {
-        std::cout << argv[0] << " <pathToScript>\n";
-        return 1;
-    }
-    
+int main() {
     auto consoleUI = init(800, 600);
     consoleUI->visible = false;
 
-    {
-        auto c = HayBCMD::Command("toggle_local_console", 0, 1, [&consoleUI](void* pData, const std::vector<std::string>& args){
-            if (args.size() == 0) {
-                consoleUI->visible = not consoleUI->visible;
-                return;
-            }
+    HayBCMD::Output::setPrintFunction([](HayBCMD::OutputLevel, const std::string& out){
+        std::cout << out;
+    });
 
-            try {
-                bool visible = (bool)std::stoi(args[0]);
-                consoleUI->visible = visible;
-            } catch (...) {
-                HayBCMD::Command::printUsage(*(HayBCMD::Command*)pData);
-            }
-        }, "- toggles local console");
-        c.pData = &c;
-    }
+    HayBCMD::Command("toggle", 3, 3, [&consoleUI](void*, const std::vector<std::string>& args){
+        HayBCMD::CVariable* buffer = nullptr;
+        if (!HayBCMD::CVARStorage::getCvar(args[0], buffer)) {
+            Meatball::Console::printf(HayBCMD::ERROR, "unknown cvar \"{}\"\n", args[0]);
+            return;
+        }
+
+        std::string asString = buffer->toString();
+        if (asString == args[1])
+            buffer->set(args[2]);
+        else
+            buffer->set(args[1]);
+    }, "<cvar> <option1> <option2> - toggles a cvar to option1 or option2");
+
+    /*
+    1 = ui_editor_mode
+    */
+    unsigned char flags = false;
+    CREATE_TOGGLE_CVAR_BITWISE("ui_editor_mode", flags, 1, "1/0 - whether should run in editor mode or ui logic");
+    CREATE_TOGGLE_CVAR("draw_local_console", consoleUI->visible, "1/0 - draws local console");
 
     Vector2 viewport = {(float)GetRenderWidth(), (float)GetRenderHeight()};
     
@@ -146,15 +191,18 @@ int main(int argc, char** argv) {
         if (width > optionsMinWidth) optionsMinWidth = width+4;
     }
 
-    HayBCMD::Command("ui_draw_options", 1, 1, [&drawOptions, &optionsPosition](void*, const std::vector<std::string>& args) {
+    HayBCMD::Command("show_ui_options", 1, 1, [&drawOptions, &optionsPosition](void*, const std::vector<std::string>& args) {
         drawOptions = std::stoi(args[0]);
         optionsPosition = GetMousePosition();
     }, "<draw> - draw options where mouse position is at");
 
     HayBCMD::execConfigFile("data/cfg/config.cfg", Meatball::Console::variables);
 
+    Color editorBackgroundColor = {15,15,15,255};
+    Color runBackgroundColor = {50,50,50,255};
+
     while (!WindowShouldClose()) {
-        ClearBackground(RAYWHITE);
+        ClearBackground((flags & 1)? editorBackgroundColor : runBackgroundColor);
 
         float dt = GetFrameTime();
         if (dt > 0.016)
