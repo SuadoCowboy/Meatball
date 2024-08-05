@@ -16,44 +16,9 @@
 #include <Utils/Defaults.h>
 #include <Utils/DrawFuncs.h>
 
-#define UI_TYPE_BUTTON 0
-#define UI_TYPE_DYNAMIC_PANEL 1
+#include "GameInterface.h"
 
 Font consoleGeneralFont, consoleLabelFont, defaultFont;
-
-#pragma region macros
-
-#define CREATE_TOGGLE_CVAR(name, boolVar, description) \
-    HayBCMD::CVARStorage::setCvar( \
-        name, \
-        [&](const std::string& s) { \
-            int i = 0; \
-            if (!stringToInt(s, i)) return; \
-            boolVar = (bool)i; \
-        }, \
-        [&]() { \
-            if (boolVar) \
-                return std::string("1"); \
-            else \
-                return std::string("0"); \
-        }, description)
-
-#define CREATE_TOGGLE_CVAR_BITWISE(name, flags, bitToToggle, description) \
-    HayBCMD::CVARStorage::setCvar( \
-        name, \
-        [&flags](const std::string& s) { \
-            int i = 0; \
-            if (!stringToInt(s, i)) return; \
-            if (i == 0) \
-                flags &= ~bitToToggle; \
-            else \
-                flags |= bitToToggle; \
-        }, \
-        [&flags](){ \
-            return std::to_string(flags & bitToToggle); \
-        }, description)
-
-#pragma endregion
 
 bool stringToInt(const std::string& str, int& buffer) {
     try {
@@ -63,36 +28,6 @@ bool stringToInt(const std::string& str, int& buffer) {
         return false;
     }
 }
-
-struct UIObject {
-    void* object = nullptr;
-    const char* name;
-    unsigned char type;
-    std::function<void()> update, draw;
-
-    UIObject(void* object, const char* name, unsigned char type,
-            const std::function<void()>& update, const std::function<void()>& draw)
-        : object(object), name(name), type(type), update(update), draw(draw) {}
-    
-    ~UIObject() {
-        switch (type) {
-            case UI_TYPE_BUTTON:
-                delete (Meatball::Button*)object;
-                break;
-            case UI_TYPE_DYNAMIC_PANEL:
-                delete (Meatball::DynamicPanel*)object;
-                break;
-        }
-    }
-};
-
-struct UIOption {
-    const char* text;
-    Font& font;
-    unsigned char type;
-
-    UIOption(const char* text, Font& font, unsigned char type) : text(text), font(font), type(type) {}
-};
 
 Meatball::ConsoleUIScene* init(int width, int height) {
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
@@ -115,35 +50,10 @@ Meatball::ConsoleUIScene* init(int width, int height) {
     return consoleUI;
 }
 
-void createUIObject(std::vector<UIObject*>& uiObjects, const Vector2& optionsPosition, unsigned char type, const Vector2& renderSize) {
-    switch (type) {
-    case UI_TYPE_BUTTON: {
-        Meatball::Button* button = new Meatball::Button((Rectangle){optionsPosition.x, optionsPosition.y, renderSize.x*0.1f, renderSize.y*0.06f});
-        button->config = std::make_shared<Meatball::Config::Button>(Meatball::Defaults::buttonConfig);
-
-        UIObject* object = new UIObject(
-                button,
-                HayBCMD::formatString("Item{}", uiObjects.size()).c_str(),
-                type,
-                [button](){button->update();},
-                [button](){
-                Meatball::drawRect(button->rect, button->isHovered()? button->config->hoveredColor : button->config->color);
-        });
-
-        uiObjects.push_back(object);
-        break;
-    }
-    };
-
-}
-
 int main() {
     auto consoleUI = init(800, 600);
+    SetExitKey(KEY_NULL);
     consoleUI->visible = false;
-
-    HayBCMD::Output::setPrintFunction([](HayBCMD::OutputLevel, const std::string& out){
-        std::cout << out;
-    });
 
     HayBCMD::Command("toggle", 3, 3, [&consoleUI](void*, const std::vector<std::string>& args){
         HayBCMD::CVariable* buffer = nullptr;
@@ -162,7 +72,7 @@ int main() {
     /*
     1 = ui_editor_mode
     */
-    unsigned char flags = false;
+    unsigned char flags = 1;
     CREATE_TOGGLE_CVAR_BITWISE("ui_editor_mode", flags, 1, "1/0 - whether should run in editor mode or ui logic");
     CREATE_TOGGLE_CVAR("draw_local_console", consoleUI->visible, "1/0 - draws local console");
 
@@ -191,18 +101,19 @@ int main() {
         if (width > optionsMinWidth) optionsMinWidth = width+4;
     }
 
-    HayBCMD::Command("show_ui_options", 1, 1, [&drawOptions, &optionsPosition](void*, const std::vector<std::string>& args) {
+    HayBCMD::Command("show_ui_options", 1, 1, [&drawOptions, &optionsPosition, &flags](void*, const std::vector<std::string>& args) {
+        if (!(flags & 1)) return;
+
         drawOptions = std::stoi(args[0]);
         optionsPosition = GetMousePosition();
     }, "<draw> - draw options where mouse position is at");
 
     HayBCMD::execConfigFile("data/cfg/config.cfg", Meatball::Console::variables);
 
-    Color editorBackgroundColor = {15,15,15,255};
-    Color runBackgroundColor = {50,50,50,255};
+    Color backgroundColor = {0,0,0,255};
 
     while (!WindowShouldClose()) {
-        ClearBackground((flags & 1)? editorBackgroundColor : runBackgroundColor);
+        ClearBackground(backgroundColor);
 
         float dt = GetFrameTime();
         if (dt > 0.016)
@@ -225,7 +136,7 @@ int main() {
             obj->draw();
         }
 
-        if (drawOptions) {
+        if ((flags & 1) && drawOptions) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
                 drawOptions = false;
 
@@ -246,5 +157,9 @@ int main() {
         consoleUI->draw();
 
         EndDrawing();
+    }
+
+    for (auto& obj : uiObjects) {
+        delete obj;
     }
 }
