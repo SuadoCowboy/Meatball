@@ -29,6 +29,8 @@ namespace Meatball {
     float measureTextWidth(const Font& font, float height, const char* text);
         
     float measureTextHeight(const Font& font, float height, const char* text);
+
+    bool parseStringToColor(const std::string& str, Color& buf);
 }
 
 bool operator==(const Color& left, const Color& right);

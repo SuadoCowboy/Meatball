@@ -59,6 +59,32 @@ float Meatball::measureTextHeight(const Font& font, float height, const char* te
     return textSize.y;
 }
 
+bool Meatball::parseStringToColor(const std::string& str, Color& buf) {
+    Color color = BLACK;
+    
+    try {
+        size_t secondCommaIdx;
+        {
+            size_t firstCommaIdx = str.find(",");
+            color.r = std::stoi(str.substr(0, firstCommaIdx));
+            
+            secondCommaIdx = str.find(",", firstCommaIdx+1);
+            color.g = std::stoi(str.substr(firstCommaIdx+1, secondCommaIdx-firstCommaIdx-1));
+        }
+
+        size_t thirdCommaIdx = str.find(",", secondCommaIdx+1);
+
+        color.b = std::stoi(str.substr(secondCommaIdx+1, thirdCommaIdx-secondCommaIdx-1));
+        if (thirdCommaIdx != std::string::npos)
+            color.a = std::stoi(str.substr(thirdCommaIdx+1));
+        
+        buf = color;
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
 bool operator==(const Color& left, const Color& right) {
     return (left.r == right.r) && 
      (left.g == right.g) && 

@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include "Console.h"
+#include "Utils/Utils.h"
 
 static bool handleSpaceError(size_t spaceIdx, size_t spaceIdxBefore, size_t lineIdx) {
     if (spaceIdx == std::string::npos || spaceIdx == 0 || spaceIdx == spaceIdxBefore+1) {
@@ -11,27 +12,6 @@ static bool handleSpaceError(size_t spaceIdx, size_t spaceIdxBefore, size_t line
     }
 
     return false;
-}
-
-static Color parseStringToColor(std::string str) {
-    Color color = BLACK;
-
-    size_t secondCommaIdx;
-    {
-        size_t firstCommaIdx = str.find(",");
-        color.r = std::stoi(str.substr(0, firstCommaIdx));
-        
-        secondCommaIdx = str.find(",", firstCommaIdx+1);
-        color.g = std::stoi(str.substr(firstCommaIdx+1, secondCommaIdx-firstCommaIdx-1));
-    }
-
-    size_t thirdCommaIdx = str.find(",", secondCommaIdx+1);
-
-    color.b = std::stoi(str.substr(secondCommaIdx+1, thirdCommaIdx-secondCommaIdx-1));
-    if (thirdCommaIdx != std::string::npos)
-        color.a = std::stoi(str.substr(thirdCommaIdx+1));
-    
-    return color;
 }
 
 void Meatball::Config::clearData(std::unordered_map<std::string, Meatball::Config::ConfigData*>& map) {
@@ -98,7 +78,9 @@ std::unordered_map<std::string, Meatball::Config::ConfigData*> Meatball::Config:
             data[name] = new ConfigTypeData((unsigned char)std::stoi(value));
             data[name]->type = UNSIGNED_CHAR;
         } else if (type == "COLOR") {
-            data[name] = new ConfigTypeData(parseStringToColor(value));
+            Color buf = BLACK;
+            parseStringToColor(value, buf);
+            data[name] = new ConfigTypeData(buf);
             data[name]->type = COLOR;
         }
 
