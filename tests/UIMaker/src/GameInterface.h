@@ -50,10 +50,11 @@ struct UIObject {
     void* object = nullptr;
     const char* name;
     unsigned char type;
-    std::function<void()> update, draw;
+    void (*update)(void*);
+    void (*draw)(void*);
 
     UIObject(void* object, const char* name, unsigned char type,
-            const std::function<void()>& update, const std::function<void()>& draw)
+            void (*update)(void*), void (*draw)(void*))
         : object(object), name(name), type(type), update(update), draw(draw) {}
     
     ~UIObject() {
@@ -76,4 +77,4 @@ struct UIOption {
     UIOption(const char* text, Font& font, unsigned char type) : text(text), font(font), type(type) {}
 };
 
-void createUIObject(std::vector<UIObject*>& uiObjects, const Vector2& optionsPosition, unsigned char type, const Vector2& renderSize);
+UIObject* createUIObject(const char* name, std::vector<UIObject*>& uiObjects, const Vector2& position, unsigned char type, const Vector2& renderSize);
