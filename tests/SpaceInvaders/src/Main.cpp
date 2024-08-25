@@ -63,7 +63,7 @@ void loadSettingsAndInit() {
 int main(int, char**) {
     loadSettingsAndInit();
 
-    while (!(conditionFlags & 1)) {
+    while (!shouldQuit) {
         float dt = GetFrameTime();
         update(dt);
         render();

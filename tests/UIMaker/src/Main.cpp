@@ -16,6 +16,7 @@
 #include <Utils/Defaults.h>
 #include <Utils/DrawFuncs.h>
 #include <Utils/Utils.h>
+#include <Utils/CvarFuncs.h>
 
 #include "GameInterface.h"
 
@@ -28,6 +29,57 @@ Vector2 viewport;
 // User Interface CVars
 Color uiColor = BLACK, uiHoveredColor = BLACK;
 
+bool drawOptions = false;
+// TODO: fully customizable program in the future :D
+// for now becuse ui stuff is not fully developed yet,
+// we don't need to worry about customizable stuff in this
+// program. But in the end this should be also customizable.
+std::vector<UIOption> options;
+// options background color
+Color optionsColor = {20, 20, 20, 255};
+Color optionsTextColor = LIGHTGRAY;
+Color optionsHoveredTextColor = WHITE;
+Font optionsFont;
+Vector2 optionsPosition = {0,0};
+
+// CVARs
+bool uiEditorMode = true;
+
+#pragma region commands
+
+static void toggleCommand(void*, HayBCMD::Command&, const std::vector<std::string>& args) {
+    HayBCMD::CVariable cvar;
+    if (!HayBCMD::CVARStorage::getCvar(args[0], cvar)) {
+        Meatball::Console::printf(HayBCMD::ERROR, "unknown cvar \"{}\"\n", args[0]);
+        return;
+    }
+
+    HayBCMD::Command cvarCommand;
+    if (!HayBCMD::Command::getCommand(args[0], cvarCommand, true)) return;
+
+    std::string asString = cvar.toString(cvarCommand.pData);
+    if (asString == args[1])
+        cvar.set(cvarCommand.pData, args[2]);
+    else
+        cvar.set(cvarCommand.pData, args[1]);
+}
+
+static void uiCreateButtonCommand(void*, HayBCMD::Command&, const std::vector<std::string>& args) {
+    UIObject* buttonObj = createUIObject(args[0].c_str(), uiObjects, {0.0f,0.0f}, UI_TYPE_BUTTON, viewport);
+    auto button = (Meatball::Button*)buttonObj->object;
+    button->config = std::make_shared<Meatball::Config::Button>(Meatball::Defaults::buttonConfig);
+    button->config->color = uiColor;
+    button->config->hoveredColor = uiHoveredColor;
+}
+
+static void showUiOptionsCommand(void*, HayBCMD::Command&, const std::vector<std::string>& args) {
+    if (!uiEditorMode) return;
+
+    drawOptions = std::stoi(args[0]);
+    optionsPosition = GetMousePosition();
+}
+#pragma endregion
+
 bool stringToInt(const std::string& str, int& buffer) {
     try {
         buffer = std::stoi(str);
@@ -38,27 +90,9 @@ bool stringToInt(const std::string& str, int& buffer) {
 }
 
 void initCommands() {
-    HayBCMD::Command("toggle", 3, 3, [](void*, const std::vector<std::string>& args){
-        HayBCMD::CVariable* buffer = nullptr;
-        if (!HayBCMD::CVARStorage::getCvar(args[0], buffer)) {
-            Meatball::Console::printf(HayBCMD::ERROR, "unknown cvar \"{}\"\n", args[0]);
-            return;
-        }
-
-        std::string asString = buffer->toString();
-        if (asString == args[1])
-            buffer->set(args[2]);
-        else
-            buffer->set(args[1]);
-    }, "<cvar> <option1> <option2> - toggles a cvar to option1 or option2");
-
-    HayBCMD::Command("ui_create_button", 1, 1, [](void*, const std::vector<std::string>& args){
-        UIObject* buttonObj = createUIObject(args[0].c_str(), uiObjects, {0.0f,0.0f}, UI_TYPE_BUTTON, viewport);
-        auto button = (Meatball::Button*)buttonObj->object;
-        button->config = std::make_shared<Meatball::Config::Button>(Meatball::Defaults::buttonConfig);
-        button->config->color = uiColor;
-        button->config->hoveredColor = uiHoveredColor;
-    }, "<name> - creates a button using the defined data by other ui commands");
+    HayBCMD::Command("toggle", 3, 3, toggleCommand, "<cvar> <option1> <option2> - toggles a cvar to option1 or option2");
+    HayBCMD::Command("ui_create_button", 1, 1, uiCreateButtonCommand, "<name> - creates a button using the defined data by other ui commands");
+    HayBCMD::Command("show_ui_options", 1, 1, showUiOptionsCommand, "<draw> - draw options where mouse position is at");
 }
 
 Meatball::ConsoleUIScene* init(int width, int height) {
@@ -82,6 +116,8 @@ Meatball::ConsoleUIScene* init(int width, int height) {
 
     initCommands();
 
+    optionsFont = GetFontDefault();
+
     return consoleUI;
 }
 
@@ -90,13 +126,18 @@ int main() {
     SetExitKey(KEY_NULL);
     consoleUI->visible = false;
 
-    /*
-    1 = ui_editor_mode
-    */
-    unsigned char flags = 1;
-    CREATE_TOGGLE_CVAR_BITWISE("ui_editor_mode", flags, 1, "1/0 - whether should run in editor mode or ui logic");
-    CREATE_TOGGLE_CVAR("draw_local_console", consoleUI->visible, "1/0 - draws local console");
-    
+    HayBCMD::CVARStorage::setCvar("ui_editor_mode",
+        &uiEditorMode,
+        HayBCMD::CVARUtils::setBoolean,
+        HayBCMD::CVARUtils::getBoolean,
+        "1/0 - whether should run in editor mode or ui logic"
+    );
+    HayBCMD::CVARStorage::setCvar("draw_local_console",
+        &consoleUI->visible,
+        HayBCMD::CVARUtils::setBoolean,
+        HayBCMD::CVARUtils::getBoolean,
+        "1/0 - draws local console"
+    );
 
     // Unfortunately, we can not create a lambda for cvar, that will be out of scope later. I should fix this soon.
     /*
@@ -109,38 +150,19 @@ int main() {
     */
     HayBCMD::CVARStorage::setCvar(
         "ui_color",
-        [](const std::string& str){
-            Meatball::parseStringToColor(str, uiColor);
-        },
-        [](){
-            return HayBCMD::formatString("{}, {}, {}, {}", (short)uiColor.r, (short)uiColor.g, (short)uiColor.b, (short)uiColor.a);
-        },
+        &uiColor,
+        Meatball::CVARFuncs::setColor,
+        Meatball::CVARFuncs::getColor,
         "");
     HayBCMD::CVARStorage::setCvar(
         "ui_hovered_color",
-        [](const std::string& str){
-            Meatball::parseStringToColor(str, uiHoveredColor);
-        },
-        [](){ // TODO: those functions could receive a void pointer so that if we had too much repeating lambdas, it could be a single function that would receive a void*
-            return HayBCMD::formatString("{}, {}, {}, {}", (short)uiHoveredColor.r, (short)uiHoveredColor.g, (short)uiHoveredColor.b, (short)uiHoveredColor.a);
-        },
+        &uiHoveredColor,
+        Meatball::CVARFuncs::setColor,
+        Meatball::CVARFuncs::getColor,
         "");
 
     Meatball::Input::allowedUiCommands.push_back("draw_local_console");
     //Meatball::Input::allowedUiCommands.push_back("quit");
-
-    bool drawOptions = false;
-    // TODO: fully customizable program in the future :D
-    // for now becuse ui stuff is not fully developed yet,
-    // we don't need to worry about customizable stuff in this
-    // program. But in the end this should be also customizable.
-    std::vector<UIOption> options;
-    // options background color
-    Color optionsColor = {20, 20, 20, 255};
-    Color optionsTextColor = LIGHTGRAY;
-    Color optionsHoveredTextColor = WHITE;
-    Font optionsFont = GetFontDefault();
-    Vector2 optionsPosition = {0,0};
 
     options.push_back({"Create Button", optionsFont, UI_TYPE_BUTTON});
 
@@ -149,14 +171,7 @@ int main() {
         float width = Meatball::measureTextWidth(option.font, option.font.baseSize, option.text);
         if (width > optionsMinWidth) optionsMinWidth = width+4;
     }
-
-    HayBCMD::Command("show_ui_options", 1, 1, [&drawOptions, &optionsPosition, &flags](void*, const std::vector<std::string>& args) {
-        if (!(flags & 1)) return;
-
-        drawOptions = std::stoi(args[0]);
-        optionsPosition = GetMousePosition();
-    }, "<draw> - draw options where mouse position is at");
-
+    
     HayBCMD::execConfigFile("data/cfg/config.cfg", Meatball::Console::variables);
 
     Color backgroundColor = {0,0,0,255};
@@ -185,7 +200,7 @@ int main() {
             obj->draw(obj->object);
         }
 
-        if ((flags & 1) && drawOptions) {
+        if (uiEditorMode && drawOptions) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
                 drawOptions = false;
 

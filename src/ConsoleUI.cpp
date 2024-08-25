@@ -86,9 +86,9 @@ Meatball::ConsoleUIScene::ConsoleUIScene(const Rectangle& rect, const std::share
 
 		size_t spaceIdx = text.find(" ");
 		std::string commandName = text.substr(0, spaceIdx);
-		HayBCMD::Command *pCommand = HayBCMD::Command::getCommand(commandName, false);
-		if (pCommand) {
-			autoCompleteText.push_back({pCommand->name+" "+pCommand->usage, config->autoCompleteTextColor});
+		HayBCMD::Command command;
+		if (HayBCMD::Command::getCommand(commandName, command, false)) {
+			autoCompleteText.push_back({command.name+" "+command.usage, config->autoCompleteTextColor});
 			return;
 		}
 

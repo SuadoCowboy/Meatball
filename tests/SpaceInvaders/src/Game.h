@@ -19,4 +19,5 @@ bool handleBullet(size_t& bulletIdx, float dt);
 
 extern Meatball::ConsoleUIScene* consoleUI;
 extern Texture2D backgroundTexture;
-extern unsigned char conditionFlags;
+extern bool shouldQuit;
+extern bool saveSettings;

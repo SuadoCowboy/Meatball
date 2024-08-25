@@ -12,40 +12,6 @@
 #define UI_TYPE_BUTTON 0
 #define UI_TYPE_DYNAMIC_PANEL 1
 
-#pragma region macros
-
-#define CREATE_TOGGLE_CVAR(name, boolVar, description) \
-    HayBCMD::CVARStorage::setCvar( \
-        name, \
-        [&](const std::string& s) { \
-            int i = 0; \
-            if (!stringToInt(s, i)) return; \
-            boolVar = (bool)i; \
-        }, \
-        [&]() { \
-            if (boolVar) \
-                return std::string("1"); \
-            else \
-                return std::string("0"); \
-        }, description)
-
-#define CREATE_TOGGLE_CVAR_BITWISE(name, flags, bitToToggle, description) \
-    HayBCMD::CVARStorage::setCvar( \
-        name, \
-        [&flags](const std::string& s) { \
-            int i = 0; \
-            if (!stringToInt(s, i)) return; \
-            if (i == 0) \
-                flags &= ~bitToToggle; \
-            else \
-                flags |= bitToToggle; \
-        }, \
-        [&flags](){ \
-            return std::to_string(flags & bitToToggle); \
-        }, description)
-
-#pragma endregion
-
 struct UIObject {
     void* object = nullptr;
     const char* name;

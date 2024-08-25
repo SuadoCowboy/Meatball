@@ -155,7 +155,7 @@ void Meatball::Input::update(bool uiAllowedCommandsOnly) {
 	}
 }
 
-void Meatball::Input::bindCommand(void*, const std::vector<std::string>& args) {
+void Meatball::Input::bindCommand(void*, HayBCMD::Command&, const std::vector<std::string>& args) {
 	if (args.size() != 1) { // set
 		bind(args[0], args[1]);
 		return;
@@ -182,11 +182,11 @@ void Meatball::Input::bindCommand(void*, const std::vector<std::string>& args) {
 	Console::printf(HayBCMD::ECHO, "{} = \"{}\"\n", args[0], callback);
 }
 
-void Meatball::Input::unBindCommand(void*, const std::vector<std::string>& args) {
+void Meatball::Input::unBindCommand(void*, HayBCMD::Command&, const std::vector<std::string>& args) {
 	unbind(args[0]);
 }
 
-void Meatball::Input::unBindAllCommand(void*, const std::vector<std::string>&) {
+void Meatball::Input::unBindAllCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
 	for (auto& key : keyState) {
 		key.second.callback = "";
 		key.second.offCallback = "";

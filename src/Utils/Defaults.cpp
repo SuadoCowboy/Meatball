@@ -17,6 +17,27 @@
 #include "OutputColors.h"
 #include "Utils/Utils.h"
 
+static void defaultConsoleUiPrint(void *pData, const HayBCMD::OutputLevel &level, const std::string &text) {
+    size_t spaceIdxBefore = 0;
+    size_t currentSpaceIdx = text.find('\n');
+    
+    while (currentSpaceIdx != std::string::npos) {
+        ((Meatball::ConsoleUIScene*)pData)->print(level, text.substr(spaceIdxBefore, currentSpaceIdx-spaceIdxBefore));
+        spaceIdxBefore = currentSpaceIdx+1;
+        currentSpaceIdx = text.find('\n', spaceIdxBefore);
+    }
+
+    ((Meatball::ConsoleUIScene*)pData)->print(level, text.substr(spaceIdxBefore));
+}
+
+static void clearOutputBoxCommand(void *pData, HayBCMD::Command&, const std::vector<std::string>&) {
+        ((Meatball::ConsoleUIScene*)pData)->outputBox.clearText();
+}
+
+static void printToVector(void *pData, const HayBCMD::OutputLevel &level, const std::string &text) {
+    ((std::vector<std::pair<std::string, HayBCMD::OutputLevel>>*)pData)->push_back({text, level});
+}
+
 void Meatball::Defaults::init(const std::string& meatdataPath, Font& defaultFont) {
     auto initData = Config::loadData(meatdataPath);
 
@@ -122,11 +143,9 @@ void Meatball::Defaults::loadConsoleFonts(ConsoleUIScene& consoleUI, const std::
     consoleUI.onResize(1, 1);
 }
 
-Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& rect, const std::string &meatdataPath, Font& outGeneralFont, Font& outLabelFont) {
+Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& rect, const std::string &meatdataPath, Font& outGeneralFont, Font& outLabelFont) {    
     std::vector<std::pair<std::string, HayBCMD::OutputLevel>> texts;
-    HayBCMD::Output::setPrintFunction([&texts](const HayBCMD::OutputLevel &level, const std::string &text) {
-        texts.push_back({text, level});
-    });
+    HayBCMD::Output::setPrintFunction(&texts, printToVector);
     
     auto consoleData = Config::loadData(meatdataPath);
     auto consoleConfig = std::make_shared<Config::ConsoleUI>();
@@ -189,27 +208,14 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
 
     Config::clearData(consoleData);
 
-    Console::init([&consoleUI](const HayBCMD::OutputLevel &level, const std::string &text) {
-        size_t spaceIdxBefore = 0;
-        size_t currentSpaceIdx = text.find('\n');
-        
-        while (currentSpaceIdx != std::string::npos) {
-            consoleUI.print(level, text.substr(spaceIdxBefore, currentSpaceIdx-spaceIdxBefore));
-            spaceIdxBefore = currentSpaceIdx+1;
-            currentSpaceIdx = text.find('\n', spaceIdxBefore);
-        }
-
-        consoleUI.print(level, text.substr(spaceIdxBefore));
-    });
+    Console::init(&consoleUI, defaultConsoleUiPrint);
 
     Console::print(HayBCMD::OutputLevel::ECHO, "Console initialized");
 
     for (auto &text : texts)
         Console::print(text.second, text.first);
 
-    HayBCMD::Command("clear", 0, 0,
-        [&](void*, const std::vector<std::string>&) {
-            consoleUI.outputBox.clearText();}, "- clears the console");
+    HayBCMD::Command("clear", 0, 0, clearOutputBoxCommand, "- clears the console");
 
     return consoleUI;
 }

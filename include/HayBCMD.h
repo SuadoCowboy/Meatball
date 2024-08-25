@@ -27,7 +27,6 @@
 #include <sstream>
 #include <unordered_map>
 #include <vector>
-#include <functional>
 
 namespace HayBCMD {
     enum TokenType {
@@ -93,7 +92,7 @@ namespace HayBCMD {
         ERROR, // anything that went wrong
     };
 
-    typedef std::function<void(const OutputLevel& level, const std::string& message)> PrintFunction;
+    typedef void(*PrintFunction)(void *pData, const OutputLevel& level, const std::string& message);
 
     class Output {
     public:
@@ -103,21 +102,26 @@ namespace HayBCMD {
         }
 
         static void print(const OutputLevel& level, const std::string& str);
-        static void setPrintFunction(PrintFunction printFunc);
+        static void setPrintFunction(void *pData, PrintFunction printFunc);
         static void printUnknownCommand(const std::string& command);
 
     private:
         static PrintFunction printFunc;
+        static void *printFuncData;
     };
 
-    typedef std::function<void(void* data, const std::vector<std::string>& args)> CommandCall;
+    class Command;
+
+    typedef void(*CommandCall)(void* pData, Command& command, const std::vector<std::string>& args);
 
     class Command {
     public:
+        Command() {}
+
         Command(const std::string& name, unsigned char minArgs, unsigned char maxArgs,
             CommandCall commandCallFunc, const std::string& usage, void* pData = nullptr);
         
-        static Command* getCommand(const std::string& name, bool printError);
+        static bool getCommand(const std::string& name, Command& outCommand, bool printError);
         
         static const std::vector<Command>& getCommands();
         
@@ -130,36 +134,33 @@ namespace HayBCMD {
         
         void run(const std::vector<std::string>& args);
 
-        std::string name;
-        std::string usage;
+        std::string name = "";
+        std::string usage = "";
 
-        unsigned char minArgs;
-        unsigned char maxArgs;
+        unsigned char minArgs = 0;
+        unsigned char maxArgs = 0;
         
-        CommandCall commandCallFunc;
+        CommandCall commandCallFunc = nullptr;
 
         void* pData = nullptr;
 
     private:
         static std::vector<Command> commands;
-        static void addCommand(Command& pCommand);
     };
 
-    class BaseCommands {
-    public:
-        static void init(std::unordered_map<std::string, std::string> *variables);
+    namespace BaseCommands {
+        void init(std::unordered_map<std::string, std::string> *variables);
 
-    private:
-        static std::unordered_map<std::string, std::string> *variables;
+        extern std::unordered_map<std::string, std::string> *variables;
 
-        static void help(void*, const std::vector<std::string>& args);
-        static void commands(void*, const std::vector<std::string>&);
-        static void echo(void*, const std::vector<std::string>& args);
-        static void alias(void*, const std::vector<std::string>& args);
-        static void getVariables(void*, const std::vector<std::string>&);
-        static void variable(void*, const std::vector<std::string>& args);
-        static void incrementvar(void*, const std::vector<std::string>& args);
-        static void exec(void*, const std::vector<std::string>& args);
+        void help(void*, Command&, const std::vector<std::string>& args);
+        void commands(void*, Command&, const std::vector<std::string>&);
+        void echo(void*, Command&, const std::vector<std::string>& args);
+        void alias(void*, Command&, const std::vector<std::string>& args);
+        void getVariables(void*, Command&, const std::vector<std::string>&);
+        void variable(void*, Command&, const std::vector<std::string>& args);
+        void incrementvar(void*, Command&, const std::vector<std::string>& args);
+        void exec(void*, Command&, const std::vector<std::string>& args);
     };
 
     class Lexer {
@@ -179,9 +180,32 @@ namespace HayBCMD {
         Token lastToken;
     };
 
+    namespace CVARUtils {
+        void setString(void *pData, const std::string& value);
+        std::string getString(void *pData);
+
+        void setBoolean(void *pData, const std::string& value);
+        std::string getBoolean(void *pData);
+
+        void setFloat(void *pData, const std::string& value);
+        std::string getFloat(void *pData);
+
+        void setInteger(void *pData, const std::string& value);
+        std::string getInteger(void *pData);
+
+        void setShort(void *pData, const std::string& value);
+        std::string getShort(void *pData);
+
+        void setUnsignedShort(void *pData, const std::string& value);
+        std::string getUnsignedShort(void *pData);
+
+        void setUnsignedChar(void *pData, const std::string& value);
+        std::string getUnsignedChar(void *pData);
+    }
+
     struct CVariable {
-        std::function<void(const std::string& value)> set;
-        std::function<std::string()> toString;
+        void (*set)(void *pData, const std::string &value);
+        std::string (*toString)(void *pData);
     };
 
     class CVARStorage {
@@ -189,16 +213,16 @@ namespace HayBCMD {
         /// @param set to convert a string into the same type and set the new value
         /// @param toString get the cvar value as string
         /// @param usage to be printed out to the console if the user uses help command in it
-        static void setCvar(const std::string& name, const std::function<void(const std::string& value)>& set, const std::function<std::string()>& toString, const std::string& usage);
+        static void setCvar(const std::string& name, void* pData, void(*set)(void *pData, const std::string &value), std::string (*toString)(void *pData), const std::string& usage);
 
         /// @brief Searches for the CVAR and returns it to a buffer
         /// @return false if could not get cvar
-        static bool getCvar(const std::string& name, CVariable*& buf);
+        static bool getCvar(const std::string& name, CVariable& buf);
 
     private:
         static std::unordered_map<std::string, CVariable> cvars;
         
-        static void asCommand(void* pData, const std::vector<std::string>& args);
+        static void asCommand(void* pData, Command& command, const std::vector<std::string>& args);
     };
 
     extern std::vector<std::string> loopAliasesRunning;

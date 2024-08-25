@@ -27,13 +27,47 @@ ConsoleFonts consoleFonts;
 
 Texture2D backgroundTexture;
 
-/*
-shouldQuit = 1,
-saveSettings = 2
-*/
-unsigned char conditionFlags = 0;
+bool shouldQuit = false;
+bool saveSettings = true;
 
 Font consoleGeneralFont, consoleLabelFont;
+
+#pragma region commands
+static void quitCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+    shouldQuit = true;
+}
+
+static void moveUpCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+    player.direction.y--;
+}
+
+static void moveDownCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+    player.direction.y++;
+}
+
+static void moveLeftCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+    player.direction.x--;
+}
+
+static void moveRightCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+    player.direction.x++;
+}
+
+static void fireCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+    bullets.push_back({ PLAYER, { player.position.x + entityData[PLAYER].texture.width * 0.5f - bulletSize.x * 0.5f, player.position.y + bulletSize.y * 0.25f } });
+}
+
+static void reloadFontsCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+    reloadFonts();
+}
+
+static void toggleLocalConsoleCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+    consoleUI->visible = not consoleUI->visible;
+    if (!consoleUI->visible)
+        resetCursor(currentMouseCursorPriorityLevel);
+}
+
+#pragma endregion
 
 void init(int windowWidth, int windowHeight) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -98,38 +132,33 @@ void init(int windowWidth, int windowHeight) {
 
     bulletSpeed = 0.8f;
 
-    conditionFlags |= 2;
-
     HayBCMD::CVARStorage::setCvar("bullet_speed",
-        [](const std::string& str) {
-            float value = std::stof(str);
-            if (value < 0.0f) return;
-            bulletSpeed = value;
-        },
-        []() { return std::to_string(bulletSpeed); }, "");
+        &bulletSpeed,
+        HayBCMD::CVARUtils::setFloat,
+        HayBCMD::CVARUtils::getFloat,
+        "");
     HayBCMD::CVARStorage::setCvar("player_health",
-        [](const std::string& value) { player.health = (short)std::stoi(value); },
-        []() { return std::to_string(player.health); }, "");
+        &player.health,
+        HayBCMD::CVARUtils::setShort,
+        HayBCMD::CVARUtils::getShort,
+        "");
 
     HayBCMD::CVARStorage::setCvar("player_speed_x",
-        [](const std::string& value) { player.speed.x = std::stof(value); },
-        []() {
-            return std::to_string(player.speed.x);
-        }, "");
+        &player.speed.x,
+        HayBCMD::CVARUtils::setFloat,
+        HayBCMD::CVARUtils::getFloat,
+        "");
 
     HayBCMD::CVARStorage::setCvar("player_speed_y",
-        [](const std::string& value) { player.speed.y = std::stof(value); },
-        []() {
-            return std::to_string(player.speed.y);
-        }, "");
+        &player.speed.y,
+        HayBCMD::CVARUtils::setFloat,
+        HayBCMD::CVARUtils::getFloat,
+        "");
 
     HayBCMD::CVARStorage::setCvar("save_settings",
-        [](const std::string& str) {
-            bool value = (bool)std::stoi(str);
-            if (value) conditionFlags |= 2;
-            else conditionFlags &= ~2;
-        },
-        [](){ return std::to_string((bool)(conditionFlags & 2)); },
+        &saveSettings,
+        HayBCMD::CVARUtils::setBoolean,
+        HayBCMD::CVARUtils::getBoolean,
         "if should save the changed settings in .meatdata");
 
     HayBCMD::execConfigFile("data/cfg/autoexec.cfg", Console::variables);
@@ -185,7 +214,7 @@ void update(float dt) {
     consoleUI->update();
     Input::update(consoleUI->visible);
 
-    if (WindowShouldClose()) conditionFlags |= 1;
+    if (WindowShouldClose()) shouldQuit = true;
     if (IsWindowResized())
         resize();
 
@@ -228,7 +257,7 @@ void render() {
 }
 
 void save(const std::string& path) {
-    if (!(conditionFlags & 2)) return;
+    if (!saveSettings) return;
 
     std::unordered_map<std::string, Meatball::Config::ConfigData*> dataMap;
 
@@ -250,40 +279,24 @@ void cleanup() {
 }
 
 void loadCommands() {
-    HayBCMD::Command("quit", 0, 0, [](void*, const std::vector<std::string>&){ conditionFlags |= 1; }, "- closes the window");
-    HayBCMD::Command("+moveup", 0, 0, [](void*, const std::vector<std::string>&) { player.direction.y--; },
-        "- moves up");
-    HayBCMD::Command("+movedown", 0, 0, [](void*, const std::vector<std::string>&) { player.direction.y++; },
-        "- moves down");
-    HayBCMD::Command("+moveleft", 0, 0, [](void*, const std::vector<std::string>&) { player.direction.x--; },
-        "- moves left");
-    HayBCMD::Command("+moveright", 0, 0, [](void*, const std::vector<std::string>&) { player.direction.x++; },
-        "- moves right");
+    HayBCMD::Command("quit", 0, 0, quitCommand, "- closes the window");
+    HayBCMD::Command("+moveup", 0, 0, moveUpCommand, "- moves up");
+    HayBCMD::Command("+movedown", 0, 0, moveDownCommand, "- moves down");
+    HayBCMD::Command("+moveleft", 0, 0, moveLeftCommand, "- moves left");
+    HayBCMD::Command("+moveright", 0, 0, moveRightCommand, "- moves right");
 
-    HayBCMD::Command("-moveup", 0, 0, [](void*, const std::vector<std::string>&) { player.direction.y++; },
-        "- stops moving up");
-    HayBCMD::Command("-movedown", 0, 0, [](void*, const std::vector<std::string>&) { player.direction.y--; },
-        "- stops moving down");
-    HayBCMD::Command("-moveleft", 0, 0, [](void*, const std::vector<std::string>&) { player.direction.x++; },
-        "- stops moving left");
-    HayBCMD::Command("-moveright", 0, 0, [](void*, const std::vector<std::string>&) { player.direction.x--; },
-        "- stops moving right");
+    HayBCMD::Command("-moveup", 0, 0, moveDownCommand, "- stops moving up");
+    HayBCMD::Command("-movedown", 0, 0, moveUpCommand, "- stops moving down");
+    HayBCMD::Command("-moveleft", 0, 0, moveRightCommand, "- stops moving left");
+    HayBCMD::Command("-moveright", 0, 0, moveLeftCommand, "- stops moving right");
 
-    HayBCMD::Command("+fire", 0, 0, [](void*, const std::vector<std::string>&) {
-        bullets.push_back({ PLAYER, { player.position.x + entityData[PLAYER].texture.width * 0.5f - bulletSize.x * 0.5f, player.position.y + bulletSize.y * 0.25f } });
-    }, "- shoots a bullet");
+    HayBCMD::Command("+fire", 0, 0, fireCommand, "- shoots a bullet");
 
     Console::variables["-fire"] = " ";
 
-    HayBCMD::Command("reload_fonts", 0, 0, [&](void*, const std::vector<std::string>&) {
-        reloadFonts();
-    }, "- reloads all text fonts.");
+    HayBCMD::Command("reload_fonts", 0, 0, reloadFontsCommand, "- reloads all text fonts.");
 
-    HayBCMD::Command("toggle_local_console", 0, 0, [&](void*, const std::vector<std::string>&) {
-        consoleUI->visible = not consoleUI->visible;
-        if (!consoleUI->visible)
-            resetCursor(MouseCursorPriorityLevel::INPUT_TEXT_BOX);
-    }, "- toggles the console ui visibility");
+    HayBCMD::Command("toggle_local_console", 0, 0, toggleLocalConsoleCommand, "- toggles the console ui visibility");
 
     Input::allowedUiCommands.push_back("toggle_local_console");
     Input::allowedUiCommands.push_back("quit");
