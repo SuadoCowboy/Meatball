@@ -39,12 +39,13 @@ namespace Meatball {
         };
     }
 
-    class ConsoleUIScene : public Scene {
+    class ConsoleUI : public Scene {
     public:
-        /// @param visible if scene is visible or not(only this class uses this)
-        ConsoleUIScene(const Rectangle& rect, const std::shared_ptr<Config::ConsoleUI> &config, bool visible = false);
+        /// @brief makes a empty ConsoleUI
+        ConsoleUI();
+        ConsoleUI(const Rectangle& rect, const std::shared_ptr<Config::ConsoleUI> &config, bool visible = false);
 
-        virtual ~ConsoleUIScene() {};
+        virtual ~ConsoleUI() {};
 
         /// @brief appends text to outputTextbox
         void print(const HayBCMD::OutputLevel &level, const std::string &text) {
@@ -73,7 +74,7 @@ namespace Meatball {
 
         // Only console can appear in every scene so only it needs visible boolean.
         // The rest of the scenes will be handled by a class or something that says which one should be used.
-        bool visible;
+        bool visible = false;
         
         DynamicPanel mainPanel;
         Button closeButton;

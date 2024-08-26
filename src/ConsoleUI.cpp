@@ -5,7 +5,7 @@
 #include "Utils/Utils.h"
 #include "MouseCursor.h"
 
-unsigned char Meatball::ConsoleUIScene::margin = 4;
+unsigned char Meatball::ConsoleUI::margin = 4;
 
 static void handleInputHistoryPos(Meatball::InputTextBox &inputBox, std::string *inputHistory, unsigned char inputHistorySize, unsigned char &inputHistoryPos) {
     if ((IsKeyPressed(KEY_UP) || IsKeyPressedRepeat(KEY_UP)) && inputHistoryPos != 0)
@@ -27,7 +27,15 @@ Meatball::Config::ConsoleUI::ConsoleUI()
  autoCompleteHighlightedTextColor(YELLOW), autoCompleteSelectedTextColor(PURPLE),
  labelTextColor(WHITE) {}
 
-Meatball::ConsoleUIScene::ConsoleUIScene(const Rectangle& rect, const std::shared_ptr<Config::ConsoleUI> &_config, bool visible)
+Meatball::ConsoleUI::ConsoleUI() {
+	config = std::make_shared<Config::ConsoleUI>();
+	mainPanel.config = std::make_shared<Config::DynamicPanel>(Defaults::dynamicPanelConfig);
+	outputBox.config = std::make_shared<Config::ScrollTextBox>(Defaults::scrollTextBoxConfig);
+    inputBox.config = std::make_shared<Config::InputTextBox>(Defaults::inputTextBoxConfig);
+	closeButton.config = std::make_shared<Config::Button>(Defaults::buttonConfig);
+}
+
+Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const std::shared_ptr<Config::ConsoleUI> &_config, bool visible)
  : Scene(), config(_config), visible(visible), mainPanel(rect) {
 	// Because console interface SHOULD always exist, it's a good idea to get the default
 	// config from here. any other interface that the default config is not defined in the
@@ -142,7 +150,7 @@ Meatball::ConsoleUIScene::ConsoleUIScene(const Rectangle& rect, const std::share
 	*/
 }
 
-void Meatball::ConsoleUIScene::update() {
+void Meatball::ConsoleUI::update() {
 	if (!visible) return;
 
 	inputBox.update();
@@ -209,7 +217,7 @@ void Meatball::ConsoleUIScene::update() {
 	mainPanel.update();
 }
 
-void Meatball::ConsoleUIScene::draw() {
+void Meatball::ConsoleUI::draw() {
 	if (!visible) return;
 
 	drawRect(mainPanel.rect, mainPanel.config->color);
@@ -262,7 +270,7 @@ void Meatball::ConsoleUIScene::draw() {
 	drawX(closeButton.rect, closeButton.isHovered()? closeButton.config->hoveredColor : closeButton.config->color);
 }
 
-void Meatball::ConsoleUIScene::onResize(float ratioWidth, float ratioHeight) {
+void Meatball::ConsoleUI::onResize(float ratioWidth, float ratioHeight) {
 	mainPanel.config->grabHeight = config->labelFont->baseSize;
 
 	mainPanel.rect.x *= ratioWidth;
