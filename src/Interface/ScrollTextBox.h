@@ -20,6 +20,13 @@ namespace Meatball {
         };
     }
 
+    struct ColoredText {
+        std::string text;
+        Color color;
+
+        ColoredText(const std::string& text, const Color& color) : text(text), color(color) {}
+    };
+
     namespace Defaults {
         extern Config::ScrollTextBox scrollTextBoxConfig;
     }
@@ -45,7 +52,7 @@ namespace Meatball {
         /// @brief removes the text at index 0
         void popFront() noexcept;
 
-        const std::list<std::pair<std::string, const Color&>> &getText() const;
+        const std::list<ColoredText> &getText() const;
 
         void draw();
         void drawScrollbar();
@@ -57,7 +64,7 @@ namespace Meatball {
         std::shared_ptr<Config::ScrollTextBox> config;
 
     private:
-        std::list<std::pair<std::string, const Color&>> text;
+        std::list<ColoredText> text;
         unsigned int contentHeight = 0;
         
         ScrollBar scrollBar; // it appears when text is higher than rect.height
