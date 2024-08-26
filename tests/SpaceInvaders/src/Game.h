@@ -17,7 +17,7 @@ void cleanup();
 void loadCommands();
 bool handleBullet(size_t& bulletIdx, float dt);
 
-extern Meatball::ConsoleUI* consoleUI;
+extern Meatball::ConsoleUI consoleUI;
 extern Texture2D backgroundTexture;
 extern bool shouldQuit;
 extern bool saveSettings;
