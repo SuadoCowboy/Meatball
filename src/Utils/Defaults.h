@@ -12,11 +12,11 @@ namespace Meatball::Defaults {
     /// @param meatdataPath the path to the .meatdata file
     void init(const std::string& meatdataPath, Font& defaultFont);
 
-    void loadConsoleFonts(ConsoleUIScene& consoleUI, const std::filesystem::path& fontPath, Font& outGeneralFont, Font& outLabelFont);
+    void loadConsoleFonts(ConsoleUI& consoleUI, const std::filesystem::path& fontPath, Font& outGeneralFont, Font& outLabelFont);
 
     /// @brief does the boring part for you.
     /// @param rect position and size of the console
     /// @param meatdataPath the path to the .meatdata file
     /// @return ConsoleUIScene since it's not a static class
-    ConsoleUIScene initLocalConsole(const Rectangle& rect, const std::string& meatdataPath, Font& outGeneralFont, Font& outLabelFont);
+    ConsoleUI initLocalConsole(const Rectangle& rect, const std::string& meatdataPath, Font& outGeneralFont, Font& outLabelFont);
 }

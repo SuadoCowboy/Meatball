@@ -22,16 +22,16 @@ static void defaultConsoleUiPrint(void *pData, const HayBCMD::OutputLevel &level
     size_t currentSpaceIdx = text.find('\n');
     
     while (currentSpaceIdx != std::string::npos) {
-        ((Meatball::ConsoleUIScene*)pData)->print(level, text.substr(spaceIdxBefore, currentSpaceIdx-spaceIdxBefore));
+        ((Meatball::ConsoleUI*)pData)->print(level, text.substr(spaceIdxBefore, currentSpaceIdx-spaceIdxBefore));
         spaceIdxBefore = currentSpaceIdx+1;
         currentSpaceIdx = text.find('\n', spaceIdxBefore);
     }
 
-    ((Meatball::ConsoleUIScene*)pData)->print(level, text.substr(spaceIdxBefore));
+    ((Meatball::ConsoleUI*)pData)->print(level, text.substr(spaceIdxBefore));
 }
 
 static void clearOutputBoxCommand(void *pData, HayBCMD::Command&, const std::vector<std::string>&) {
-        ((Meatball::ConsoleUIScene*)pData)->outputBox.clearText();
+        ((Meatball::ConsoleUI*)pData)->outputBox.clearText();
 }
 
 static void printToVector(void *pData, const HayBCMD::OutputLevel &level, const std::string &text) {
@@ -131,7 +131,7 @@ void Meatball::Defaults::init(const std::string& meatdataPath, Font& defaultFont
     Config::clearData(initData);
 }
 
-void Meatball::Defaults::loadConsoleFonts(ConsoleUIScene& consoleUI, const std::filesystem::path& fontPath, Font& outGeneralFont, Font& outLabelFont) {
+void Meatball::Defaults::loadConsoleFonts(ConsoleUI& consoleUI, const std::filesystem::path& fontPath, Font& outGeneralFont, Font& outLabelFont) {
     int size = (int)consoleUI.inputBox.rect.height - 2 + (int)consoleUI.inputBox.rect.height % 2;
     if (Meatball::loadFont(fontPath, size, nullptr, 0, outGeneralFont))
         consoleUI.inputBox.config->font = consoleUI.outputBox.config->font = &outGeneralFont;
@@ -143,7 +143,7 @@ void Meatball::Defaults::loadConsoleFonts(ConsoleUIScene& consoleUI, const std::
     consoleUI.onResize(1, 1);
 }
 
-Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& rect, const std::string &meatdataPath, Font& outGeneralFont, Font& outLabelFont) {    
+Meatball::ConsoleUI Meatball::Defaults::initLocalConsole(const Rectangle& rect, const std::string &meatdataPath, Font& outGeneralFont, Font& outLabelFont) {    
     std::vector<std::pair<std::string, HayBCMD::OutputLevel>> texts;
     HayBCMD::Output::setPrintFunction(&texts, printToVector);
     
@@ -151,8 +151,8 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
     auto consoleConfig = std::make_shared<Config::ConsoleUI>();
 
     Config::ConfigData *data = Config::ifContainsGet(consoleData, "margin");
-    Meatball::ConsoleUIScene::margin = data?
-        Config::getConfig<unsigned char>(data)->value : Meatball::ConsoleUIScene::margin;
+    Meatball::ConsoleUI::margin = data?
+        Config::getConfig<unsigned char>(data)->value : Meatball::ConsoleUI::margin;
 
     data = Config::ifContainsGet(consoleData, "OutputDefaultColor");
     if (data) Config::OutputColors::defaultColor = Config::getConfig<Color>(data)->value;
@@ -184,7 +184,7 @@ Meatball::ConsoleUIScene Meatball::Defaults::initLocalConsole(const Rectangle& r
     consoleConfig->labelFont = &outLabelFont;
     consoleConfig->labelText = "Local Console";
 
-    auto consoleUI = Meatball::ConsoleUIScene({rect.x, rect.y, rect.width, rect.height}, std::move(consoleConfig));
+    auto consoleUI = Meatball::ConsoleUI({rect.x, rect.y, rect.width, rect.height}, std::move(consoleConfig));
 
     data = Config::ifContainsGet(consoleData, "closeButtonColor");
     if (data) consoleUI.closeButton.config->color = Config::getConfig<Color>(data)->value;

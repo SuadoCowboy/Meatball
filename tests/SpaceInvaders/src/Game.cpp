@@ -17,7 +17,7 @@
 
 using namespace Meatball;
 
-Meatball::ConsoleUIScene* consoleUI = nullptr;
+Meatball::ConsoleUI* consoleUI = nullptr;
 struct ConsoleFonts {
     Font label;
     Font inputBox;
@@ -86,7 +86,7 @@ void init(int windowWidth, int windowHeight) {
     consoleUIRect.y = windowHeight * 0.5f - consoleUIRect.height * 0.5f;
 
     if (consoleUI != nullptr) delete consoleUI;
-    consoleUI = new ConsoleUIScene(Defaults::initLocalConsole(
+    consoleUI = new ConsoleUI(Defaults::initLocalConsole(
         consoleUIRect,
         "data/meatdata/Console.meatdata",
         consoleGeneralFont,
