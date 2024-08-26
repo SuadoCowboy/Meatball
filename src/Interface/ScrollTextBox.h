@@ -7,6 +7,7 @@
 #include <raylib.h>
 
 #include "ScrollBar.h"
+#include "Utils/Utils.h"
 
 namespace Meatball {
     namespace Config {
@@ -19,13 +20,6 @@ namespace Meatball {
             Color color;
         };
     }
-
-    struct ColoredText {
-        std::string text;
-        Color color;
-
-        ColoredText(const std::string& text, const Color& color) : text(text), color(color) {}
-    };
 
     namespace Defaults {
         extern Config::ScrollTextBox scrollTextBoxConfig;
