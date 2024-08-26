@@ -152,14 +152,18 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const std::shared_ptr<Conf
 
 Meatball::ConsoleUI::~ConsoleUI() {
 	config.reset();
+	closeButton.config.reset();
+	inputBox.config.reset();
+	outputBox.config.reset();
+	mainPanel.config.reset();
+
+
 	autoCompleteText.clear();
 	for (unsigned char i = 0; i < CONSOLEUI_INPUT_MAX_HISTORY; ++i) {
 		inputHistory[i].clear();
 	}
 
-	autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd = 0;
 	inputBoxOriginalText.clear();
-	inputHistoryPos = inputHistorySize = 0;
 }
 
 void Meatball::ConsoleUI::update() {
