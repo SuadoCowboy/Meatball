@@ -7,7 +7,15 @@
 #include "Shared.h"
 
 namespace Meatball {
+    // because Raylib does not provide a textSpacing global, I'm doing my own
     extern float textSpacing;
+
+    struct ColoredText {
+        std::string text;
+        Color color;
+
+        ColoredText(const std::string& text, const Color& color) : text(text), color(color) {}
+    };
 
     /// @brief since alot of classes might do hover check, this function exists to facilitate the process of implementing it
     void checkHovered(bool& hovered, const Rectangle& rect, VoidFunc* onHover, VoidFunc* onRelease);
