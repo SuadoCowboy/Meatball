@@ -150,6 +150,18 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const std::shared_ptr<Conf
 	*/
 }
 
+Meatball::ConsoleUI::~ConsoleUI() {
+	config.reset();
+	autoCompleteText.clear();
+	for (unsigned char i = 0; i < CONSOLEUI_INPUT_MAX_HISTORY; ++i) {
+		inputHistory[i].clear();
+	}
+
+	autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd = 0;
+	inputBoxOriginalText.clear();
+	inputHistoryPos = inputHistorySize = 0;
+}
+
 void Meatball::ConsoleUI::update() {
 	if (!visible) return;
 
@@ -165,13 +177,13 @@ void Meatball::ConsoleUI::update() {
 				autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
 				
 				size_t idx = autoCompleteSelectedIdxEnd;
-				autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
-				std::string newText = autoCompleteText[idx].first;
+				autoCompleteText[idx].color = config->autoCompleteSelectedTextColor;
+				std::string newText = autoCompleteText[idx].text;
 				
 				--idx;
-				while (autoCompleteText[idx].first.back() != ' ') {
-					autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
-					newText = autoCompleteText[idx].first+newText;
+				while (autoCompleteText[idx].text.back() != ' ') {
+					autoCompleteText[idx].color = config->autoCompleteSelectedTextColor;
+					newText = autoCompleteText[idx].text+newText;
 					if (idx == 0) break;
 					--idx;
 				}
@@ -191,13 +203,13 @@ void Meatball::ConsoleUI::update() {
 				if (autoCompleteSelectedIdxEnd == 0) autoCompleteSelectedIdxBegin = 0;
 				
 				size_t idx = autoCompleteSelectedIdxBegin;
-				autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
-				std::string newText = autoCompleteText[idx].first;
+				autoCompleteText[idx].color = config->autoCompleteSelectedTextColor;
+				std::string newText = autoCompleteText[idx].text;
 				
-				while (autoCompleteText[idx].first.back() != ' ') {
+				while (autoCompleteText[idx].text.back() != ' ') {
 					++idx;
-					autoCompleteText[idx].second = config->autoCompleteSelectedTextColor;
-					newText += autoCompleteText[idx].first;
+					autoCompleteText[idx].color = config->autoCompleteSelectedTextColor;
+					newText += autoCompleteText[idx].text;
 				}
 				
 				newText.pop_back();
@@ -235,16 +247,16 @@ void Meatball::ConsoleUI::draw() {
 			float selectedTextWidth = 0;
 			bool passedThroughSelectedText = false;
 			
-			for (auto &pair : autoCompleteText) {
-				if (pair.second == config->autoCompleteSelectedTextColor) {
-					selectedTextWidth += Meatball::measureTextWidth(*inputBox.config->font, inputBox.config->fontSize, pair.first.c_str());
+			for (auto &coloredText : autoCompleteText) {
+				if (coloredText.color == config->autoCompleteSelectedTextColor) {
+					selectedTextWidth += Meatball::measureTextWidth(*inputBox.config->font, inputBox.config->fontSize, coloredText.text.c_str());
 					passedThroughSelectedText = true;
 					continue;
 				}
 
 				if (passedThroughSelectedText) break;
 				
-				offsetX += Meatball::measureTextWidth(*inputBox.config->font, inputBox.config->fontSize, pair.first.c_str())+1;
+				offsetX += Meatball::measureTextWidth(*inputBox.config->font, inputBox.config->fontSize, coloredText.text.c_str())+1;
 			}
 
 			if (offsetX+selectedTextWidth < mainPanel.rect.width) offsetX = 0;
@@ -257,9 +269,9 @@ void Meatball::ConsoleUI::draw() {
 		BeginScissorMode(mainPanel.rect.x, autoCompleteY, mainPanel.rect.width, inputBox.rect.height);
 
 		float x = mainPanel.rect.x;
-		for (auto &pair : autoCompleteText) {
-			drawText(*inputBox.config->font, inputBox.config->fontSize, pair.first.c_str(), x-offsetX, autoCompleteY+1, pair.second);
-			x += Meatball::measureTextWidth(*inputBox.config->font, inputBox.config->fontSize, pair.first.c_str())+1;
+		for (auto &coloredText : autoCompleteText) {
+			drawText(*inputBox.config->font, inputBox.config->fontSize, coloredText.text.c_str(), x-offsetX, autoCompleteY+1, coloredText.color);
+			x += Meatball::measureTextWidth(*inputBox.config->font, inputBox.config->fontSize, coloredText.text.c_str())+1;
 		}
 
 		EndScissorMode();

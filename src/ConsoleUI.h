@@ -45,7 +45,7 @@ namespace Meatball {
         ConsoleUI();
         ConsoleUI(const Rectangle& rect, const std::shared_ptr<Config::ConsoleUI> &config, bool visible = false);
 
-        virtual ~ConsoleUI() {};
+        ~ConsoleUI();
 
         /// @brief appends text to outputTextbox
         void print(const HayBCMD::OutputLevel &level, const std::string &text) {
@@ -86,7 +86,7 @@ namespace Meatball {
         static unsigned char margin;
 
     private:
-        std::vector<std::pair<std::string, Color>> autoCompleteText;
+        std::vector<ColoredText> autoCompleteText;
         size_t autoCompleteSelectedIdxBegin = 0, autoCompleteSelectedIdxEnd = 0;
         std::string inputBoxOriginalText; // the inputBox text that was used before selecting in auto complete
 
