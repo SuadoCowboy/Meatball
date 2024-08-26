@@ -17,7 +17,7 @@
 
 using namespace Meatball;
 
-Meatball::ConsoleUI* consoleUI = nullptr;
+Meatball::ConsoleUI consoleUI;
 struct ConsoleFonts {
     Font label;
     Font inputBox;
@@ -62,8 +62,8 @@ static void reloadFontsCommand(void*, HayBCMD::Command&, const std::vector<std::
 }
 
 static void toggleLocalConsoleCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
-    consoleUI->visible = not consoleUI->visible;
-    if (!consoleUI->visible)
+    consoleUI.visible = not consoleUI.visible;
+    if (!consoleUI.visible)
         resetCursor(currentMouseCursorPriorityLevel);
 }
 
@@ -85,14 +85,13 @@ void init(int windowWidth, int windowHeight) {
     consoleUIRect.x = windowWidth * 0.5f - consoleUIRect.width * 0.5f;
     consoleUIRect.y = windowHeight * 0.5f - consoleUIRect.height * 0.5f;
 
-    if (consoleUI != nullptr) delete consoleUI;
-    consoleUI = new ConsoleUI(Defaults::initLocalConsole(
+    consoleUI = ConsoleUI(Defaults::initLocalConsole(
         consoleUIRect,
         "data/meatdata/Console.meatdata",
         consoleGeneralFont,
         consoleLabelFont));
 
-    consoleUI->visible = false;
+    consoleUI.visible = false;
 
     entityData[PLAYER] = {10, 90, {255, 255, 0, 255}, LoadTexture("data/images/player.png")};
     entityData[ENEMY_WEAK] = {10, 30, {0, 0, 255, 255}, LoadTexture("data/images/enemy0.png")};
@@ -175,7 +174,7 @@ void reloadFonts() {
 
     auto data = Config::ifContainsGet(consoleData, "font");
     std::string path;
-    if (data) Defaults::loadConsoleFonts(*consoleUI, ((Config::ConfigTypeData<std::string>*)data)->value, consoleGeneralFont, consoleLabelFont);
+    if (data) Defaults::loadConsoleFonts(consoleUI, ((Config::ConfigTypeData<std::string>*)data)->value, consoleGeneralFont, consoleLabelFont);
 
     Config::clearData(consoleData);
 }
@@ -184,7 +183,7 @@ void resize() {
     int newScreenWidth = GetRenderWidth(), newScreenHeight = GetRenderHeight();
     Vector2 ratio = { (float)newScreenWidth / backgroundTexture.width, (float)newScreenHeight / backgroundTexture.height };
 
-    consoleUI->onResize(ratio.x, ratio.y);
+    consoleUI.onResize(ratio.x, ratio.y);
 
     backgroundTexture.width = newScreenWidth;
     backgroundTexture.height = newScreenHeight;
@@ -211,8 +210,8 @@ void resize() {
 }
 
 void update(float dt) {
-    consoleUI->update();
-    Input::update(consoleUI->visible);
+    consoleUI.update();
+    Input::update(consoleUI.visible);
 
     if (WindowShouldClose()) shouldQuit = true;
     if (IsWindowResized())
@@ -251,7 +250,7 @@ void render() {
     player.draw();
     
     DrawFPS(0, 0);
-    consoleUI->draw();
+    consoleUI.draw();
 
     EndDrawing();
 }
