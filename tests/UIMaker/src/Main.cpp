@@ -17,7 +17,7 @@
 #include <Utils/DrawFuncs.h>
 #include <Utils/Utils.h>
 #include <Utils/CvarFuncs.h>
-#include <Scene.h>
+#include <IScene.h>
 
 #include "GameInterface.h"
 
