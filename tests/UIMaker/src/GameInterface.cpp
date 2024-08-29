@@ -16,7 +16,7 @@ UIObject* createUIObject(const char* name, std::vector<UIObject*>& uiObjects, co
     switch (type) {
     case UI_TYPE_BUTTON: {
         Meatball::Button* button = new Meatball::Button((Rectangle){position.x, position.y, renderSize.x*0.1f, renderSize.y*0.06f});
-        button->config = std::make_shared<Meatball::Config::Button>(Meatball::Defaults::buttonConfig);
+        button->config = &Meatball::Defaults::buttonConfig;
 
         UIObject* object = new UIObject(
                 button,
