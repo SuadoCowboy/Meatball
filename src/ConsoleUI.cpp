@@ -23,7 +23,7 @@ static void handleInputHistoryPos(Meatball::InputTextBox &inputBox, std::string 
 }
 
 Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const Config::ConsoleUI& _config, bool visible)
- : Scene(), config(_config), visible(visible), mainPanel(rect) {
+ : IScene(), config(_config), visible(visible), mainPanel(rect) {
 	mainPanel.config = &Defaults::dynamicPanelConfig;
 	outputBox.config = &Defaults::scrollTextBoxConfig;
     inputBox.config = &Defaults::inputTextBoxConfig;

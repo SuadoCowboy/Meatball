@@ -4,7 +4,7 @@
 
 #include <HayBCMD.h>
 
-#include "Scene.h"
+#include "IScene.h"
 #include "Interface/DynamicPanel.h"
 #include "Interface/Button.h"
 #include "Interface/ScrollTextBox.h"
@@ -36,11 +36,12 @@ namespace Meatball {
         };
     }
 
-    class ConsoleUI : public Scene {
+    class ConsoleUI : public IScene {
     public:
         /// @brief makes a empty ConsoleUI
-        ConsoleUI();
         ConsoleUI(const Rectangle &rect, const Config::ConsoleUI &config, bool visible = false);
+
+        virtual ~ConsoleUI() {};
 
         /// @brief appends text to outputTextbox
         void print(const HayBCMD::OutputLevel &level, const std::string &text) {
