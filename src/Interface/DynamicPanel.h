@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <raylib.h>
 
 #include "Shared.h"
@@ -32,7 +30,7 @@ namespace Meatball {
         /// @brief whether is dragging/resizing/hovered
         bool isAnyConditionActive();
 
-        std::shared_ptr<Config::DynamicPanel> config;
+        Config::DynamicPanel *config = &Defaults::dynamicPanelConfig;
         Rectangle rect;
 
         // TODO: grabHeight proportional to screen size or window size

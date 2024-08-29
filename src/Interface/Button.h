@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <memory>
 
 #include <raylib.h>
 
@@ -29,7 +28,7 @@ namespace Meatball {
         void update();
         bool isHovered();
 
-        std::shared_ptr<Config::Button> config;
+        Config::Button *config =  &Defaults::buttonConfig;
         
         VoidFunc onRelease, onHover;
         Rectangle rect;
