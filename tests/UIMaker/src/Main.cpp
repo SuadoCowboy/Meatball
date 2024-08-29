@@ -17,6 +17,7 @@
 #include <Utils/DrawFuncs.h>
 #include <Utils/Utils.h>
 #include <Utils/CvarFuncs.h>
+#include <Scene.h>
 
 #include "GameInterface.h"
 
@@ -26,8 +27,17 @@ std::vector<UIObject*> uiObjects;
 
 Vector2 viewport;
 
-// User Interface CVars
+// CVARS
+bool uiEditorMode = true;
+
 Color uiColor = BLACK, uiHoveredColor = BLACK;
+std::string uiAnchor = "";
+
+static void resetUiCvars() {
+    uiColor = BLACK;
+    uiHoveredColor = BLACK;
+    uiAnchor = "";
+}
 
 bool drawOptions = false;
 // TODO: fully customizable program in the future :D
@@ -42,34 +52,17 @@ Color optionsHoveredTextColor = WHITE;
 Font optionsFont;
 Vector2 optionsPosition = {0,0};
 
-// CVARs
-bool uiEditorMode = true;
+Meatball::ConsoleUI* pConsoleUI;
 
 #pragma region commands
-
-static void toggleCommand(void*, HayBCMD::Command&, const std::vector<std::string>& args) {
-    HayBCMD::CVariable cvar;
-    if (!HayBCMD::CVARStorage::getCvar(args[0], cvar)) {
-        Meatball::Console::printf(HayBCMD::ERROR, "unknown cvar \"{}\"\n", args[0]);
-        return;
-    }
-
-    HayBCMD::Command cvarCommand;
-    if (!HayBCMD::Command::getCommand(args[0], cvarCommand, true)) return;
-
-    std::string asString = cvar.toString(cvarCommand.pData);
-    if (asString == args[1])
-        cvar.set(cvarCommand.pData, args[2]);
-    else
-        cvar.set(cvarCommand.pData, args[1]);
-}
 
 static void uiCreateButtonCommand(void*, HayBCMD::Command&, const std::vector<std::string>& args) {
     UIObject* buttonObj = createUIObject(args[0].c_str(), uiObjects, {0.0f,0.0f}, UI_TYPE_BUTTON, viewport);
     auto button = (Meatball::Button*)buttonObj->object;
-    button->config = std::make_shared<Meatball::Config::Button>(Meatball::Defaults::buttonConfig);
     button->config->color = uiColor;
     button->config->hoveredColor = uiHoveredColor;
+
+    resetUiCvars();
 }
 
 static void showUiOptionsCommand(void*, HayBCMD::Command&, const std::vector<std::string>& args) {
@@ -89,42 +82,9 @@ bool stringToInt(const std::string& str, int& buffer) {
     }
 }
 
-void initCommands() {
-    HayBCMD::Command("toggle", 3, 3, toggleCommand, "<cvar> <option1> <option2> - toggles a cvar to option1 or option2");
+static void initCommands() {
     HayBCMD::Command("ui_create_button", 1, 1, uiCreateButtonCommand, "<name> - creates a button using the defined data by other ui commands");
     HayBCMD::Command("show_ui_options", 1, 1, showUiOptionsCommand, "<draw> - draw options where mouse position is at");
-}
-
-Meatball::ConsoleUIScene* init(int width, int height) {
-    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
-    InitWindow(width, height, "Meatball's Interface Creator");
-    viewport = {(float)GetRenderWidth(), (float)GetRenderHeight()};
-
-    defaultFont = GetFontDefault();
-
-    Meatball::Defaults::init("data/meatdata/Init.meatdata", defaultFont);
-    auto consoleUI = new Meatball::ConsoleUIScene(Meatball::Defaults::initLocalConsole(
-        {0, 0, 800 * 0.5f, 600 * 0.75f},
-        "data/meatdata/Console.meatdata",
-        consoleGeneralFont,
-        consoleLabelFont
-    ));
-
-    Meatball::Input::registerCommands();
-    Meatball::Input::mapKeyboardKeys();
-    Meatball::Input::mapMouseKeys();
-
-    initCommands();
-
-    optionsFont = GetFontDefault();
-
-    return consoleUI;
-}
-
-int main() {
-    auto consoleUI = init(800, 600);
-    SetExitKey(KEY_NULL);
-    consoleUI->visible = false;
 
     HayBCMD::CVARStorage::setCvar("ui_editor_mode",
         &uiEditorMode,
@@ -133,13 +93,12 @@ int main() {
         "1/0 - whether should run in editor mode or ui logic"
     );
     HayBCMD::CVARStorage::setCvar("draw_local_console",
-        &consoleUI->visible,
+        &pConsoleUI->visible,
         HayBCMD::CVARUtils::setBoolean,
         HayBCMD::CVARUtils::getBoolean,
         "1/0 - draws local console"
     );
 
-    // Unfortunately, we can not create a lambda for cvar, that will be out of scope later. I should fix this soon.
     /*
     // x% y% width% height%
     ui_anchor "mainPanel" // mainPanel should be defined before closeButton
@@ -160,9 +119,45 @@ int main() {
         Meatball::CVARFuncs::setColor,
         Meatball::CVARFuncs::getColor,
         "");
+    HayBCMD::CVARStorage::setCvar(
+        "ui_anchor",
+        &uiAnchor,
+        HayBCMD::CVARUtils::setString,
+        HayBCMD::CVARUtils::getString,
+        "");
 
     Meatball::Input::allowedUiCommands.push_back("draw_local_console");
     //Meatball::Input::allowedUiCommands.push_back("quit");
+}
+
+static void init(int width, int height) {
+    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
+    InitWindow(width, height, "Meatball's Interface Creator");
+    viewport = {(float)GetRenderWidth(), (float)GetRenderHeight()};
+
+    defaultFont = GetFontDefault();
+
+    Meatball::Defaults::init("data/meatdata/Init.meatdata", defaultFont);
+    pConsoleUI = new Meatball::ConsoleUI(Meatball::Defaults::initLocalConsole(
+        {0, 0, 800 * 0.5f, 600 * 0.75f},
+        "data/meatdata/Console.meatdata",
+        consoleGeneralFont,
+        consoleLabelFont
+    ));
+
+    Meatball::Input::registerCommands();
+    Meatball::Input::mapKeyboardKeys();
+    Meatball::Input::mapMouseKeys();
+
+    initCommands();
+
+    optionsFont = GetFontDefault();
+}
+
+int main() {
+    init(800, 600);
+    SetExitKey(KEY_NULL);
+    pConsoleUI->visible = false;
 
     options.push_back({"Create Button", optionsFont, UI_TYPE_BUTTON});
 
@@ -203,10 +198,9 @@ int main() {
         if (uiEditorMode && drawOptions) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
                 drawOptions = false;
-
-            unsigned char i = 0;
+            
             DrawRectangle(optionsPosition.x, optionsPosition.y, optionsMinWidth, options.size()*optionsFont.baseSize, optionsColor);
-            for (; i < options.size(); ++i) {
+            for (unsigned char i = 0; i < options.size(); ++i) {
                 if (CheckCollisionPointRec(GetMousePosition(), {optionsPosition.x, optionsPosition.y, optionsMinWidth, (float)optionsFont.baseSize})) {
                     Meatball::drawText(optionsFont, optionsFont.baseSize, options[i].text, optionsPosition.x+2, optionsPosition.y+i*optionsFont.baseSize, optionsHoveredTextColor);
                 
@@ -217,8 +211,8 @@ int main() {
             }
         }
 
-        consoleUI->update();
-        consoleUI->draw();
+        pConsoleUI->update();
+        pConsoleUI->draw();
 
         EndDrawing();
     }

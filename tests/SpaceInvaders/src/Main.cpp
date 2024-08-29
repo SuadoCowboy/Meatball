@@ -71,6 +71,4 @@ int main(int, char**) {
 
     save(SETTINGS_PATH);
     cleanup();
-
-    consoleUI.~ConsoleUI();
 }
