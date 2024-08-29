@@ -11,10 +11,10 @@ namespace Meatball {
     extern float textSpacing;
 
     struct ColoredText {
+        ColoredText(const std::string& text, const Color& color);
+
         std::string text;
         Color color;
-
-        ColoredText(const std::string& text, const Color& color) : text(text), color(color) {}
     };
 
     /// @brief since alot of classes might do hover check, this function exists to facilitate the process of implementing it

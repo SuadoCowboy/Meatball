@@ -2,6 +2,8 @@
 
 float Meatball::textSpacing = 1.0f;
 
+Meatball::ColoredText::ColoredText(const std::string& text, const Color& color) : text(text), color(color) {}
+
 void Meatball::checkHovered(bool& hovered, const Rectangle& rect, VoidFunc* onHover, VoidFunc* onRelease) {
     bool wasHovered = hovered;
     hovered = CheckCollisionPointRec(GetMousePosition(), rect);
