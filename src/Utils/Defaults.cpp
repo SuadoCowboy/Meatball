@@ -138,7 +138,7 @@ void Meatball::Defaults::loadConsoleFonts(ConsoleUI& consoleUI, const std::files
 
     size = consoleUI.inputBox.rect.height*0.5;
     if (Meatball::loadFont(fontPath, size, nullptr, 0, outLabelFont))
-        consoleUI.config->labelFont = &outLabelFont;
+        consoleUI.config.labelFont = &outLabelFont;
     
     consoleUI.onResize(1, 1);
 }
@@ -148,7 +148,7 @@ Meatball::ConsoleUI Meatball::Defaults::initLocalConsole(const Rectangle& rect, 
     HayBCMD::Output::setPrintFunction(&texts, printToVector);
     
     auto consoleData = Config::loadData(meatdataPath);
-    auto consoleConfig = std::make_shared<Config::ConsoleUI>();
+    Config::ConsoleUI consoleConfig = {};
 
     Config::ConfigData *data = Config::ifContainsGet(consoleData, "margin");
     Meatball::ConsoleUI::margin = data?
@@ -167,24 +167,24 @@ Meatball::ConsoleUI Meatball::Defaults::initLocalConsole(const Rectangle& rect, 
     if (data) Config::OutputColors::errorColor = Config::getConfig<Color>(data)->value;
 
     data = Config::ifContainsGet(consoleData, "autoCompleteColor");
-    if (data) consoleConfig->autoCompleteColor = Config::getConfig<Color>(data)->value;
+    if (data) consoleConfig.autoCompleteColor = Config::getConfig<Color>(data)->value;
 
     data = Config::ifContainsGet(consoleData, "autoCompleteTextColor");
-    if (data) consoleConfig->autoCompleteTextColor = Config::getConfig<Color>(data)->value;
+    if (data) consoleConfig.autoCompleteTextColor = Config::getConfig<Color>(data)->value;
 
     data = Config::ifContainsGet(consoleData, "autoCompleteHightlightedTextColor");
-    if (data) consoleConfig->autoCompleteHighlightedTextColor = Config::getConfig<Color>(data)->value;
+    if (data) consoleConfig.autoCompleteHighlightedTextColor = Config::getConfig<Color>(data)->value;
 
     data = Config::ifContainsGet(consoleData, "autoCompleteSelectedTextColor");
-    if (data) consoleConfig->autoCompleteSelectedTextColor = Config::getConfig<Color>(data)->value;
+    if (data) consoleConfig.autoCompleteSelectedTextColor = Config::getConfig<Color>(data)->value;
 
     data = Config::ifContainsGet(consoleData, "labelColor");
-    if (data) consoleConfig->labelTextColor = Config::getConfig<Color>(data)->value;
+    if (data) consoleConfig.labelTextColor = Config::getConfig<Color>(data)->value;
 
-    consoleConfig->labelFont = &outLabelFont;
-    consoleConfig->labelText = "Local Console";
+    consoleConfig.labelFont = &outLabelFont;
+    consoleConfig.labelText = "Local Console";
 
-    auto consoleUI = Meatball::ConsoleUI({rect.x, rect.y, rect.width, rect.height}, std::move(consoleConfig));
+    auto consoleUI = Meatball::ConsoleUI({rect.x, rect.y, rect.width, rect.height}, consoleConfig);
 
     data = Config::ifContainsGet(consoleData, "closeButtonColor");
     if (data) consoleUI.closeButton.config->color = Config::getConfig<Color>(data)->value;

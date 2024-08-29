@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <memory>
 
 #include <HayBCMD.h>
 
@@ -24,16 +23,14 @@
 namespace Meatball {
     namespace Config {
         struct ConsoleUI {
-            ConsoleUI();
-            
-            Font* labelFont; // used only for label
+            Font* labelFont = nullptr; // used only for label
 
-            Color autoCompleteColor; // color of the rect
-            Color autoCompleteTextColor;
-            Color autoCompleteHighlightedTextColor;
-            Color autoCompleteSelectedTextColor;
+            Color autoCompleteColor = BLACK; // color of the rect
+            Color autoCompleteTextColor = WHITE;
+            Color autoCompleteHighlightedTextColor = YELLOW;
+            Color autoCompleteSelectedTextColor = PURPLE;
 
-            Color labelTextColor;
+            Color labelTextColor = WHITE;
 
             const char* labelText;
         };
@@ -43,9 +40,7 @@ namespace Meatball {
     public:
         /// @brief makes a empty ConsoleUI
         ConsoleUI();
-        ConsoleUI(const Rectangle& rect, const std::shared_ptr<Config::ConsoleUI> &config, bool visible = false);
-
-        ~ConsoleUI();
+        ConsoleUI(const Rectangle &rect, const Config::ConsoleUI &config, bool visible = false);
 
         /// @brief appends text to outputTextbox
         void print(const HayBCMD::OutputLevel &level, const std::string &text) {
@@ -70,7 +65,7 @@ namespace Meatball {
         /// @param ratioHeight renderHeightNow/renderHeightBefore
         void onResize(float ratioWidth, float ratioHeight);
 
-        std::shared_ptr<Config::ConsoleUI> config;
+        Config::ConsoleUI config;
 
         // Only console can appear in every scene so only it needs visible boolean.
         // The rest of the scenes will be handled by a class or something that says which one should be used.
@@ -88,8 +83,8 @@ namespace Meatball {
     private:
         std::vector<ColoredText> autoCompleteText;
         size_t autoCompleteSelectedIdxBegin = 0, autoCompleteSelectedIdxEnd = 0;
+        
         std::string inputBoxOriginalText; // the inputBox text that was used before selecting in auto complete
-
         std::string inputHistory[CONSOLEUI_INPUT_MAX_HISTORY];
         unsigned char inputHistorySize = 0;
         unsigned char inputHistoryPos = 0; // the position the user is when using inputHistory

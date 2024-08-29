@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <raylib.h>
 
 #include "Shared.h"
@@ -47,7 +45,7 @@ namespace Meatball {
         
         const Rectangle& getRect();
 
-        std::shared_ptr<Config::ScrollBar> config;
+        Config::ScrollBar *config = &Defaults::scrollBarConfig;
         
         bool visible;
 

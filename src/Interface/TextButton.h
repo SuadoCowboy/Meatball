@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <memory>
 
 #include <raylib.h>
 
@@ -42,7 +41,8 @@ namespace Meatball {
         const std::string &getText();
         void setText(const std::string &newText);
 
-        std::shared_ptr<Config::TextButton> config;
+        Config::TextButton *config = &Defaults::textButtonConfig;
+
         VoidFunc onRelease, onHover;
         Rectangle rect;
 

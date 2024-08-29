@@ -11,18 +11,14 @@ Meatball::Config::ScrollTextBox::ScrollTextBox() : font(nullptr), fontSize(0), c
 Meatball::ScrollTextBox::ScrollTextBox() {
     setSize(0,0);
     setPosition(0,0);
-
-    scrollBar.config = std::make_shared<Config::ScrollBar>(Defaults::scrollBarConfig);
 }
 
 Meatball::ScrollTextBox::ScrollTextBox(const Rectangle& rect) {
     setSize(rect.width, rect.height);
     setPosition(rect.x, rect.y);
-
-    scrollBar.config = std::make_shared<Config::ScrollBar>(Defaults::scrollBarConfig);
 }
 
-static float _getContentHeight(const std::list<Meatball::ColoredText> &text, unsigned short fontSize) {
+static float _getContentHeight(const std::deque<Meatball::ColoredText> &text, unsigned short fontSize) {
     size_t lineIdx = 0;
     for (auto &line : text) {
         size_t newLineIdx = 0;
@@ -35,8 +31,8 @@ static float _getContentHeight(const std::list<Meatball::ColoredText> &text, uns
     return lineIdx*fontSize; // contentHeight
 }
 
-static inline void handleTextWrapping(std::list<Meatball::ColoredText> &textList, const std::string &text, Color& color, Font* font, float maxWidth) {
-    textList.push_back({"", color});
+static inline void handleTextWrapping(std::deque<Meatball::ColoredText> &textList, const std::string &text, const Color& color, Font* font, float maxWidth) {
+    textList.emplace_back("", color);
     std::string newText = text;
 
     while (Meatball::measureTextWidth(*font, font->baseSize, newText.c_str()) >= maxWidth) {
@@ -98,11 +94,15 @@ void Meatball::ScrollTextBox::updateTextWrap() {
     scrollBar.visible = contentHeight > rect.height;
 }
 
-void Meatball::ScrollTextBox::appendText(std::string newText, Color& color) {
+void Meatball::ScrollTextBox::appendText(const std::string& newText, const Color& color) {
     if (newText.size() == 0) return;
     
-    if (Meatball::measureTextWidth(*config->font, config->fontSize, newText.c_str()) < rect.width-scrollBar.getRect().width) {
-        text.push_back({newText, color});
+    const Font& font = *config->font;
+    float height = config->fontSize;
+    const char* _text = newText.c_str();
+    float width = Meatball::measureTextWidth(font, height, _text);
+    if (width < rect.width-scrollBar.getRect().width) {
+        text.emplace_back(newText, color);
     } else
         handleTextWrapping(text, newText, color, config->font, rect.width-scrollBar.getRect().width);
 
@@ -128,7 +128,7 @@ void Meatball::ScrollTextBox::popFront() noexcept {
     scrollBar.updateThumbHeight(rect.height, contentHeight);
 }
 
-const std::list<Meatball::ColoredText> &Meatball::ScrollTextBox::getText() const {
+const std::deque<Meatball::ColoredText> &Meatball::ScrollTextBox::getText() const {
     return text;
 }
 

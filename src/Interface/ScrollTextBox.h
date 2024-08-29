@@ -1,8 +1,7 @@
 #pragma once
 
 #include <string>
-#include <list>
-#include <memory>
+#include <deque>
 
 #include <raylib.h>
 
@@ -37,7 +36,7 @@ namespace Meatball {
         unsigned int getContentHeight() const;
         ScrollBar &getScrollBar();
 
-        void appendText(std::string text, Color& color);
+        void appendText(const std::string& text, const Color& color);
         void clearText();
 
         /// @brief checks the current rect size and wraps the whole text
@@ -46,7 +45,7 @@ namespace Meatball {
         /// @brief removes the text at index 0
         void popFront() noexcept;
 
-        const std::list<ColoredText> &getText() const;
+        const std::deque<ColoredText> &getText() const;
 
         void draw();
         void drawScrollbar();
@@ -55,10 +54,10 @@ namespace Meatball {
         void setPosition(float x, float y);
         void setSize(float width, float height);
 
-        std::shared_ptr<Config::ScrollTextBox> config;
+        Config::ScrollTextBox *config = &Defaults::scrollTextBoxConfig;
 
     private:
-        std::list<ColoredText> text;
+        std::deque<ColoredText> text;
         unsigned int contentHeight = 0;
         
         ScrollBar scrollBar; // it appears when text is higher than rect.height

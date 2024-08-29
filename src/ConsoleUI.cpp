@@ -22,36 +22,18 @@ static void handleInputHistoryPos(Meatball::InputTextBox &inputBox, std::string 
 	}
 }
 
-Meatball::Config::ConsoleUI::ConsoleUI()
- : labelFont(nullptr), autoCompleteColor(BLACK), autoCompleteTextColor(WHITE),
- autoCompleteHighlightedTextColor(YELLOW), autoCompleteSelectedTextColor(PURPLE),
- labelTextColor(WHITE) {}
-
-Meatball::ConsoleUI::ConsoleUI() {
-	config = std::make_shared<Config::ConsoleUI>();
-	mainPanel.config = std::make_shared<Config::DynamicPanel>(Defaults::dynamicPanelConfig);
-	outputBox.config = std::make_shared<Config::ScrollTextBox>(Defaults::scrollTextBoxConfig);
-    inputBox.config = std::make_shared<Config::InputTextBox>(Defaults::inputTextBoxConfig);
-	closeButton.config = std::make_shared<Config::Button>(Defaults::buttonConfig);
-}
-
-Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const std::shared_ptr<Config::ConsoleUI> &_config, bool visible)
+Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const Config::ConsoleUI& _config, bool visible)
  : Scene(), config(_config), visible(visible), mainPanel(rect) {
-	// Because console interface SHOULD always exist, it's a good idea to get the default
-	// config from here. any other interface that the default config is not defined in the
-	// console interface should be handled by YOUR program. You could just make a config
-	// pointer outside any object so whenever a object that uses that config is created,
-	// you get that outside config.
-	mainPanel.config = std::make_shared<Config::DynamicPanel>(Defaults::dynamicPanelConfig);
-	outputBox.config = std::make_shared<Config::ScrollTextBox>(Defaults::scrollTextBoxConfig);
-    inputBox.config = std::make_shared<Config::InputTextBox>(Defaults::inputTextBoxConfig);
-	closeButton.config = std::make_shared<Config::Button>(Defaults::buttonConfig);
+	mainPanel.config = &Defaults::dynamicPanelConfig;
+	outputBox.config = &Defaults::scrollTextBoxConfig;
+    inputBox.config = &Defaults::inputTextBoxConfig;
+	closeButton.config = &Defaults::buttonConfig;
 
 	mainPanel.onMove = [&]() {
 		closeButton.rect.x = mainPanel.rect.x+mainPanel.rect.width-margin-margin*0.5;
 		closeButton.rect.y = mainPanel.rect.y+margin*0.5;
 
-		outputBox.setPosition(mainPanel.rect.x+margin, mainPanel.rect.y+config->labelFont->baseSize+margin);
+		outputBox.setPosition(mainPanel.rect.x+margin, mainPanel.rect.y+config.labelFont->baseSize+margin);
 
 		inputBox.rect.x = mainPanel.rect.x+margin;
 		inputBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin-inputBox.rect.height;
@@ -66,7 +48,7 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const std::shared_ptr<Conf
 			inputBox.rect.width = mainPanel.rect.width-margin*2;
 			outputBox.config->fontSize = inputBox.config->fontSize = (int)inputBox.rect.height - 2 + (int)inputBox.rect.height % 2;
 
-			outputBox.setSize(inputBox.rect.width, mainPanel.rect.height-config->labelFont->baseSize-1-margin*2-inputBox.rect.height);
+			outputBox.setSize(inputBox.rect.width, mainPanel.rect.height-config.labelFont->baseSize-1-margin*2-inputBox.rect.height);
 
 			mainPanel.onMove();
 	};
@@ -96,7 +78,7 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const std::shared_ptr<Conf
 		std::string commandName = text.substr(0, spaceIdx);
 		HayBCMD::Command command;
 		if (HayBCMD::Command::getCommand(commandName, command, false)) {
-			autoCompleteText.push_back({command.name+" "+command.usage, config->autoCompleteTextColor});
+			autoCompleteText.emplace_back(command.name+" "+command.usage, config.autoCompleteTextColor);
 			return;
 		}
 
@@ -106,11 +88,11 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const std::shared_ptr<Conf
 
 			std::string leftText = command.name.substr(0, idx);
 			if (leftText.size() != 0)
-				autoCompleteText.push_back({leftText, config->autoCompleteTextColor});
+				autoCompleteText.emplace_back(leftText, config.autoCompleteTextColor);
 			
-			autoCompleteText.push_back({command.name.substr(idx, textSize), config->autoCompleteHighlightedTextColor}); // middleText
+			autoCompleteText.emplace_back(command.name.substr(idx, textSize), config.autoCompleteHighlightedTextColor); // middleText
 			
-			autoCompleteText.push_back({command.name.substr(idx+textSize)+" ", config->autoCompleteTextColor}); // rightText
+			autoCompleteText.emplace_back(command.name.substr(idx+textSize)+" ", config.autoCompleteTextColor); // rightText
 		}
 	};
 
@@ -150,22 +132,6 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const std::shared_ptr<Conf
 	*/
 }
 
-Meatball::ConsoleUI::~ConsoleUI() {
-	config.reset();
-	closeButton.config.reset();
-	inputBox.config.reset();
-	outputBox.config.reset();
-	mainPanel.config.reset();
-
-
-	autoCompleteText.clear();
-	for (unsigned char i = 0; i < CONSOLEUI_INPUT_MAX_HISTORY; ++i) {
-		inputHistory[i].clear();
-	}
-
-	inputBoxOriginalText.clear();
-}
-
 void Meatball::ConsoleUI::update() {
 	if (!visible) return;
 
@@ -181,12 +147,12 @@ void Meatball::ConsoleUI::update() {
 				autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
 				
 				size_t idx = autoCompleteSelectedIdxEnd;
-				autoCompleteText[idx].color = config->autoCompleteSelectedTextColor;
+				autoCompleteText[idx].color = config.autoCompleteSelectedTextColor;
 				std::string newText = autoCompleteText[idx].text;
 				
 				--idx;
 				while (autoCompleteText[idx].text.back() != ' ') {
-					autoCompleteText[idx].color = config->autoCompleteSelectedTextColor;
+					autoCompleteText[idx].color = config.autoCompleteSelectedTextColor;
 					newText = autoCompleteText[idx].text+newText;
 					if (idx == 0) break;
 					--idx;
@@ -207,12 +173,12 @@ void Meatball::ConsoleUI::update() {
 				if (autoCompleteSelectedIdxEnd == 0) autoCompleteSelectedIdxBegin = 0;
 				
 				size_t idx = autoCompleteSelectedIdxBegin;
-				autoCompleteText[idx].color = config->autoCompleteSelectedTextColor;
+				autoCompleteText[idx].color = config.autoCompleteSelectedTextColor;
 				std::string newText = autoCompleteText[idx].text;
 				
 				while (autoCompleteText[idx].text.back() != ' ') {
 					++idx;
-					autoCompleteText[idx].color = config->autoCompleteSelectedTextColor;
+					autoCompleteText[idx].color = config.autoCompleteSelectedTextColor;
 					newText += autoCompleteText[idx].text;
 				}
 				
@@ -252,7 +218,7 @@ void Meatball::ConsoleUI::draw() {
 			bool passedThroughSelectedText = false;
 			
 			for (auto &coloredText : autoCompleteText) {
-				if (coloredText.color == config->autoCompleteSelectedTextColor) {
+				if (coloredText.color == config.autoCompleteSelectedTextColor) {
 					selectedTextWidth += Meatball::measureTextWidth(*inputBox.config->font, inputBox.config->fontSize, coloredText.text.c_str());
 					passedThroughSelectedText = true;
 					continue;
@@ -269,7 +235,7 @@ void Meatball::ConsoleUI::draw() {
 		}
 
 		float autoCompleteY = mainPanel.rect.y+mainPanel.rect.height-margin;
-		DrawRectangle(mainPanel.rect.x, autoCompleteY, mainPanel.rect.width, inputBox.rect.height, config->autoCompleteColor);
+		DrawRectangle(mainPanel.rect.x, autoCompleteY, mainPanel.rect.width, inputBox.rect.height, config.autoCompleteColor);
 		BeginScissorMode(mainPanel.rect.x, autoCompleteY, mainPanel.rect.width, inputBox.rect.height);
 
 		float x = mainPanel.rect.x;
@@ -281,13 +247,13 @@ void Meatball::ConsoleUI::draw() {
 		EndScissorMode();
 	}
 
-	drawText(*config->labelFont, config->labelFont->baseSize, config->labelText, mainPanel.rect.x+margin, mainPanel.rect.y+margin, config->labelTextColor);
+	drawText(*config.labelFont, config.labelFont->baseSize, config.labelText, mainPanel.rect.x+margin, mainPanel.rect.y+margin, config.labelTextColor);
 
 	drawX(closeButton.rect, closeButton.isHovered()? closeButton.config->hoveredColor : closeButton.config->color);
 }
 
 void Meatball::ConsoleUI::onResize(float ratioWidth, float ratioHeight) {
-	mainPanel.config->grabHeight = config->labelFont->baseSize;
+	mainPanel.config->grabHeight = config.labelFont->baseSize;
 
 	mainPanel.rect.x *= ratioWidth;
     mainPanel.rect.y *= ratioHeight;
@@ -299,9 +265,9 @@ void Meatball::ConsoleUI::onResize(float ratioWidth, float ratioHeight) {
 
 	mainPanel.config->minSize = {
 		// scrollBarWidth + (margin left + margin right) + labelText size
-		(int)outputBox.getScrollBar().getRect().width+margin*2+Meatball::measureTextWidth(*config->labelFont, config->labelFont->baseSize, config->labelText),
+		(int)outputBox.getScrollBar().getRect().width+margin*2+Meatball::measureTextWidth(*config.labelFont, config.labelFont->baseSize, config.labelText),
 		// outputBox minSize + inputBox minSize + (margin left + margin right)
-		(int)outputBox.config->font->baseSize+inputBox.rect.height+margin*2+config->labelFont->baseSize};
+		(int)outputBox.config->font->baseSize+inputBox.rect.height+margin*2+config.labelFont->baseSize};
 	
 	mainPanel.onResize();
 	mainPanel.onResizeStop();

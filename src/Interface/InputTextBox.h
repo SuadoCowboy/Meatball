@@ -1,7 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include <string>
 
 #include <raylib.h>
@@ -32,7 +31,7 @@ namespace Meatball {
         void draw();
         void update();
 
-        std::shared_ptr<Config::InputTextBox> config;
+        Config::InputTextBox *config = &Defaults::inputTextBoxConfig;
         
         // onSend by default runs when KEY_ENTER/KEY_KP_ENTER is pressed
         std::function<void(const std::string&)> onSend, onTextChange;
