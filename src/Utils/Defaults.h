@@ -5,7 +5,7 @@
 
 #include <raylib.h>
 
-#include "ConsoleUI.h"
+#include "../ConsoleUI.h"
 
 namespace Meatball::Defaults {
     /// @brief loads all the needed data

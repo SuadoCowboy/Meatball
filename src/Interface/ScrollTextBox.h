@@ -6,7 +6,7 @@
 #include <raylib.h>
 
 #include "ScrollBar.h"
-#include "Utils/Utils.h"
+#include "../Utils/Utils.h"
 
 namespace Meatball {
     namespace Config {

@@ -4,7 +4,7 @@
 
 #include <raylib.h>
 
-#include "Shared.h"
+#include "../Shared.h"
 
 namespace Meatball {
     // because Raylib does not provide a textSpacing global, I'm doing my own

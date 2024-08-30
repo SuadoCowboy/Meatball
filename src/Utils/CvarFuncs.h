@@ -5,7 +5,7 @@
 #include <raylib.h>
 
 #include <HayBCMD.h>
-#include <Utils/Utils.h>
+#include "../Utils/Utils.h"
 
 /// @brief predefined functions for some data types for CVARs are stored here
 namespace Meatball::CVARFuncs {

@@ -2,7 +2,7 @@
 
 #include <raylib.h>
 
-#include "Utils/Utils.h"
+#include "Utils.h"
 
 namespace Meatball {
     void drawRect(const Rectangle& rect, const Color& color);

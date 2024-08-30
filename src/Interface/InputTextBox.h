@@ -5,7 +5,7 @@
 
 #include <raylib.h>
 
-#include "Shared.h"
+#include "../Shared.h"
 
 namespace Meatball {
     namespace Config {
