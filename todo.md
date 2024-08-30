@@ -4,6 +4,10 @@
 # TODOS
 - remove meatdata from project and use json instead
 
+- because the config of any ui class by default is a pointer to the default config, how can consoleUI have different color schemes and stuff? should I make commands that create new configurations and passes the pointers to the ui object it wants to have the config or is that too much? Personally, I think that's a fun idea
+
+- either make ConsoleUI static or allow a default constructor
+
 - make custom folder work for every current and future projects so that if a file with a recognized name is placed in a folder called "custom", it will replace the default data with that custom data without modifying the original default file
 
 - create another library for network stuff. Meatball can be used to test with it but it's not built-in in meatball unless necessary
