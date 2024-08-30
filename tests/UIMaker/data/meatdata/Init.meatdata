@@ -1,8 +1,0 @@
-dynamicPanelColor COLOR 15,15,15,200
-
-buttonColor COLOR 10,10,10
-buttonHoveredColor COLOR 25,25,25
-
-inputTextBoxColor COLOR 10,10,10,255
-inputTextBoxTextColor COLOR 210,210,210,255
-inputTextBoxCursorColor COLOR 210,210,210,255
