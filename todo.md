@@ -2,22 +2,13 @@
 - because sizeof(Color) is below 16(which is shared_ptr size), it's better cloning it or using a reference than actually using a pointer or shared_ptr.
 
 # TODOS
-- UIMaker: There should be something like a editor mode and a run mode. Editor mode can move, resize, anchor, set events that calls a command prompt string, and run mode is self explanatory
-
-- Test multiple dynamic panels together
-
 - Make custom folder work for every current and future projects so that if a file with a recognized name is placed in a folder called "custom", it will replace the default data with that custom data without modifying the original default file
 
 - Create another library for network stuff. Meatball can be used to test with it but it's not built-in in meatball unless necessary
 
 - Create tasks system, the console commands will run through tasks and then the players will be able to use the wait command(also add wait_ticks which waits ticks instead of milliseconds)
 
-- Implement UI commands
-- FontsHandler still a piece of shit. Fix it.
-
-- ConsoleUI: Try implementing a optional draw lua function so that the creator of the UI can draw the way he wants to. (this way they could also make stupid things, which is fun). If this is implemented, it would be nice to give lua variables the delta time and stuff related to game.
-
-- Example: for Console, the user have some options: mainPanel, closeButton, sendButton(optional), inputBox and OutputTextBox. They also can modify events that the Console allowed, like: mainPanel::onMove, mainPanel::onResize and mainPanel::onResizeStop. The rest of the events are handled by the ConsoleUI code. closeButton::onRelease can not be changed because by default it should set ConsoleUI.visible to false. sendButton is the same thing, it should always send to the output and clear the input text. It would be something like this in lua:
+- Example: for Console, the user have some options: mainPanel, closeButton, sendButton(optional), inputBox and OutputTextBox. They also can modify events that the Console allowed, like: mainPanel::onMove, mainPanel::onResize and mainPanel::onResizeStop. The rest of the events are handled by the ConsoleUI code. closeButton::onRelease can not be changed because by default it should set ConsoleUI.visible to false. sendButton is the same thing, it should always send to the output and clear the input text. It would look like this in a cfg file:
 ```c++
 // THIS IS STILL ON THINKING, THINGS MIGHT NOT BE LIKE THIS ON RELEASE OF THE FIRST VERSION
 // Also add something related to resizing. Something like a anchor (see how game engines work).
@@ -68,27 +59,20 @@ if a required objectName is not defined in the end: tell user and stop running
 ```
 
 # FUTURE TODOS:
-- use threads with locks, atomic and mutex; (maybe not needed or worse)
-- optimize code and use the right data structures;
-
-# THINKING:
-- The developers could make their draw functions instead of the classes drawing, because then they could use the same classes but with different styles whether they want. All that the classes could make is giving specific drawing functions for stuff that requires a complexity level or private/protected-access.
-
-- everything related to drawing is handled by the dev, so everyone could make the style they want their game to be!!
+- use threads with locks, atomic and mutex (maybe not needed or worse)
+- optimize code and use the right data structures
 
 # IMPORTANT:
 - make things minimalist, if code is too complex, find a better(and if possible optimized) way
 
-# IMPROVE .meatdata TYPE:
-- let it have variables to identify colors and transparency stuff in the code or just variables, and also let have comments with # or something idk;
-- create documentation for everything that can be modified and which name should they have in .meatdata
-- maybe permit a console command to load .meatdata files and even examine them
+# USE .json FILE TYPE:
+- create documentation for everything that can be modified and which name should they have
+- maybe allow a console command to load those files and even "debug" them
 
 # FUTURE NEXT-STEPS:
-- Input handling with binds by HayBCMD
 - multiplayer Stuff
 - make 3D easier in raylib
-- 3D map maker and loader
+- 2D/3D map editor(project) and loader(namespace inside the project)
 - take source engine movement(Bhop, ABH, Strafe, etc)
 - good Collision Detection(AABB? Search more about it)
-- NPC base class
+- NPC base class(this is way too far right now)
