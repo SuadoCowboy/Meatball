@@ -43,12 +43,12 @@ void Meatball::ScrollBar::draw() {
 
     DrawRectangle(rect.x, rect.y, rect.width, rect.height, barHovered? config->barHoveredColor : config->barColor);
 
-    Color *actualScrollColor;
-    if (barHovered) actualScrollColor = &config->thumbHoveredColor1;
-    else actualScrollColor = &config->thumbColor;
-    if (thumbHovered) actualScrollColor = &config->thumbHoveredColor2;
+    Color actualScrollColor;
+    if (barHovered || dragging) actualScrollColor = config->thumbHoveredColor1;
+    else actualScrollColor = config->thumbColor;
+    if (thumbHovered) actualScrollColor = config->thumbHoveredColor2;
 
-    DrawRectangle(rect.x, rect.y+thumbY, rect.width, thumbHeight, *actualScrollColor);
+    DrawRectangle(rect.x, rect.y+thumbY, rect.width, thumbHeight, actualScrollColor);
 }
 
 void Meatball::ScrollBar::update(const Rectangle& parentRect) {
