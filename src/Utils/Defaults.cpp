@@ -121,16 +121,23 @@ void Meatball::Defaults::init(const std::string& jsonPath, Font& defaultFont) {
     }
 }
 
-void Meatball::Defaults::loadConsoleFonts(ConsoleUI& consoleUI, const std::filesystem::path& fontPath, Font& outGeneralFont, Font& outLabelFont) {
+bool Meatball::Defaults::loadConsoleFonts(ConsoleUI& consoleUI, const std::filesystem::path& fontPath, Font& outGeneralFont, Font& outLabelFont) {
     int size = (int)consoleUI.inputBox.rect.height - 2 + (int)consoleUI.inputBox.rect.height % 2;
-    if (Meatball::loadFont(fontPath, size, nullptr, 0, outGeneralFont))
+    bool success = false;
+    if (Meatball::loadFont(fontPath, size, nullptr, 0, outGeneralFont)) {
         consoleUI.inputBox.config->font = consoleUI.outputBox.config->font = &outGeneralFont;
+        success = true;
+    }
 
     size = consoleUI.inputBox.rect.height*0.5;
-    if (Meatball::loadFont(fontPath, size, nullptr, 0, outLabelFont))
+    if (Meatball::loadFont(fontPath, size, nullptr, 0, outLabelFont)) {
         consoleUI.config.labelFont = &outLabelFont;
+        if (!success)
+            success = true;
+    }
     
     consoleUI.onResize(1, 1);
+    return success;
 }
 
 Meatball::ConsoleUI Meatball::Defaults::initLocalConsole(const Rectangle& rect, const std::string &jsonPath, Font& outGeneralFont, Font& outLabelFont) {    
