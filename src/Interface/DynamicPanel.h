@@ -35,7 +35,9 @@ namespace Meatball {
 
         // TODO: grabHeight proportional to screen size or window size
 
-        VoidFunc onResize, onMove;
+        // should also call onMove in the end of it
+        VoidFunc onResize;
+        VoidFunc onMove;
         VoidFunc onResizeStop; // when resizing is just set to false
 
     private:
