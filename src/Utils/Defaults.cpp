@@ -49,6 +49,15 @@ void Meatball::Defaults::init(const std::string& jsonPath, Font& defaultFont) {
     if (!readJSONFile(jsonPath, initData))
         HayBCMD::Output::printf(HayBCMD::ERROR, "could not read \"{}\" file\n", jsonPath);
 
+    std::string defaultFontPath = "";
+    GET_STRING_FROM_JSON(initData, "defaultFont", defaultFontPath, jsonPath);
+    if (initData.count("defaultFontSize") == 0)
+        HayBCMD::Output::printf(HayBCMD::WARNING, "missing \"defaultFontSize\" on \"{}\" file\n", jsonPath);
+    else if (!initData["defaultFontSize"].is_number())
+        HayBCMD::Output::print(HayBCMD::WARNING, "invalid \"defaultFontSize\" format. Expected a number\n");
+    else if (defaultFontPath != "" && !loadFont(defaultFontPath, initData["defaultFontSize"], nullptr, 0, defaultFont))
+        HayBCMD::Output::printf(HayBCMD::WARNING, "\"defaultFont\" gave a unvalid path: {}\n", defaultFontPath);
+
     dynamicPanelConfig = Config::DynamicPanel();
     GET_COLOR_FROM_JSON(initData, "dynamicPanelColor", dynamicPanelConfig.color, jsonPath);
 
