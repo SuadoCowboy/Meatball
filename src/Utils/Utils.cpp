@@ -27,7 +27,7 @@ float Meatball::getRectCenterY(const Rectangle& rect) {
     return rect.y+rect.height*0.5;
 }
 
-void Meatball::fitXYInRenderScreen(float x, float y, const Vector2& minPos, const Vector2& maxPos) {
+void Meatball::fitXYInRenderScreen(float& x, float& y, const Vector2& minPos, const Vector2& maxPos) {
     if (x < minPos.x) x = minPos.x;
     else if (x > GetRenderWidth()-maxPos.x) x = GetRenderWidth()-maxPos.x;
     

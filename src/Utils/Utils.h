@@ -26,7 +26,7 @@ namespace Meatball {
 
     /// @brief modifies the rect position to fit in the render screen
     /// @param maxPos the max pos is already counted with render position so you don't need to sum it yourself
-    void fitXYInRenderScreen(float x, float y, const Vector2& minPos, const Vector2& maxPos);
+    void fitXYInRenderScreen(float& x, float& y, const Vector2& minPos, const Vector2& maxPos);
 
     /// @note it sets font texture filter to bilinear
     /// @return false if path does not exist or is directory
