@@ -213,7 +213,7 @@ Meatball::ConsoleUI Meatball::Defaults::initLocalConsole(const Rectangle& rect, 
     for (auto &text : texts)
         Console::print(text.second, text.first);
 
-    HayBCMD::Command("clear", 0, 0, clearOutputBoxCommand, "- clears the console");
+    HayBCMD::Command("clear", 0, 0, clearOutputBoxCommand, "- clears the console", &consoleUI);
 
     return consoleUI;
 }
