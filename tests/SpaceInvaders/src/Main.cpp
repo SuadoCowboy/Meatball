@@ -1,15 +1,16 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include <fstream>
 
 #include <HayBCMD.h>
 
+#include <Utils/Json.h>
 #include <Console.h>
-#include <Config.h>
 
 #include "Game.h"
 
-#define SETTINGS_PATH "data/meatdata/Settings.meatdata"
+#define SETTINGS_PATH "data/settings.json"
 #define DEFAULT_WINDOW_WIDTH 1280
 #define DEFAULT_WINDOW_HEIGHT 720
 
@@ -17,47 +18,55 @@ void loadSettingsAndInit() {
     init(
         DEFAULT_WINDOW_WIDTH,
         DEFAULT_WINDOW_HEIGHT);
-    
-    auto dataMap = Meatball::Config::loadData(SETTINGS_PATH);
 
-    bool shouldRecreateFile = dataMap.size() == 0;
-    if (!shouldRecreateFile) {
-        std::vector<std::pair<std::string, Meatball::Config::ConfigType>> defaultDataVector = {
-            {"windowWidth", Meatball::Config::ConfigType::INT},
-            {"windowHeight", Meatball::Config::ConfigType::INT}
-        };
+    json settingsData;
+    Meatball::readJSONFile(SETTINGS_PATH, settingsData);
 
-        for (auto& data : defaultDataVector)
-            if (dataMap.count(data.first) == 0 || dataMap[data.first]->type != data.second) {
-                shouldRecreateFile = true;
-                break;
-            }
+    bool shouldRecreateFile = settingsData.size() == 0;
+
+    int windowWidth, windowHeight;
+    { // Window
+        bool hasKey = true;
+        if (settingsData.count("window") == 0) hasKey = false;
+
+        if (hasKey && settingsData["window"].count("width") != 0 && settingsData["window"]["width"].is_number())
+            windowWidth = settingsData["window"]["width"];
+        else
+            shouldRecreateFile = true;
+
+        if (hasKey && settingsData["window"].count("height") != 0 && settingsData["window"]["height"].is_number())
+            windowHeight = settingsData["window"]["height"];
+        else
+            shouldRecreateFile = true;
     }
 
     if (shouldRecreateFile) {
-        Meatball::Console::printf(HayBCMD::WARNING, "\"{}\" not found or corrupt. Creating one\n", SETTINGS_PATH);
-        
-        dataMap["windowWidth"] = new Meatball::Config::ConfigTypeData(DEFAULT_WINDOW_WIDTH);
-        dataMap["windowWidth"]->type = Meatball::Config::ConfigType::INT;
+        Meatball::Console::printf(HayBCMD::WARNING, "\"{}\" not found or corrupt. Creating a new one\n", SETTINGS_PATH);
 
-        dataMap["windowHeight"] = new Meatball::Config::ConfigTypeData(DEFAULT_WINDOW_HEIGHT);
-        dataMap["windowHeight"]->type = Meatball::Config::ConfigType::INT;
+        if (!settingsData.count("window") != 0)
+            settingsData["window"] = json::parse("{\"width\": 0, \"height\": 0}");
         
-        Meatball::Config::saveData(SETTINGS_PATH, dataMap);
+        if (!settingsData["window"].count("width") != 0
+        || !settingsData["window"]["width"].is_number() || settingsData["window"]["width"] == 0)
+            settingsData["window"]["width"] = DEFAULT_WINDOW_WIDTH;
+        
+        if (!settingsData["window"].count("height") != 0
+        || !settingsData["window"]["height"].is_number() || settingsData["window"]["height"] == 0)
+            settingsData["window"]["height"] = DEFAULT_WINDOW_WIDTH;
+
+        std::ofstream file(SETTINGS_PATH);
+
+        if (file)
+            file << settingsData.dump(2);
+        else
+            Meatball::Console::printf(HayBCMD::ERROR, "could not open file \"{}\"", SETTINGS_PATH);
     }
-
-    int windowWidth = Meatball::Config::getConfig<int>(dataMap["windowWidth"])->value;
-    int windowHeight = Meatball::Config::getConfig<int>(dataMap["windowHeight"])->value;
 
     if (windowWidth != GetScreenWidth() || windowHeight != GetScreenHeight()) {
         SetWindowSize(windowWidth, windowHeight);
-    
         resize();
         reloadFonts();
     }
-    
-
-    Meatball::Config::clearData(dataMap);
 }
 
 int main(int, char**) {

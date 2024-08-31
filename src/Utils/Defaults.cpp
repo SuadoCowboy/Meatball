@@ -1,12 +1,12 @@
 #include "Defaults.h"
 
-#include <memory>
+#include <iostream>
 
 #include <HayBCMD.h>
 
-#include "Console.h"
+#include "Utils/Json.h"
 
-#include "Config.h"
+#include "Console.h"
 
 #include "Interface/DynamicPanel.h"
 #include "Interface/Button.h"
@@ -38,97 +38,78 @@ static void printToVector(void *pData, const HayBCMD::OutputLevel &level, const 
     ((std::vector<std::pair<std::string, HayBCMD::OutputLevel>>*)pData)->push_back({text, level});
 }
 
-void Meatball::Defaults::init(const std::string& meatdataPath, Font& defaultFont) {
-    auto initData = Config::loadData(meatdataPath);
+static void printToStdOut(void*, const HayBCMD::OutputLevel &level, const std::string& text) {
+    std::cout << "(" << level << ") " << text;
+}
 
-    Meatball::Config::ConfigData* data;
+void Meatball::Defaults::init(const std::string& jsonPath, Font& defaultFont) {
+    HayBCMD::Output::setPrintFunction(nullptr, printToStdOut);
+
+    json initData;
+    if (!readJSONFile(jsonPath, initData))
+        HayBCMD::Output::printf(HayBCMD::ERROR, "could not read \"{}\" file\n", jsonPath);
+
     dynamicPanelConfig = Config::DynamicPanel();
-    {
-        data = Config::ifContainsGet(initData, "mainPanelColor");
-        if (data) dynamicPanelConfig.color = Config::getConfig<Color>(data)->value;
-        else dynamicPanelConfig.color = BLACK;
-    }
+    GET_COLOR_FROM_JSON(initData, "dynamicPanelColor", dynamicPanelConfig.color, jsonPath);
 
     buttonConfig = Config::Button();
     {
-        data = Config::ifContainsGet(initData, "buttonColor");
-        if (data) buttonConfig.color = Config::getConfig<Color>(data)->value;
-        else buttonConfig.color = BLACK;
-
-        data = Config::ifContainsGet(initData, "buttonHoveredColor");
-        if (data) buttonConfig.hoveredColor = Config::getConfig<Color>(data)->value;
-        else buttonConfig.hoveredColor = BLACK;
+        bool hasKey = true;
+        if (initData.count("button") == 0) hasKey = false; 
+        
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["button"], "button", "color", buttonConfig.color, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["button"], "button", "hoveredColor", buttonConfig.color, jsonPath);
     }
 
     textButtonConfig = Config::TextButton();
     {
+        bool hasKey = true;
+        if (initData.count("textButton") == 0) hasKey = false; 
+        
         textButtonConfig.font = &defaultFont;
 
-        data = Config::ifContainsGet(initData, "textButtonColor");
-        if (data) textButtonConfig.color = Config::getConfig<Color>(data)->value;
-        else textButtonConfig.color = BLACK;
-
-        data = Config::ifContainsGet(initData, "textButtonTextColor");
-        if (data) textButtonConfig.textColor = Config::getConfig<Color>(data)->value;
-        else textButtonConfig.textColor = WHITE;
-
-        data = Config::ifContainsGet(initData, "textButtonHoveredColor");
-        if (data) textButtonConfig.hoveredColor = Config::getConfig<Color>(data)->value;
-        else textButtonConfig.hoveredColor = BLACK;
-
-        data = Config::ifContainsGet(initData, "textButtonHoveredTextColor");
-        if (data) textButtonConfig.hoveredTextColor = Config::getConfig<Color>(data)->value;
-        else textButtonConfig.hoveredTextColor = WHITE;
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["textButton"], "textButton", "color", textButtonConfig.color, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["textButton"], "textButton", "textColor", textButtonConfig.textColor, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["textButton"], "textButton", "hoveredColor", textButtonConfig.hoveredColor, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["textButton"], "textButton", "hoveredTextColor", textButtonConfig.hoveredTextColor, jsonPath);
     }
 
     inputTextBoxConfig = Config::InputTextBox();
     {
+        bool hasKey = true;
+        if (initData.count("inputTextBox") == 0) hasKey = false; 
+
         inputTextBoxConfig.font = &defaultFont;
         inputTextBoxConfig.fontSize = inputTextBoxConfig.font->baseSize;
 
-        data = Config::ifContainsGet(initData, "inputTextBoxColor");
-        if (data) inputTextBoxConfig.color = Config::getConfig<Color>(data)->value;
-
-        data = Config::ifContainsGet(initData, "inputTextBoxTextColor");
-        if (data) inputTextBoxConfig.textColor = Config::getConfig<Color>(data)->value;
-
-        data = Config::ifContainsGet(initData, "inputTextBoxCursorColor");
-        if (data) inputTextBoxConfig.cursorColor = Config::getConfig<Color>(data)->value;
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["inputTextBox"], "inputTextBox", "color", inputTextBoxConfig.color, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["inputTextBox"], "inputTextBox", "textColor", inputTextBoxConfig.textColor, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["inputTextBox"], "inputTextBox", "selectionColor", inputTextBoxConfig.selectionColor, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["inputTextBox"], "inputTextBox", "cursorColor", inputTextBoxConfig.cursorColor, jsonPath);
     }
 
     scrollBarConfig = Config::ScrollBar();
     {
-        data = Config::ifContainsGet(initData, "scrollBarColor");
-        if (data) scrollBarConfig.barColor = Config::getConfig<Color>(data)->value;
-        else scrollBarConfig.barColor = BLACK;
+        bool hasKey = true;
+        if (initData.count("scrollBar") == 0) hasKey = false; 
 
-        data = Config::ifContainsGet(initData, "scrollBarHoveredColor");
-        if (data) scrollBarConfig.barHoveredColor = Config::getConfig<Color>(data)->value;
-        else scrollBarConfig.barHoveredColor = BLACK;
-
-        data = Config::ifContainsGet(initData, "scrollBarThumbColor");
-        if (data) scrollBarConfig.thumbColor = Config::getConfig<Color>(data)->value;
-        else scrollBarConfig.thumbColor = WHITE;
-
-        data = Config::ifContainsGet(initData, "scrollBarThumbHoveredColor1");
-        if (data) scrollBarConfig.thumbHoveredColor1 = Config::getConfig<Color>(data)->value;
-        else scrollBarConfig.thumbHoveredColor1 = WHITE;
-
-        data = Config::ifContainsGet(initData, "scrollBarThumbHoveredColor2");
-        if (data) scrollBarConfig.thumbHoveredColor2 = Config::getConfig<Color>(data)->value;
-        else scrollBarConfig.thumbHoveredColor2 = WHITE;
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["scrollBar"], "scrollBar", "barColor", scrollBarConfig.barColor, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["scrollBar"], "scrollBar", "barHoveredColor", scrollBarConfig.barHoveredColor, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["scrollBar"], "scrollBar", "thumbColor", scrollBarConfig.thumbColor, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["scrollBar"], "scrollBar", "thumbHoveredColor1", scrollBarConfig.thumbHoveredColor1, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["scrollBar"], "scrollBar", "barColor", scrollBarConfig.thumbHoveredColor2, jsonPath);
     }
 
     scrollTextBoxConfig = Config::ScrollTextBox();
     {
+        bool hasKey = true;
+        if (initData.count("scrollTextBox") == 0) hasKey = false;
+
         scrollTextBoxConfig.font = &defaultFont;
-
-        data = Config::ifContainsGet(initData, "color");
-        if (data) scrollTextBoxConfig.color = ((Config::ConfigTypeData<Color>*)data)->value;
-        else scrollTextBoxConfig.color = BLACK;
+        scrollTextBoxConfig.fontSize = 10;
+        
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["scrollTextBox"], "scrollTextBox", "color", scrollTextBoxConfig.color, jsonPath);
     }
-
-    Config::clearData(initData);
 }
 
 void Meatball::Defaults::loadConsoleFonts(ConsoleUI& consoleUI, const std::filesystem::path& fontPath, Font& outGeneralFont, Font& outLabelFont) {
@@ -143,70 +124,71 @@ void Meatball::Defaults::loadConsoleFonts(ConsoleUI& consoleUI, const std::files
     consoleUI.onResize(1, 1);
 }
 
-Meatball::ConsoleUI Meatball::Defaults::initLocalConsole(const Rectangle& rect, const std::string &meatdataPath, Font& outGeneralFont, Font& outLabelFont) {    
+Meatball::ConsoleUI Meatball::Defaults::initLocalConsole(const Rectangle& rect, const std::string &jsonPath, Font& outGeneralFont, Font& outLabelFont) {    
     std::vector<std::pair<std::string, HayBCMD::OutputLevel>> texts;
     HayBCMD::Output::setPrintFunction(&texts, printToVector);
+
+    json consoleData;
+    readJSONFile(jsonPath, consoleData);
     
-    auto consoleData = Config::loadData(meatdataPath);
     Config::ConsoleUI consoleConfig = {};
 
-    Config::ConfigData *data = Config::ifContainsGet(consoleData, "margin");
-    Meatball::ConsoleUI::margin = data?
-        Config::getConfig<unsigned char>(data)->value : Meatball::ConsoleUI::margin;
-
-    data = Config::ifContainsGet(consoleData, "OutputDefaultColor");
-    if (data) Config::OutputColors::defaultColor = Config::getConfig<Color>(data)->value;
-
-    data = Config::ifContainsGet(consoleData, "OutputEchoColor");
-    if (data) Config::OutputColors::echoColor = Config::getConfig<Color>(data)->value;
+    if (consoleData.count("margin") != 0 && consoleData["margin"].is_number())
+        Meatball::ConsoleUI::margin = (int)consoleData["margin"];
     
-    data = Config::ifContainsGet(consoleData, "OutputWarningColor");
-    if (data) Config::OutputColors::warningColor = Config::getConfig<Color>(data)->value;
+    {
+        bool hasKey = true;
+        if (consoleData.count("outputColors") == 0) hasKey = false;
+        
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, consoleData["outputColors"], "outputColors", "default",
+            Config::OutputColors::defaultColor, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, consoleData["outputColors"], "outputColors", "echo",
+            Config::OutputColors::echoColor, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, consoleData["outputColors"], "outputColors", "warning",
+            Config::OutputColors::warningColor, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, consoleData["outputColors"], "outputColors", "error",
+            Config::OutputColors::errorColor, jsonPath);
+    }
 
-    data = Config::ifContainsGet(consoleData, "OutputErrorColor");
-    if (data) Config::OutputColors::errorColor = Config::getConfig<Color>(data)->value;
+    {
+        bool hasKey = true;
+        if (consoleData.count("autoComplete") == 0) hasKey = false;
 
-    data = Config::ifContainsGet(consoleData, "autoCompleteColor");
-    if (data) consoleConfig.autoCompleteColor = Config::getConfig<Color>(data)->value;
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, consoleData["autoComplete"], "autoComplete", "color",
+            consoleConfig.autoCompleteColor, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, consoleData["autoComplete"], "autoComplete", "textColor",
+            consoleConfig.autoCompleteTextColor, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, consoleData["autoComplete"], "autoComplete", "highlightedTextColor",
+            consoleConfig.autoCompleteHighlightedTextColor, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, consoleData["autoComplete"], "autoComplete", "selectedTextColor",
+            consoleConfig.autoCompleteSelectedTextColor, jsonPath);
+    }
 
-    data = Config::ifContainsGet(consoleData, "autoCompleteTextColor");
-    if (data) consoleConfig.autoCompleteTextColor = Config::getConfig<Color>(data)->value;
-
-    data = Config::ifContainsGet(consoleData, "autoCompleteHightlightedTextColor");
-    if (data) consoleConfig.autoCompleteHighlightedTextColor = Config::getConfig<Color>(data)->value;
-
-    data = Config::ifContainsGet(consoleData, "autoCompleteSelectedTextColor");
-    if (data) consoleConfig.autoCompleteSelectedTextColor = Config::getConfig<Color>(data)->value;
-
-    data = Config::ifContainsGet(consoleData, "labelColor");
-    if (data) consoleConfig.labelTextColor = Config::getConfig<Color>(data)->value;
-
+    GET_COLOR_FROM_JSON(consoleData, "labelColor", consoleConfig.labelTextColor, jsonPath);
+    
     consoleConfig.labelFont = &outLabelFont;
     consoleConfig.labelText = "Local Console";
 
     auto consoleUI = Meatball::ConsoleUI({rect.x, rect.y, rect.width, rect.height}, consoleConfig);
 
-    data = Config::ifContainsGet(consoleData, "closeButtonColor");
-    if (data) consoleUI.closeButton.config->color = Config::getConfig<Color>(data)->value;
-    else consoleUI.closeButton.config->color = {100,100,100,255};
+    {
+        bool hasKey = true;
+        if (consoleData.count("closeButton") == 0) hasKey = false;
 
-    data = Config::ifContainsGet(consoleData, "closeButtonHoveredColor");
-    if (data) consoleUI.closeButton.config->hoveredColor = Config::getConfig<Color>(data)->value;
-    else consoleUI.closeButton.config->hoveredColor = {255,255,255,255};
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, consoleData["closeButton"], "closeButton", "color",
+            consoleUI.closeButton.config->color, jsonPath);
+        
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, consoleData["closeButton"], "closeButton", "hoveredColor",
+            consoleUI.closeButton.config->hoveredColor, jsonPath);
+    }
 
-    data = Config::ifContainsGet(consoleData, "font");
-    if (data) loadConsoleFonts(consoleUI, {Config::getConfig<std::string>(data)->value}, outGeneralFont, outLabelFont);
-    else outGeneralFont = outLabelFont = GetFontDefault();
-
-    // TODO: if ConsoleUI data contains changes related to static
-    // configs, create a new shared ptr and use std::swap(old, new) and maybe std::move if something goes wrong?
-    //data = Config::ifContainsGet(consoleData, "outputBoxColor");
-    //if (data) consoleUI.outputBox.config->color = Config::getConfig<Color>(data)->value;
-
-    //data = Config::ifContainsGet(consoleData, "outputBoxTextColor");
-    //if (data) consoleUI.outputBox.config->textColor = Config::getConfig<Color>(data)->value;
-
-    Config::clearData(consoleData);
+    std::string fontPath = "";
+    GET_STRING_FROM_JSON(consoleData, "font", fontPath, jsonPath);
+    
+    if (fontPath == "")
+        outGeneralFont = outLabelFont = GetFontDefault();
+    else
+        loadConsoleFonts(consoleUI, {fontPath}, outGeneralFont, outLabelFont);
 
     Console::init(&consoleUI, defaultConsoleUiPrint);
 

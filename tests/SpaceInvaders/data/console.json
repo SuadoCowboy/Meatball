@@ -1,0 +1,24 @@
+{
+    "margin": 4,
+    "font": "data/fonts/Cooper Hewitt/CooperHewitt-Medium.otf",
+    "labelColor": "255,255,255,255",
+
+    "closeButton": {
+        "color": "200,200,200,255",
+        "hoveredColor": "255,255,255,255"
+    },
+
+    "outputColors": {
+        "default": "255,255,255,255",
+        "echo": "173,216,230,255",
+        "warning": "253,250,114,255",
+        "error": "255,0,0,255"
+    },
+
+    "autoComplete": {
+        "color": "15,15,15,255",
+        "textColor": "255,255,255,255",
+        "highlightedTextColor": "0,255,255,255",
+        "selectedTextColor": "255,0,255,255"
+    }
+}

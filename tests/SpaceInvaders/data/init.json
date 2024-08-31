@@ -1,0 +1,20 @@
+{
+    "dynamicPanelColor": "40,40,40,255",
+
+    "button": {
+        "color": "255,255,255,255",
+        "hoveredColor": "0,0,0,255"
+    },
+
+    "inputTextBox": {
+        "color": "10,10,10,255",
+        "textColor": "210,210,210,255",
+        "cursorColor": "210,210,210,255",
+        "selectionColor": "255,255,255,70"
+    },
+
+    "scrollTextBox": {
+        "color": "10,10,10,200",
+        "textColor": "255,255,255,255"
+    }
+}

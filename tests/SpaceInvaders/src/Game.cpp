@@ -3,12 +3,13 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <fstream>
 
+#include <Utils/Json.h>
 #include <Console.h>
 #include <Utils/Defaults.h>
 #include <MouseCursor.h>
 #include <Input.h>
-#include <Config.h>
 
 #include "Entity.h"
 #include "Player.h"
@@ -80,7 +81,7 @@ void init(int windowWidth, int windowHeight) {
     SetWindowMaxSize(GetMonitorWidth(currentMonitorId), GetMonitorHeight(currentMonitorId));
 
     Font defaultFont = GetFontDefault();
-    Defaults::init("data/meatdata/Init.meatdata", defaultFont);
+    Defaults::init("data/init.json", defaultFont);
 
     Rectangle consoleUIRect = { 0, 0, windowWidth * 0.5f, windowHeight * 0.75f };
     consoleUIRect.x = windowWidth * 0.5f - consoleUIRect.width * 0.5f;
@@ -88,7 +89,7 @@ void init(int windowWidth, int windowHeight) {
 
     pConsoleUI = new ConsoleUI(Defaults::initLocalConsole(
         consoleUIRect,
-        "data/meatdata/Console.meatdata",
+        "data/console.json",
         consoleGeneralFont,
         consoleLabelFont));
 
@@ -99,20 +100,28 @@ void init(int windowWidth, int windowHeight) {
     entityData[ENEMY_MEDIUM] = {25, 60, {255, 0, 0, 255}, LoadTexture("data/images/enemy1.png")};
     entityData[ENEMY_STRONG] = {40, 90, {0, 255, 0, 255}, LoadTexture("data/images/enemy2.png")};
 
-    auto dataMap = Config::loadData("data/meatdata/Game.meatdata");
-    auto data = Config::ifContainsGet(dataMap, "playerBulletColor");
-    if (data) entityData[PLAYER].color = Config::getConfig<Color>(data)->value;
+    json gameData;
+    if (Meatball::readJSONFile("data/game.json", gameData)) {
+        GET_COLOR_FROM_JSON(gameData, "playerBulletColor", entityData[PLAYER].color, "data/game.json");
 
-    data = Config::ifContainsGet(dataMap, "enemy0BulletColor");
-    if (data) entityData[ENEMY_WEAK].color = Config::getConfig<Color>(data)->value;
-
-    data = Config::ifContainsGet(dataMap, "enemy1BulletColor");
-    if (data) entityData[ENEMY_MEDIUM].color = Config::getConfig<Color>(data)->value;
-
-    data = Config::ifContainsGet(dataMap, "enemy2BulletColor");
-    if (data) entityData[ENEMY_STRONG].color = Config::getConfig<Color>(data)->value;
-
-    Config::clearData(dataMap);
+        if (!gameData.count("enemiesBulletsColors") != 0 || !gameData["enemiesBulletsColors"][0].is_string()
+            || !parseStringToColor(gameData["enemiesBulletsColors"][0], entityData[ENEMY_WEAK].color)) {
+                entityData[ENEMY_WEAK].color = RED;
+                Meatball::Console::print(HayBCMD::ERROR, "missing enemiesBulletsColors[0] from \"data/game.json\" file");
+            }
+        
+        if (!gameData.count("enemiesBulletsColors") != 0 || !gameData["enemiesBulletsColors"][1].is_string()
+            || !parseStringToColor(gameData["enemiesBulletsColors"][1], entityData[ENEMY_MEDIUM].color)) {
+                entityData[ENEMY_MEDIUM].color = BLUE;
+                Meatball::Console::print(HayBCMD::ERROR, "missing enemiesBulletsColors[1] from \"data/game.json\" file");
+            }
+        
+        if (!gameData.count("enemiesBulletsColors") != 0 || !gameData["enemiesBulletsColors"][2].is_string()
+            || !parseStringToColor(gameData["enemiesBulletsColors"][2], entityData[ENEMY_STRONG].color)) {
+                entityData[ENEMY_STRONG].color = GREEN;
+                Meatball::Console::print(HayBCMD::ERROR, "missing enemiesBulletsColors[2] from \"data/game.json\" file");
+            }
+    }
 
     loadCommands();
     Input::registerCommands();
@@ -159,7 +168,7 @@ void init(int windowWidth, int windowHeight) {
         &saveSettings,
         HayBCMD::CVARUtils::setBoolean,
         HayBCMD::CVARUtils::getBoolean,
-        "if should save the changed settings in .meatdata");
+        "if should save the changed settings in a file");
 
     HayBCMD::execConfigFile("data/cfg/autoexec.cfg", Console::variables);
     HayBCMD::execConfigFile("data/cfg/config.cfg", Console::variables);
@@ -171,13 +180,16 @@ void init(int windowWidth, int windowHeight) {
 }
 
 void reloadFonts() {
-    auto consoleData = Config::loadData("data/meatdata/Console.meatdata");
+    json consoleData;
+    if (!Meatball::readJSONFile("data/console.json", consoleData)) {
+        Meatball::Console::print(HayBCMD::ERROR, "could not parse console.json");
+        return;
+    }
 
-    auto data = Config::ifContainsGet(consoleData, "font");
-    std::string path;
-    if (data) Defaults::loadConsoleFonts(*pConsoleUI, ((Config::ConfigTypeData<std::string>*)data)->value, consoleGeneralFont, consoleLabelFont);
-
-    Config::clearData(consoleData);
+    std::string path = "";
+    GET_STRING_FROM_JSON(consoleData, "font", path, "data/console.json");
+    if (path != "")
+        Defaults::loadConsoleFonts(*pConsoleUI, path, consoleGeneralFont, consoleLabelFont);
 }
 
 void resize() {
@@ -258,17 +270,18 @@ void render() {
 
 void save(const std::string& path) {
     if (!saveSettings) return;
+    
+    json settingsData = json::parse("{ \"window\": {\"width\": 0, \"height\": 0} }");
+    
+    settingsData["window"]["width"] = GetScreenWidth();
+    settingsData["window"]["height"] = GetScreenHeight();
 
-    std::unordered_map<std::string, Meatball::Config::ConfigData*> dataMap;
+    std::ofstream file(path);
 
-    dataMap["windowWidth"] = new Meatball::Config::ConfigTypeData(GetScreenWidth());
-    dataMap["windowWidth"]->type = Meatball::Config::ConfigType::INT;
-
-    dataMap["windowHeight"] = new Meatball::Config::ConfigTypeData(GetScreenHeight());
-    dataMap["windowHeight"]->type = Meatball::Config::ConfigType::INT;
-
-    Meatball::Config::saveData(path, dataMap);
-    Meatball::Config::clearData(dataMap);
+    if (file)
+        file << settingsData.dump(2);
+    else
+        Meatball::Console::printf(HayBCMD::ERROR, "could not open file \"{}\"", path);
 }
 
 void cleanup() {
