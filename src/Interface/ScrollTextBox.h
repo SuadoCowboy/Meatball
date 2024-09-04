@@ -11,12 +11,8 @@
 namespace Meatball {
     namespace Config {
         struct ScrollTextBox {
-            ScrollTextBox();
-
-            Font* font;
-            unsigned short fontSize;
-
-            Color color;
+            Font* font = nullptr;
+            Color color = BLACK;
         };
     }
 
@@ -55,6 +51,8 @@ namespace Meatball {
         void setSize(float width, float height);
 
         Config::ScrollTextBox *config = &Defaults::scrollTextBoxConfig;
+
+        unsigned short fontSize = 0;
 
     private:
         std::deque<ColoredText> text;

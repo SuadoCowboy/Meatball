@@ -6,8 +6,14 @@
 
 Meatball::Config::TextButton Meatball::Defaults::textButtonConfig;
 
+Meatball::TextButton::TextButton() {
+    fontSize = config->font->baseSize;
+}
+
 Meatball::TextButton::TextButton(const Rectangle& rect)
- : rect(rect) {}
+ : rect(rect) {
+    fontSize = config->font->baseSize;
+ }
 
 bool Meatball::TextButton::isHovered() {
     return hovered;
@@ -25,7 +31,7 @@ void Meatball::TextButton::update() {
 void Meatball::TextButton::drawText() {
     BeginScissorMode(rect.x, rect.y, rect.width, rect.height);
     
-    Meatball::drawText(*config->font, config->fontSize, text.c_str(), rect.x+rect.width*0.5, rect.y+rect.height*0.5, hovered? config->hoveredTextColor : config->textColor);
+    Meatball::drawText(*config->font, fontSize, text.c_str(), rect.x+rect.width*0.5, rect.y+rect.height*0.5, hovered? config->hoveredTextColor : config->textColor);
 
     EndScissorMode();
 }

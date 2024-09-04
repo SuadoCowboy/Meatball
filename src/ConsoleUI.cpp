@@ -46,7 +46,7 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const Config::ConsoleUI& _
 			closeButton.rect.height = margin;
 
 			inputBox.rect.width = mainPanel.rect.width-margin*2;
-			outputBox.config->fontSize = inputBox.config->fontSize = (int)inputBox.rect.height - 2 + (int)inputBox.rect.height % 2;
+			outputBox.fontSize = inputBox.fontSize = (int)inputBox.rect.height - 2 + (int)inputBox.rect.height % 2;
 
 			outputBox.setSize(inputBox.rect.width, mainPanel.rect.height-config.labelFont->baseSize-1-margin*2-inputBox.rect.height);
 
@@ -219,14 +219,14 @@ void Meatball::ConsoleUI::draw() {
 			
 			for (auto &coloredText : autoCompleteText) {
 				if (coloredText.color == config.autoCompleteSelectedTextColor) {
-					selectedTextWidth += Meatball::measureTextWidth(*inputBox.config->font, inputBox.config->fontSize, coloredText.text.c_str());
+					selectedTextWidth += Meatball::measureTextWidth(*inputBox.config->font, inputBox.fontSize, coloredText.text.c_str());
 					passedThroughSelectedText = true;
 					continue;
 				}
 
 				if (passedThroughSelectedText) break;
 				
-				offsetX += Meatball::measureTextWidth(*inputBox.config->font, inputBox.config->fontSize, coloredText.text.c_str())+1;
+				offsetX += Meatball::measureTextWidth(*inputBox.config->font, inputBox.fontSize, coloredText.text.c_str())+1;
 			}
 
 			if (offsetX+selectedTextWidth < mainPanel.rect.width) offsetX = 0;
@@ -240,8 +240,8 @@ void Meatball::ConsoleUI::draw() {
 
 		float x = mainPanel.rect.x;
 		for (auto &coloredText : autoCompleteText) {
-			drawText(*inputBox.config->font, inputBox.config->fontSize, coloredText.text.c_str(), x-offsetX, autoCompleteY+1, coloredText.color);
-			x += Meatball::measureTextWidth(*inputBox.config->font, inputBox.config->fontSize, coloredText.text.c_str())+1;
+			drawText(*inputBox.config->font, inputBox.fontSize, coloredText.text.c_str(), x-offsetX, autoCompleteY+1, coloredText.color);
+			x += Meatball::measureTextWidth(*inputBox.config->font, inputBox.fontSize, coloredText.text.c_str())+1;
 		}
 
 		EndScissorMode();

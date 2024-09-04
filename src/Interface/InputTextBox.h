@@ -10,12 +10,12 @@
 namespace Meatball {
     namespace Config {
         struct InputTextBox {
-            InputTextBox();
+            Font* font = nullptr;
 
-            Font* font;
-            unsigned short fontSize;
-
-            Color color, textColor, cursorColor, selectionColor;
+            Color color = {40,40,40,255},
+                textColor = WHITE,
+                cursorColor = WHITE,
+                selectionColor = {100,100,100,55};
         };
     }
 
@@ -39,7 +39,7 @@ namespace Meatball {
         bool focused = false;
         size_t cursorPos = 0;
 
-        Rectangle rect;
+        Rectangle rect = {0.0f,0.0f,0.0f,0.0f};
 
         const std::string& getText() const;
         /// @return false if text size is higher than allowed
@@ -47,6 +47,8 @@ namespace Meatball {
 
         // textMaxSize range is the unsigned short range from 0 to max unsigned short MINUS ONE;
         unsigned short textMaxSize = 1000;
+
+        unsigned short fontSize = 0;
     private:
         std::string text = "";
 

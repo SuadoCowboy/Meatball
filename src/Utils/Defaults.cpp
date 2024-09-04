@@ -89,7 +89,6 @@ void Meatball::Defaults::init(const std::string& jsonPath, Font& defaultFont) {
         if (initData.count("inputTextBox") == 0) hasKey = false; 
 
         inputTextBoxConfig.font = &defaultFont;
-        inputTextBoxConfig.fontSize = inputTextBoxConfig.font->baseSize;
 
         GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["inputTextBox"], "inputTextBox", "color", inputTextBoxConfig.color, jsonPath);
         GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["inputTextBox"], "inputTextBox", "textColor", inputTextBoxConfig.textColor, jsonPath);
@@ -115,7 +114,6 @@ void Meatball::Defaults::init(const std::string& jsonPath, Font& defaultFont) {
         if (initData.count("scrollTextBox") == 0) hasKey = false;
 
         scrollTextBoxConfig.font = &defaultFont;
-        scrollTextBoxConfig.fontSize = 10;
         
         GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["scrollTextBox"], "scrollTextBox", "color", scrollTextBoxConfig.color, jsonPath);
     }
