@@ -9,16 +9,14 @@
 namespace Meatball {
     namespace Config {
         struct TextButton {
-            TextButton();
+            Font* font = nullptr;
+            unsigned short fontSize = 0;
 
-            Font* font;
-            unsigned short fontSize;
+            Color color = BLACK;
+            Color textColor = WHITE;
 
-            Color color;
-            Color textColor;
-
-            Color hoveredColor;
-            Color hoveredTextColor;
+            Color hoveredColor = WHITE;
+            Color hoveredTextColor = BLACK;
         };
     }
 
@@ -28,8 +26,8 @@ namespace Meatball {
 
     class TextButton {
     public:
-        TextButton();
-        TextButton(Rectangle rect);
+        TextButton() {}
+        TextButton(const Rectangle& rect);
 
         void update();
 
@@ -37,18 +35,14 @@ namespace Meatball {
         void drawText();
 
         bool isHovered();
-        
-        const std::string &getText();
-        void setText(const std::string &newText);
 
         Config::TextButton *config = &Defaults::textButtonConfig;
 
         VoidFunc onRelease, onHover;
-        Rectangle rect;
-
-    private:
-        bool hovered;
+        Rectangle rect = {0.0f,0.0f,0.0f,0.0f};
 
         std::string text;
+    private:
+        bool hovered = false;
     };
 }

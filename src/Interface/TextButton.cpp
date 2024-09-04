@@ -6,14 +6,7 @@
 
 Meatball::Config::TextButton Meatball::Defaults::textButtonConfig;
 
-Meatball::Config::TextButton::TextButton()
- : font(nullptr), fontSize(0), color(BLACK), textColor(WHITE), hoveredColor(WHITE),
-   hoveredTextColor(BLACK) {}
-
-Meatball::TextButton::TextButton()
- : rect({0,0,0,0}) {}
-
-Meatball::TextButton::TextButton(Rectangle rect)
+Meatball::TextButton::TextButton(const Rectangle& rect)
  : rect(rect) {}
 
 bool Meatball::TextButton::isHovered() {
@@ -35,19 +28,4 @@ void Meatball::TextButton::drawText() {
     Meatball::drawText(*config->font, config->fontSize, text.c_str(), rect.x+rect.width*0.5, rect.y+rect.height*0.5, hovered? config->hoveredTextColor : config->textColor);
 
     EndScissorMode();
-}
-
-const std::string &Meatball::TextButton::getText() {
-    return text;
-}
-
-void Meatball::TextButton::setText(const std::string &_newText) {
-    text = _newText;
-
-    int textWidth = Meatball::measureTextWidth(*config->font, config->fontSize, text.c_str());
-
-    while (textWidth > rect.width) {
-        text.erase(text.end());
-        textWidth = Meatball::measureTextWidth(*config->font, config->fontSize, text.c_str());
-    }
 }
