@@ -7,13 +7,6 @@ unsigned char Meatball::ScrollBar::scrollSpeed = 50;
 
 Meatball::Config::ScrollBar Meatball::Defaults::scrollBarConfig;
 
-Meatball::Config::ScrollBar::ScrollBar()
- : barColor({15,15,15,255}), barHoveredColor({25,25,25,255}),
- thumbColor({30,30,30,255}), thumbHoveredColor1({60,60,60,255}), thumbHoveredColor2({90,90,90,255}) {}
-
-Meatball::ScrollBar::ScrollBar()
- : visible(false), rect({0,0,0,0}), thumbHeight(rect.height) {}
-
 Meatball::ScrollBar::ScrollBar(const Rectangle& rect, bool visible)
  : visible(visible), rect(rect), thumbHeight(rect.height) {}
 

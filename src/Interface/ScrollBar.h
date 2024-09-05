@@ -7,13 +7,11 @@
 namespace Meatball {
     namespace Config {
         struct ScrollBar {
-            ScrollBar();
-
-            Color barColor;
-            Color barHoveredColor;
-            Color thumbColor;
-            Color thumbHoveredColor1;
-            Color thumbHoveredColor2;
+            Color barColor = {15,15,15,255};
+            Color barHoveredColor = {25,25,25,255};
+            Color thumbColor = {30,30,30,255};
+            Color thumbHoveredColor1 = {60,60,60,255};
+            Color thumbHoveredColor2 = {90,90,90,255};
         };
     }
 
@@ -23,7 +21,7 @@ namespace Meatball {
 
     class ScrollBar {
     public:
-        ScrollBar();
+        ScrollBar() {}
         /// @param rect the bar rect
         ScrollBar(const Rectangle& rect, bool visible = true);
         
@@ -47,17 +45,17 @@ namespace Meatball {
 
         Config::ScrollBar *config = &Defaults::scrollBarConfig;
         
-        bool visible;
+        bool visible = true;
 
         static unsigned char scrollSpeed;
     
     private:
-        Rectangle rect;
+        Rectangle rect = {0.0f,0.0f,0.0f,0.0f};
 
         bool barHovered = false, thumbHovered = false;
-        float scrollValue = 0; // IT'S NOT BETWEEN 0 AND 1 AS I THOUGHT
-        float thumbY = 0, thumbHeight = 1;
+        float scrollValue = 0.0f; // IT'S NOT BETWEEN 0 AND 1 AS I THOUGHT
+        float thumbY = 0.0f, thumbHeight = 1.0f;
         bool dragging = false; // Whether the thumb is currently being dragged
-        float dragOffsetY = 0;
+        float dragOffsetY = 0.0f;
     };
 }
