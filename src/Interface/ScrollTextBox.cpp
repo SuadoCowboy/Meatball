@@ -32,14 +32,14 @@ static float _getContentHeight(const std::deque<Meatball::ColoredText> &text, un
     return lineIdx*fontSize; // contentHeight
 }
 
-static inline void handleTextWrapping(std::deque<Meatball::ColoredText> &textList, const std::string &text, const Color& color, Font* font, float maxWidth) {
+static inline void handleTextWrapping(std::deque<Meatball::ColoredText> &textList, unsigned short fontSize, const std::string &text, const Color& color, Font* font, float maxWidth) {
     textList.emplace_back("", color);
     std::string newText = text;
 
-    while (Meatball::measureTextWidth(*font, font->baseSize, newText.c_str()) >= maxWidth) {
+    while (Meatball::measureTextWidth(*font, fontSize, newText.c_str()) >= maxWidth) {
         size_t columnIdx = 1; 
         
-        while (Meatball::measureTextWidth(*font, font->baseSize, newText.substr(0, columnIdx).c_str()) < maxWidth)
+        while (Meatball::measureTextWidth(*font, fontSize, newText.substr(0, columnIdx).c_str()) < maxWidth)
             ++columnIdx;
         
         --columnIdx;
@@ -105,7 +105,7 @@ void Meatball::ScrollTextBox::appendText(const std::string& newText, const Color
     if (width < rect.width-scrollBar.getRect().width) {
         text.emplace_back(newText, color);
     } else
-        handleTextWrapping(text, newText, color, config->font, rect.width-scrollBar.getRect().width);
+        handleTextWrapping(text, fontSize, newText, color, config->font, rect.width-scrollBar.getRect().width);
 
 
     contentHeight = _getContentHeight(text, fontSize);
