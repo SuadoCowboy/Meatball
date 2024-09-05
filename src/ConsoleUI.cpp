@@ -267,7 +267,7 @@ void Meatball::ConsoleUI::onResize(float ratioWidth, float ratioHeight) {
 		// scrollBarWidth + (margin left + margin right) + labelText size
 		(int)outputBox.getScrollBar().getRect().width+margin*2+Meatball::measureTextWidth(*config.labelFont, config.labelFont->baseSize, config.labelText),
 		// outputBox minSize + inputBox minSize + (margin left + margin right)
-		(int)outputBox.config->font->baseSize+inputBox.rect.height+margin*2+config.labelFont->baseSize};
+		(int)outputBox.fontSize+inputBox.rect.height+margin*2+config.labelFont->baseSize};
 	
 	mainPanel.onResize();
 	mainPanel.onResizeStop();

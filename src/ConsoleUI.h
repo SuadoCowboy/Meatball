@@ -52,7 +52,7 @@ namespace Meatball {
             if (length != 0)
                 outputBox.appendText(text.substr(0, length), outputLevelToOutputColor(level));
             
-            while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*(unsigned int)outputBox.config->font->baseSize) {
+            while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*(unsigned int)outputBox.fontSize) {
                 if (outputBox.getText().size() == 0) break;
                 outputBox.popFront();
             }
