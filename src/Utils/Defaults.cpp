@@ -124,6 +124,8 @@ bool Meatball::Defaults::loadConsoleFonts(ConsoleUI& consoleUI, const std::files
     bool success = false;
     if (Meatball::loadFont(fontPath, size, nullptr, 0, outGeneralFont)) {
         consoleUI.inputBox.config->font = consoleUI.outputBox.config->font = &outGeneralFont;
+        consoleUI.inputBox.fontSize = consoleUI.inputBox.config->font->baseSize;
+        consoleUI.outputBox.fontSize = consoleUI.outputBox.config->font->baseSize;
         success = true;
     }
 
