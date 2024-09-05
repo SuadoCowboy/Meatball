@@ -29,9 +29,5 @@ void Meatball::TextButton::update() {
 }
 
 void Meatball::TextButton::drawText() {
-    BeginScissorMode(rect.x, rect.y, rect.width, rect.height);
-    
     Meatball::drawText(*config->font, fontSize, text.c_str(), rect.x+rect.width*0.5, rect.y+rect.height*0.5, hovered? config->hoveredTextColor : config->textColor);
-
-    EndScissorMode();
 }
