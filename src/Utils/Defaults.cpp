@@ -105,7 +105,7 @@ void Meatball::Defaults::init(const std::string& jsonPath, Font& defaultFont) {
         GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["scrollBar"], "scrollBar", "barHoveredColor", scrollBarConfig.barHoveredColor, jsonPath);
         GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["scrollBar"], "scrollBar", "thumbColor", scrollBarConfig.thumbColor, jsonPath);
         GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["scrollBar"], "scrollBar", "thumbHoveredColor1", scrollBarConfig.thumbHoveredColor1, jsonPath);
-        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["scrollBar"], "scrollBar", "barColor", scrollBarConfig.thumbHoveredColor2, jsonPath);
+        GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, initData["scrollBar"], "scrollBar", "thumbHoveredColor2", scrollBarConfig.thumbHoveredColor2, jsonPath);
     }
 
     scrollTextBoxConfig = Config::ScrollTextBox();
