@@ -9,10 +9,8 @@
 namespace Meatball {
     namespace Config {
         struct Button {
-            Button();
-
-            Color color;
-            Color hoveredColor;
+            Color color = BLACK;
+            Color hoveredColor = WHITE;
         };
     }
 
@@ -22,18 +20,16 @@ namespace Meatball {
 
     class Button {
     public:
-        Button();
+        Button() {}
         Button(const Rectangle& rect);
         
         void update();
-        bool isHovered();
 
         Config::Button *config =  &Defaults::buttonConfig;
         
         VoidFunc onRelease, onHover;
-        Rectangle rect;
+        Rectangle rect = {0.0f,0.0f,0.0f,0.0f};
 
-    private:
-        bool hovered;
+        bool hovered = false;
     };
 }

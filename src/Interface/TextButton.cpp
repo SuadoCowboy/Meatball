@@ -15,10 +15,6 @@ Meatball::TextButton::TextButton(const Rectangle& rect)
     fontSize = config->font->baseSize;
  }
 
-bool Meatball::TextButton::isHovered() {
-    return hovered;
-}
-
 void Meatball::TextButton::update() {
     if (hovered)
         setCursor(MOUSE_CURSOR_POINTING_HAND, MouseCursorPriorityLevel::BUTTON);

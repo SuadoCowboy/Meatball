@@ -33,8 +33,6 @@ namespace Meatball {
         /// @brief draws text centered on the button
         void drawText();
 
-        bool isHovered();
-
         Config::TextButton *config = &Defaults::textButtonConfig;
 
         VoidFunc onRelease, onHover;
@@ -42,7 +40,7 @@ namespace Meatball {
 
         std::string text;
         unsigned short fontSize = 0;
-    private:
+
         bool hovered = false;
     };
 }

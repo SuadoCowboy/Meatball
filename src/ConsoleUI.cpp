@@ -249,7 +249,7 @@ void Meatball::ConsoleUI::draw() {
 
 	drawText(*config.labelFont, config.labelFont->baseSize, config.labelText, mainPanel.rect.x+margin, mainPanel.rect.y+margin, config.labelTextColor);
 
-	drawX(closeButton.rect, closeButton.isHovered()? closeButton.config->hoveredColor : closeButton.config->color);
+	drawX(closeButton.rect, closeButton.hovered? closeButton.config->hoveredColor : closeButton.config->color);
 }
 
 void Meatball::ConsoleUI::onResize(float ratioWidth, float ratioHeight) {
