@@ -29,5 +29,5 @@ void Meatball::TextButton::update() {
 }
 
 void Meatball::TextButton::drawText() {
-    Meatball::drawText(*config->font, fontSize, text.c_str(), rect.x+rect.width*0.5, rect.y+rect.height*0.5, hovered? config->hoveredTextColor : config->textColor);
+    Meatball::drawText(*config->font, fontSize, text.c_str(), rect.x+rect.width*0.5f-measureTextWidth(*config->font, fontSize, text.c_str())*0.5f, rect.y+rect.height*0.5f, hovered? config->hoveredTextColor : config->textColor);
 }
