@@ -2,6 +2,8 @@
 - because sizeof(Color) is below 16(which is shared_ptr size), it's better cloning it or using a reference than actually using a pointer or shared_ptr.
 
 # TODOS
+- config stuff can be removed and their members can be passed as parameters in the needed functions. This will make the code clearer to understand(probably). Maybe let default config stuff since it might still be useful
+
 - because the config of any ui class by default is a pointer to the default config, how can consoleUI have different color schemes and stuff? should I make commands that create new configurations and passes the pointers to the ui object it wants to have the config or is that too much? Personally, I think that's a fun idea
 
 - either make ConsoleUI static or allow a default constructor
