@@ -2,6 +2,8 @@
 - because sizeof(Color) is below 16(which is shared_ptr size), it's better cloning it or using a reference than actually using a pointer or shared_ptr.
 
 # TODOS
+- UI Stuff: Instead of them being updated on every frame, it would be easier with functions that handles events like a mousepress function which calls the current scene stuff that requires mousepress, keypress/keyrelease, mousemove, etc
+
 - config stuff can be removed and their members can be passed as parameters in the needed functions. This will make the code clearer to understand(probably). Maybe let default config stuff since it might still be useful for now
 
 - Delete default config and make configs be json file that can be loaded in the code with a console function (or auto detect idk) and they can be set by names. If a default json is not set, then it will create a pretty default one
