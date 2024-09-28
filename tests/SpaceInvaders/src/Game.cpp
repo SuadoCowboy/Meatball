@@ -100,24 +100,24 @@ void init(int windowWidth, int windowHeight) {
     entityData[ENEMY_MEDIUM] = {25, 60, {255, 0, 0, 255}, LoadTexture("data/images/enemy1.png")};
     entityData[ENEMY_STRONG] = {40, 90, {0, 255, 0, 255}, LoadTexture("data/images/enemy2.png")};
 
-    json gameData;
-    if (Meatball::readJSONFile("data/game.json", gameData)) {
-        GET_COLOR_FROM_JSON(gameData, "playerBulletColor", entityData[PLAYER].color, "data/game.json");
+    Meatball::Json gameData{"data/game.json"};
+    if (gameData.object.size() != 0) {
+        gameData.getColor("playerBulletColor", entityData[PLAYER].color);
 
-        if (!gameData.count("enemiesBulletsColors") != 0 || !gameData["enemiesBulletsColors"][0].is_string()
-            || !parseStringToColor(gameData["enemiesBulletsColors"][0], entityData[ENEMY_WEAK].color)) {
+        if (!gameData.object.count("enemiesBulletsColors") != 0 || !gameData.object["enemiesBulletsColors"][0].is_string()
+            || !parseStringToColor(gameData.object["enemiesBulletsColors"][0], entityData[ENEMY_WEAK].color)) {
                 entityData[ENEMY_WEAK].color = RED;
                 Meatball::Console::print(SweatCI::ERROR, "missing enemiesBulletsColors[0] from \"data/game.json\" file");
             }
         
-        if (!gameData.count("enemiesBulletsColors") != 0 || !gameData["enemiesBulletsColors"][1].is_string()
-            || !parseStringToColor(gameData["enemiesBulletsColors"][1], entityData[ENEMY_MEDIUM].color)) {
+        if (!gameData.object.count("enemiesBulletsColors") != 0 || !gameData.object["enemiesBulletsColors"][1].is_string()
+            || !parseStringToColor(gameData.object["enemiesBulletsColors"][1], entityData[ENEMY_MEDIUM].color)) {
                 entityData[ENEMY_MEDIUM].color = BLUE;
                 Meatball::Console::print(SweatCI::ERROR, "missing enemiesBulletsColors[1] from \"data/game.json\" file");
             }
         
-        if (!gameData.count("enemiesBulletsColors") != 0 || !gameData["enemiesBulletsColors"][2].is_string()
-            || !parseStringToColor(gameData["enemiesBulletsColors"][2], entityData[ENEMY_STRONG].color)) {
+        if (!gameData.object.count("enemiesBulletsColors") != 0 || !gameData.object["enemiesBulletsColors"][2].is_string()
+            || !parseStringToColor(gameData.object["enemiesBulletsColors"][2], entityData[ENEMY_STRONG].color)) {
                 entityData[ENEMY_STRONG].color = GREEN;
                 Meatball::Console::print(SweatCI::ERROR, "missing enemiesBulletsColors[2] from \"data/game.json\" file");
             }
@@ -180,15 +180,15 @@ void init(int windowWidth, int windowHeight) {
 }
 
 void reloadFonts() {
-    json consoleData;
-    if (!Meatball::readJSONFile("data/console.json", consoleData)) {
+    Json consoleData{"data/console.json"};
+    if (consoleData.object.size() == 0) {
         Meatball::Console::print(SweatCI::ERROR, "could not parse console.json");
         return;
     }
 
     std::string path = "";
-    GET_STRING_FROM_JSON(consoleData, "font", path, "data/console.json");
-    if (path != "")
+    consoleData.getString("font", path);
+    if (!path.empty())
         Defaults::loadConsoleFonts(*pConsoleUI, path, consoleGeneralFont, consoleLabelFont);
 }
 

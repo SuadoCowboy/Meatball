@@ -16,7 +16,7 @@
         "selectionColor": "255,255,255,70"
     },
 
-    "scrollTextBox": {
+    "ScrollBox": {
         "color": "10,10,10,200",
         "textColor": "255,255,255,255"
     }

@@ -7,7 +7,7 @@
 #include "IScene.h"
 #include "Interface/DynamicPanel.h"
 #include "Interface/Button.h"
-#include "Interface/ScrollTextBox.h"
+#include "Interface/ScrollBox.h"
 #include "Interface/InputTextBox.h"
 #include "Utils/Utils.h"
 #include "OutputColors.h"
@@ -74,7 +74,7 @@ namespace Meatball {
         
         DynamicPanel mainPanel;
         Button closeButton;
-        ScrollTextBox outputBox;
+        ScrollBox outputBox;
         InputTextBox inputBox;
         
 

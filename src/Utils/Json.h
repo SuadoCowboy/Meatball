@@ -2,28 +2,33 @@
 
 #include <string>
 
+#include <raylib.h>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
-#define GET_COLOR_FROM_JSON_INSIDE_JOBJECT(hasKey, jObject, objectName, colorVariableName, colorVariable, jsonFilePath) \
-    if (!hasKey || jObject.count(colorVariableName) == 0 \
-    || !parseStringToColor(jObject[colorVariableName], colorVariable)) \
-        SweatCI::Output::printf(SweatCI::WARNING, std::string("missing \"") + objectName + "." + colorVariableName + "\" on \"{}\" file\n", jsonFilePath);
-
-#define GET_COLOR_FROM_JSON(jObject, colorVariableName, colorVariable, jsonFilePath) \
-    if (jObject.count(colorVariableName) == 0 \
-    || !parseStringToColor(jObject[colorVariableName], colorVariable)) \
-        SweatCI::Output::printf(SweatCI::WARNING, std::string("missing \"") + colorVariableName + "\" on \"{}\" file\n", jsonFilePath);
-
-#define GET_STRING_FROM_JSON(jObject, stringVariableName, stringVariable, jsonFilePath) \
-    if (jObject.count(stringVariableName) == 0 || !jObject[stringVariableName].is_string()) \
-        SweatCI::Output::printf(SweatCI::WARNING, std::string("missing \"") + stringVariableName + "\" on \"{}\" file\n", jsonFilePath); \
-    else \
-        stringVariable = jObject[stringVariableName];
-
 namespace Meatball {
-    /// @brief parses JSON File into a json file
-    /// @return false if is not a directory or does not exists or if could not read file
-    bool readJSONFile(const std::string& path, json& outJObject);
+    /// @brief parses JSON File into a nlohmann::json object
+    /// @return false if is not a directory, does not exists or if could not read file
+    bool parseJsonFile(const std::string& path, json& output);
+
+    class Json {
+    public:
+        json object;
+        std::string filePath = "", objectName = "";
+
+        Json() {}
+        
+        Json(const Json& other, const std::string& key);
+        Json(const std::string& filePath);
+
+        bool getJson(const std::string& key, Meatball::Json& json) const;
+
+        bool getString(const std::string& key, std::string& string) const;
+        bool getColor(const std::string& key, Color& color) const;
+        
+        bool getInt(const std::string& key, int& number) const;
+        bool getFloat(const std::string& key, float& number) const;
+        bool getUnsigned(const std::string& key, unsigned int& number) const;
+    };
 }

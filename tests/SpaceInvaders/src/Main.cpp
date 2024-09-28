@@ -19,45 +19,37 @@ void loadSettingsAndInit() {
         DEFAULT_WINDOW_WIDTH,
         DEFAULT_WINDOW_HEIGHT);
 
-    json settingsData;
-    Meatball::readJSONFile(SETTINGS_PATH, settingsData);
+    Meatball::Json settingsData{SETTINGS_PATH};
 
-    bool shouldRecreateFile = settingsData.size() == 0;
+    bool shouldRecreateFile = settingsData.object.size() == 0;
 
-    int windowWidth, windowHeight;
+    int windowWidth=1, windowHeight=1;
     { // Window
-        bool hasKey = true;
-        if (settingsData.count("window") == 0) hasKey = false;
+        Meatball::Json windowData{settingsData, "window"};
 
-        if (hasKey && settingsData["window"].count("width") != 0 && settingsData["window"]["width"].is_number())
-            windowWidth = settingsData["window"]["width"];
-        else
-            shouldRecreateFile = true;
-
-        if (hasKey && settingsData["window"].count("height") != 0 && settingsData["window"]["height"].is_number())
-            windowHeight = settingsData["window"]["height"];
-        else
+        bool result = windowData.getInt("height", windowHeight);
+        if (!windowData.getInt("width", windowWidth) || !result)
             shouldRecreateFile = true;
     }
 
     if (shouldRecreateFile) {
         Meatball::Console::printf(SweatCI::WARNING, "\"{}\" not found or corrupt. Creating a new one\n", SETTINGS_PATH);
 
-        if (!settingsData.count("window") != 0)
-            settingsData["window"] = json::parse("{\"width\": 0, \"height\": 0}");
+        if (!settingsData.object.count("window") != 0)
+            settingsData.object["window"] = json::parse("{\"width\": 0, \"height\": 0}");
         
-        if (!settingsData["window"].count("width") != 0
-        || !settingsData["window"]["width"].is_number() || settingsData["window"]["width"] == 0)
-            settingsData["window"]["width"] = DEFAULT_WINDOW_WIDTH;
+        if (!settingsData.object["window"].count("width") != 0
+        || !settingsData.object["window"]["width"].is_number() || settingsData.object["window"]["width"] == 0)
+            settingsData.object["window"]["width"] = DEFAULT_WINDOW_WIDTH;
         
-        if (!settingsData["window"].count("height") != 0
-        || !settingsData["window"]["height"].is_number() || settingsData["window"]["height"] == 0)
-            settingsData["window"]["height"] = DEFAULT_WINDOW_WIDTH;
+        if (!settingsData.object["window"].count("height") != 0
+        || !settingsData.object["window"]["height"].is_number() || settingsData.object["window"]["height"] == 0)
+            settingsData.object["window"]["height"] = DEFAULT_WINDOW_WIDTH;
 
         std::ofstream file(SETTINGS_PATH);
 
         if (file)
-            file << settingsData.dump(2);
+            file << settingsData.object.dump(2);
         else
             Meatball::Console::printf(SweatCI::ERROR, "could not open file \"{}\"", SETTINGS_PATH);
     }
