@@ -32,7 +32,7 @@ void Meatball::Input::bind(std::string keyName, const std::string& callback) {
 	else if (isMouseWheelDown)
 		mouseWheelDownCallback = callback;
 	else if (keyState.count(keyName) == 0 && !isMouseButton) {
-		Console::printf(HayBCMD::ERROR, "unknown key \"{}\"", keyName);
+		Console::printf(SweatCI::ERROR, "unknown key \"{}\"", keyName);
 		return;
 	}
 	
@@ -40,10 +40,10 @@ void Meatball::Input::bind(std::string keyName, const std::string& callback) {
 	else mouseState[keyName].callback = callback;
 	
 	std::stringstream stream;
-	HayBCMD::Lexer lexer{callback};
-	HayBCMD::Token token = lexer.nextToken();
-	while (token.getType() != HayBCMD::TokenType::_EOF) {
-		if (token.getType() == HayBCMD::TokenType::COMMAND && std::find(allowedUiCommands.begin(), allowedUiCommands.end(), token.getValue()) == allowedUiCommands.end()) {
+	SweatCI::Lexer lexer{callback};
+	SweatCI::Token token = lexer.nextToken();
+	while (token.getType() != SweatCI::TokenType::_EOF) {
+		if (token.getType() == SweatCI::TokenType::COMMAND && std::find(allowedUiCommands.begin(), allowedUiCommands.end(), token.getValue()) == allowedUiCommands.end()) {
 			if (isMouseButton)
 				mouseState[keyName].uiAllowed = false;
 			else if (!isMouseWheelDown && !isMouseWheelUp)
@@ -51,14 +51,14 @@ void Meatball::Input::bind(std::string keyName, const std::string& callback) {
 		}
 
 		if (token.getValue()[0] == '+') {
-			if (token.getType() != HayBCMD::TokenType::COMMAND && Console::variables.count(token.getValue()) == 0) {
+			if (token.getType() != SweatCI::TokenType::COMMAND && Console::variables.count(token.getValue()) == 0) {
 				token = lexer.nextToken();
 				continue;
 			}
 
 			stream << '-'+token.getValue().substr(1) << ";";
 			
-			while (token.getType() != HayBCMD::TokenType::_EOF && token.getType() != HayBCMD::TokenType::EOS)
+			while (token.getType() != SweatCI::TokenType::_EOF && token.getType() != SweatCI::TokenType::EOS)
 				token = lexer.nextToken();
 		}
 
@@ -155,7 +155,7 @@ void Meatball::Input::update(bool uiAllowedCommandsOnly) {
 	}
 }
 
-void Meatball::Input::bindCommand(void*, HayBCMD::Command&, const std::vector<std::string>& args) {
+void Meatball::Input::bindCommand(void*, SweatCI::Command&, const std::vector<std::string>& args) {
 	if (args.size() != 1) { // set
 		bind(args[0], args[1]);
 		return;
@@ -175,18 +175,18 @@ void Meatball::Input::bindCommand(void*, HayBCMD::Command&, const std::vector<st
 	else if (args[0] == "mwheeldown")
 		callback = mouseWheelDownCallback;
 	else {
-		Console::printf(HayBCMD::ERROR, "unknown key {}\n", args[0]);
+		Console::printf(SweatCI::ERROR, "unknown key {}\n", args[0]);
 		return;
 	}
 
-	Console::printf(HayBCMD::ECHO, "{} = \"{}\"\n", args[0], callback);
+	Console::printf(SweatCI::ECHO, "{} = \"{}\"\n", args[0], callback);
 }
 
-void Meatball::Input::unBindCommand(void*, HayBCMD::Command&, const std::vector<std::string>& args) {
+void Meatball::Input::unBindCommand(void*, SweatCI::Command&, const std::vector<std::string>& args) {
 	unbind(args[0]);
 }
 
-void Meatball::Input::unBindAllCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+void Meatball::Input::unBindAllCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
 	for (auto& key : keyState) {
 		key.second.callback = "";
 		key.second.offCallback = "";
@@ -201,9 +201,9 @@ void Meatball::Input::unBindAllCommand(void*, HayBCMD::Command&, const std::vect
 }
 
 void Meatball::Input::registerCommands() {
-	HayBCMD::Command("bind", 1, 2, bindCommand, "<key> <commands?> - binds a key to a command");
-	HayBCMD::Command("unbind", 1, 1, unBindCommand, "<key> - unbinds a key");
-	HayBCMD::Command("unbindall", 0, 0, unBindAllCommand, "unbinds all keys");
+	SweatCI::Command("bind", 1, 2, bindCommand, "<key> <commands?> - binds a key to a command");
+	SweatCI::Command("unbind", 1, 1, unBindCommand, "<key> - unbinds a key");
+	SweatCI::Command("unbindall", 0, 0, unBindAllCommand, "unbinds all keys");
 }
 
 void Meatball::Input::mapKeyboardKeys() {

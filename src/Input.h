@@ -6,7 +6,7 @@
 
 #include <raylib.h>
 
-#include <HayBCMD.h>
+#include <SweatCI.h>
 
 namespace Meatball {
 	struct InputData {
@@ -31,9 +31,9 @@ namespace Meatball {
 		/// @param uiAllowedCommandsOnly this is used when an interface is active, so that only ui-allowed commands can run
 		static void update(bool uiAllowedCommandsOnly);
 
-		static void bindCommand(void*, HayBCMD::Command&, const std::vector<std::string>& args);
-		static void unBindCommand(void*, HayBCMD::Command&, const std::vector<std::string>& args);
-		static void unBindAllCommand(void*, HayBCMD::Command&, const std::vector<std::string>& args);
+		static void bindCommand(void*, SweatCI::Command&, const std::vector<std::string>& args);
+		static void unBindCommand(void*, SweatCI::Command&, const std::vector<std::string>& args);
+		static void unBindAllCommand(void*, SweatCI::Command&, const std::vector<std::string>& args);
 		
 		/// @brief register bind, unbind and unbindall commands
 		static void registerCommands();

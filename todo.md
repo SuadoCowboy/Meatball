@@ -1,6 +1,3 @@
-# WARNING
-- because sizeof(Color) is below 16(which is shared_ptr size), it's better cloning it or using a reference than actually using a pointer or shared_ptr.
-
 # TODOS
 - UI Stuff: Instead of them being updated on every frame, it would be easier with functions that handles events like a mousepress function which calls the current scene stuff that requires mousepress, keypress/keyrelease, mousemove, etc
 

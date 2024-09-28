@@ -4,7 +4,7 @@
 
 #include <raylib.h>
 
-#include <HayBCMD.h>
+#include <SweatCI.h>
 #include "../Utils/Utils.h"
 
 /// @brief predefined functions for some data types for CVARs are stored here

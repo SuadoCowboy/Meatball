@@ -3,7 +3,7 @@
 #include <vector>
 #include <fstream>
 
-#include <HayBCMD.h>
+#include <SweatCI.h>
 
 #include <Utils/Json.h>
 #include <Console.h>
@@ -41,7 +41,7 @@ void loadSettingsAndInit() {
     }
 
     if (shouldRecreateFile) {
-        Meatball::Console::printf(HayBCMD::WARNING, "\"{}\" not found or corrupt. Creating a new one\n", SETTINGS_PATH);
+        Meatball::Console::printf(SweatCI::WARNING, "\"{}\" not found or corrupt. Creating a new one\n", SETTINGS_PATH);
 
         if (!settingsData.count("window") != 0)
             settingsData["window"] = json::parse("{\"width\": 0, \"height\": 0}");
@@ -59,7 +59,7 @@ void loadSettingsAndInit() {
         if (file)
             file << settingsData.dump(2);
         else
-            Meatball::Console::printf(HayBCMD::ERROR, "could not open file \"{}\"", SETTINGS_PATH);
+            Meatball::Console::printf(SweatCI::ERROR, "could not open file \"{}\"", SETTINGS_PATH);
     }
 
     if (windowWidth != GetScreenWidth() || windowHeight != GetScreenHeight()) {

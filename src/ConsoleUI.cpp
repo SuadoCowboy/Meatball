@@ -76,13 +76,13 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const Config::ConsoleUI& _
 
 		size_t spaceIdx = text.find(" ");
 		std::string commandName = text.substr(0, spaceIdx);
-		HayBCMD::Command command;
-		if (HayBCMD::Command::getCommand(commandName, command, false)) {
+		SweatCI::Command command;
+		if (SweatCI::Command::getCommand(commandName, command, false)) {
 			autoCompleteText.emplace_back(command.name+" "+command.usage, config.autoCompleteTextColor);
 			return;
 		}
 
-		for (auto &command : HayBCMD::Command::getCommands()) {
+		for (auto &command : SweatCI::Command::getCommands()) {
 			size_t idx = command.name.find(text);
 			if (idx == std::string::npos) continue;
 
@@ -99,7 +99,7 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const Config::ConsoleUI& _
 	inputBox.onSend = [&](const std::string& text) {
 		autoCompleteText.clear();
 		autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd = 0;
-		print(HayBCMD::OutputLevel::DEFAULT, text);
+		print(SweatCI::OutputLevel::DEFAULT, text);
 		Console::run(text);
 		addToInputHistory(text);
 	};

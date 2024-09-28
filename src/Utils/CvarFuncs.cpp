@@ -6,5 +6,5 @@ void Meatball::CVARFuncs::setColor(void *pData, const std::string& str) {
 
 std::string Meatball::CVARFuncs::getColor(void *pData) {
     Color color = *(Color*)pData;
-    return HayBCMD::formatString("{}, {}, {}, {}", (short)color.r, (short)color.g, (short)color.b, (short)color.a);
+    return SweatCI::formatString("{}, {}, {}, {}", (short)color.r, (short)color.g, (short)color.b, (short)color.a);
 }

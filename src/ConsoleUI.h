@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <HayBCMD.h>
+#include <SweatCI.h>
 
 #include "IScene.h"
 #include "Interface/DynamicPanel.h"
@@ -44,7 +44,7 @@ namespace Meatball {
         virtual ~ConsoleUI() {};
 
         /// @brief appends text to outputTextbox
-        void print(const HayBCMD::OutputLevel &level, const std::string &text) {
+        void print(const SweatCI::OutputLevel &level, const std::string &text) {
             size_t length = text.size();
             while (text[length-1] == '\n' && length != 0)
                 --length;

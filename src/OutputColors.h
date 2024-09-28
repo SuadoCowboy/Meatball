@@ -1,6 +1,6 @@
 #pragma once
 
-#include <HayBCMD.h>
+#include <SweatCI.h>
 
 #include <raylib.h>
 
@@ -15,5 +15,5 @@ namespace Meatball {
     }
 
     /// @note see Meatball::Config::OutputColors
-    Color& outputLevelToOutputColor(const HayBCMD::OutputLevel &level);
+    Color& outputLevelToOutputColor(const SweatCI::OutputLevel &level);
 }

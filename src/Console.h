@@ -4,24 +4,24 @@
 #include <string>
 #include <functional>
 
-#include <HayBCMD.h>
+#include <SweatCI.h>
 
 namespace Meatball {
     class Console {
     public:
-        /// @brief initializes static functionalities of HayBCMD
-        static void init(void *printFuncData, const HayBCMD::PrintFunction& printFunction);
+        /// @brief initializes static functionalities of SweatCI
+        static void init(void *printFuncData, const SweatCI::PrintFunction& printFunction);
 
-        /// @brief parses a string into HayBCMD
+        /// @brief parses a string into SweatCI
         static void run(const std::string& input);
 
-        static constexpr auto print = HayBCMD::Output::print;
+        static constexpr auto print = SweatCI::Output::print;
 
         template<typename ...Args>
-        static void printf(const HayBCMD::OutputLevel& level, const std::string& format, Args ...args) {
-            HayBCMD::Output::printf(level, format, args...);
+        static void printf(const SweatCI::OutputLevel& level, const std::string& format, Args ...args) {
+            SweatCI::Output::printf(level, format, args...);
         }
     
-        static std::unordered_map<std::string, std::string> variables; // HayBCMD aliases are stored here
+        static std::unordered_map<std::string, std::string> variables; // SweatCI aliases are stored here
     };
 }

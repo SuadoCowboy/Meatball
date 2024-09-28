@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include <HayBCMD.h>
+#include <SweatCI.h>
 
 #include "Utils/Json.h"
 
@@ -17,7 +17,7 @@
 #include "OutputColors.h"
 #include "Utils/Utils.h"
 
-static void defaultConsoleUiPrint(void *pData, const HayBCMD::OutputLevel &level, const std::string &text) {
+static void defaultConsoleUiPrint(void *pData, const SweatCI::OutputLevel &level, const std::string &text) {
     size_t spaceIdxBefore = 0;
     size_t currentSpaceIdx = text.find('\n');
     
@@ -30,33 +30,33 @@ static void defaultConsoleUiPrint(void *pData, const HayBCMD::OutputLevel &level
     ((Meatball::ConsoleUI*)pData)->print(level, text.substr(spaceIdxBefore));
 }
 
-static void clearOutputBoxCommand(void *pData, HayBCMD::Command&, const std::vector<std::string>&) {
+static void clearOutputBoxCommand(void *pData, SweatCI::Command&, const std::vector<std::string>&) {
         ((Meatball::ConsoleUI*)pData)->outputBox.clearText();
 }
 
-static void printToVector(void *pData, const HayBCMD::OutputLevel &level, const std::string &text) {
-    ((std::vector<std::pair<std::string, HayBCMD::OutputLevel>>*)pData)->push_back({text, level});
+static void printToVector(void *pData, const SweatCI::OutputLevel &level, const std::string &text) {
+    ((std::vector<std::pair<std::string, SweatCI::OutputLevel>>*)pData)->push_back({text, level});
 }
 
-static void printToStdOut(void*, const HayBCMD::OutputLevel &level, const std::string& text) {
+static void printToStdOut(void*, const SweatCI::OutputLevel &level, const std::string& text) {
     std::cout << "(" << level << ") " << text;
 }
 
 void Meatball::Defaults::init(const std::string& jsonPath, Font& defaultFont) {
-    HayBCMD::Output::setPrintFunction(nullptr, printToStdOut);
+    SweatCI::Output::setPrintFunction(nullptr, printToStdOut);
 
     json initData;
     if (!readJSONFile(jsonPath, initData))
-        HayBCMD::Output::printf(HayBCMD::ERROR, "could not read \"{}\" file\n", jsonPath);
+        SweatCI::Output::printf(SweatCI::ERROR, "could not read \"{}\" file\n", jsonPath);
 
     std::string defaultFontPath = "";
     GET_STRING_FROM_JSON(initData, "defaultFont", defaultFontPath, jsonPath);
     if (initData.count("defaultFontSize") == 0)
-        HayBCMD::Output::printf(HayBCMD::WARNING, "missing \"defaultFontSize\" on \"{}\" file\n", jsonPath);
+        SweatCI::Output::printf(SweatCI::WARNING, "missing \"defaultFontSize\" on \"{}\" file\n", jsonPath);
     else if (!initData["defaultFontSize"].is_number())
-        HayBCMD::Output::print(HayBCMD::WARNING, "invalid \"defaultFontSize\" format. Expected a number\n");
+        SweatCI::Output::print(SweatCI::WARNING, "invalid \"defaultFontSize\" format. Expected a number\n");
     else if (defaultFontPath != "" && !loadFont(defaultFontPath, initData["defaultFontSize"], nullptr, 0, defaultFont))
-        HayBCMD::Output::printf(HayBCMD::WARNING, "\"defaultFont\" gave a unvalid path: {}\n", defaultFontPath);
+        SweatCI::Output::printf(SweatCI::WARNING, "\"defaultFont\" gave a unvalid path: {}\n", defaultFontPath);
 
     dynamicPanelConfig = Config::DynamicPanel();
     GET_COLOR_FROM_JSON(initData, "dynamicPanelColor", dynamicPanelConfig.color, jsonPath);
@@ -141,8 +141,8 @@ bool Meatball::Defaults::loadConsoleFonts(ConsoleUI& consoleUI, const std::files
 }
 
 Meatball::ConsoleUI Meatball::Defaults::initLocalConsole(const Rectangle& rect, const std::string &jsonPath, Font& outGeneralFont, Font& outLabelFont) {    
-    std::vector<std::pair<std::string, HayBCMD::OutputLevel>> texts;
-    HayBCMD::Output::setPrintFunction(&texts, printToVector);
+    std::vector<std::pair<std::string, SweatCI::OutputLevel>> texts;
+    SweatCI::Output::setPrintFunction(&texts, printToVector);
 
     json consoleData;
     readJSONFile(jsonPath, consoleData);
@@ -208,12 +208,12 @@ Meatball::ConsoleUI Meatball::Defaults::initLocalConsole(const Rectangle& rect, 
 
     Console::init(&consoleUI, defaultConsoleUiPrint);
 
-    Console::print(HayBCMD::OutputLevel::ECHO, "Console initialized");
+    Console::print(SweatCI::OutputLevel::ECHO, "Console initialized");
 
     for (auto &text : texts)
         Console::print(text.second, text.first);
 
-    HayBCMD::Command("clear", 0, 0, clearOutputBoxCommand, "- clears the console", &consoleUI);
+    SweatCI::Command("clear", 0, 0, clearOutputBoxCommand, "- clears the console", &consoleUI);
 
     return consoleUI;
 }

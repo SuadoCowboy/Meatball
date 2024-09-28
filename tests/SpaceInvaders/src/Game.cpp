@@ -35,35 +35,35 @@ bool saveSettings = true;
 Font consoleGeneralFont, consoleLabelFont;
 
 #pragma region commands
-static void quitCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+static void quitCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
     shouldQuit = true;
 }
 
-static void moveUpCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+static void moveUpCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
     player.direction.y--;
 }
 
-static void moveDownCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+static void moveDownCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
     player.direction.y++;
 }
 
-static void moveLeftCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+static void moveLeftCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
     player.direction.x--;
 }
 
-static void moveRightCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+static void moveRightCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
     player.direction.x++;
 }
 
-static void fireCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+static void fireCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
     bullets.push_back({ PLAYER, { player.position.x + entityData[PLAYER].texture.width * 0.5f - bulletSize.x * 0.5f, player.position.y + bulletSize.y * 0.25f } });
 }
 
-static void reloadFontsCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+static void reloadFontsCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
     reloadFonts();
 }
 
-static void toggleLocalConsoleCommand(void*, HayBCMD::Command&, const std::vector<std::string>&) {
+static void toggleLocalConsoleCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
     pConsoleUI->visible = not pConsoleUI->visible;
     if (!pConsoleUI->visible)
         resetCursor(currentMouseCursorPriorityLevel);
@@ -107,19 +107,19 @@ void init(int windowWidth, int windowHeight) {
         if (!gameData.count("enemiesBulletsColors") != 0 || !gameData["enemiesBulletsColors"][0].is_string()
             || !parseStringToColor(gameData["enemiesBulletsColors"][0], entityData[ENEMY_WEAK].color)) {
                 entityData[ENEMY_WEAK].color = RED;
-                Meatball::Console::print(HayBCMD::ERROR, "missing enemiesBulletsColors[0] from \"data/game.json\" file");
+                Meatball::Console::print(SweatCI::ERROR, "missing enemiesBulletsColors[0] from \"data/game.json\" file");
             }
         
         if (!gameData.count("enemiesBulletsColors") != 0 || !gameData["enemiesBulletsColors"][1].is_string()
             || !parseStringToColor(gameData["enemiesBulletsColors"][1], entityData[ENEMY_MEDIUM].color)) {
                 entityData[ENEMY_MEDIUM].color = BLUE;
-                Meatball::Console::print(HayBCMD::ERROR, "missing enemiesBulletsColors[1] from \"data/game.json\" file");
+                Meatball::Console::print(SweatCI::ERROR, "missing enemiesBulletsColors[1] from \"data/game.json\" file");
             }
         
         if (!gameData.count("enemiesBulletsColors") != 0 || !gameData["enemiesBulletsColors"][2].is_string()
             || !parseStringToColor(gameData["enemiesBulletsColors"][2], entityData[ENEMY_STRONG].color)) {
                 entityData[ENEMY_STRONG].color = GREEN;
-                Meatball::Console::print(HayBCMD::ERROR, "missing enemiesBulletsColors[2] from \"data/game.json\" file");
+                Meatball::Console::print(SweatCI::ERROR, "missing enemiesBulletsColors[2] from \"data/game.json\" file");
             }
     }
 
@@ -141,37 +141,37 @@ void init(int windowWidth, int windowHeight) {
 
     bulletSpeed = 0.8f;
 
-    HayBCMD::CVARStorage::setCvar("bullet_speed",
+    SweatCI::CVARStorage::setCvar("bullet_speed",
         &bulletSpeed,
-        HayBCMD::CVARUtils::setFloat,
-        HayBCMD::CVARUtils::getFloat,
+        SweatCI::CVARUtils::setFloat,
+        SweatCI::CVARUtils::getFloat,
         "");
-    HayBCMD::CVARStorage::setCvar("player_health",
+    SweatCI::CVARStorage::setCvar("player_health",
         &player.health,
-        HayBCMD::CVARUtils::setShort,
-        HayBCMD::CVARUtils::getShort,
+        SweatCI::CVARUtils::setShort,
+        SweatCI::CVARUtils::getShort,
         "");
 
-    HayBCMD::CVARStorage::setCvar("player_speed_x",
+    SweatCI::CVARStorage::setCvar("player_speed_x",
         &player.speed.x,
-        HayBCMD::CVARUtils::setFloat,
-        HayBCMD::CVARUtils::getFloat,
+        SweatCI::CVARUtils::setFloat,
+        SweatCI::CVARUtils::getFloat,
         "");
 
-    HayBCMD::CVARStorage::setCvar("player_speed_y",
+    SweatCI::CVARStorage::setCvar("player_speed_y",
         &player.speed.y,
-        HayBCMD::CVARUtils::setFloat,
-        HayBCMD::CVARUtils::getFloat,
+        SweatCI::CVARUtils::setFloat,
+        SweatCI::CVARUtils::getFloat,
         "");
 
-    HayBCMD::CVARStorage::setCvar("save_settings",
+    SweatCI::CVARStorage::setCvar("save_settings",
         &saveSettings,
-        HayBCMD::CVARUtils::setBoolean,
-        HayBCMD::CVARUtils::getBoolean,
+        SweatCI::CVARUtils::setBoolean,
+        SweatCI::CVARUtils::getBoolean,
         "if should save the changed settings in a file");
 
-    HayBCMD::execConfigFile("data/cfg/autoexec.cfg", Console::variables);
-    HayBCMD::execConfigFile("data/cfg/config.cfg", Console::variables);
+    SweatCI::execConfigFile("data/cfg/autoexec.cfg", Console::variables);
+    SweatCI::execConfigFile("data/cfg/config.cfg", Console::variables);
 
     enemies = {Enemy({windowWidth * 0.5f, windowHeight * 0.5f}, ENEMY_WEAK)};
 
@@ -182,7 +182,7 @@ void init(int windowWidth, int windowHeight) {
 void reloadFonts() {
     json consoleData;
     if (!Meatball::readJSONFile("data/console.json", consoleData)) {
-        Meatball::Console::print(HayBCMD::ERROR, "could not parse console.json");
+        Meatball::Console::print(SweatCI::ERROR, "could not parse console.json");
         return;
     }
 
@@ -230,7 +230,7 @@ void update(float dt) {
     if (IsWindowResized())
         resize();
 
-    HayBCMD::handleLoopAliasesRunning(Console::variables);
+    SweatCI::handleLoopAliasesRunning(Console::variables);
 
     player.update(backgroundTexture.width, backgroundTexture.height, dt);
 
@@ -281,7 +281,7 @@ void save(const std::string& path) {
     if (file)
         file << settingsData.dump(2);
     else
-        Meatball::Console::printf(HayBCMD::ERROR, "could not open file \"{}\"", path);
+        Meatball::Console::printf(SweatCI::ERROR, "could not open file \"{}\"", path);
 }
 
 void cleanup() {
@@ -295,24 +295,24 @@ void cleanup() {
 }
 
 void loadCommands() {
-    HayBCMD::Command("quit", 0, 0, quitCommand, "- closes the window");
-    HayBCMD::Command("+moveup", 0, 0, moveUpCommand, "- moves up");
-    HayBCMD::Command("+movedown", 0, 0, moveDownCommand, "- moves down");
-    HayBCMD::Command("+moveleft", 0, 0, moveLeftCommand, "- moves left");
-    HayBCMD::Command("+moveright", 0, 0, moveRightCommand, "- moves right");
+    SweatCI::Command("quit", 0, 0, quitCommand, "- closes the window");
+    SweatCI::Command("+moveup", 0, 0, moveUpCommand, "- moves up");
+    SweatCI::Command("+movedown", 0, 0, moveDownCommand, "- moves down");
+    SweatCI::Command("+moveleft", 0, 0, moveLeftCommand, "- moves left");
+    SweatCI::Command("+moveright", 0, 0, moveRightCommand, "- moves right");
 
-    HayBCMD::Command("-moveup", 0, 0, moveDownCommand, "- stops moving up");
-    HayBCMD::Command("-movedown", 0, 0, moveUpCommand, "- stops moving down");
-    HayBCMD::Command("-moveleft", 0, 0, moveRightCommand, "- stops moving left");
-    HayBCMD::Command("-moveright", 0, 0, moveLeftCommand, "- stops moving right");
+    SweatCI::Command("-moveup", 0, 0, moveDownCommand, "- stops moving up");
+    SweatCI::Command("-movedown", 0, 0, moveUpCommand, "- stops moving down");
+    SweatCI::Command("-moveleft", 0, 0, moveRightCommand, "- stops moving left");
+    SweatCI::Command("-moveright", 0, 0, moveLeftCommand, "- stops moving right");
 
-    HayBCMD::Command("+fire", 0, 0, fireCommand, "- shoots a bullet");
+    SweatCI::Command("+fire", 0, 0, fireCommand, "- shoots a bullet");
 
     Console::variables["-fire"] = " ";
 
-    HayBCMD::Command("reload_fonts", 0, 0, reloadFontsCommand, "- reloads all text fonts.");
+    SweatCI::Command("reload_fonts", 0, 0, reloadFontsCommand, "- reloads all text fonts.");
 
-    HayBCMD::Command("toggle_local_console", 0, 0, toggleLocalConsoleCommand, "- toggles the console ui visibility");
+    SweatCI::Command("toggle_local_console", 0, 0, toggleLocalConsoleCommand, "- toggles the console ui visibility");
 
     Input::allowedUiCommands.push_back("toggle_local_console");
     Input::allowedUiCommands.push_back("quit");
