@@ -1,7 +1,7 @@
 {
     "dynamicPanelColor": "40,40,40,255",
     
-    "defaultFont": "data/fonts/Cooper Hewitt/CooperHewitt-Medium.otf",
+    "defaultFont": "data/font/Cooper Hewitt/CooperHewitt-Medium.otf",
     "defaultFontSize": 24,
 
     "button": {

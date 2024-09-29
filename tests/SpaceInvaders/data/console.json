@@ -1,6 +1,6 @@
 {
     "margin": 4,
-    "font": "data/fonts/Cooper Hewitt/CooperHewitt-Medium.otf",
+    "font": "data/font/Cooper Hewitt/CooperHewitt-Medium.otf",
     "labelColor": "255,255,255,255",
 
     "closeButton": {
