@@ -5,8 +5,6 @@
 
 unsigned char Meatball::ScrollBar::scrollSpeed = 50;
 
-Meatball::Config::ScrollBar Meatball::Defaults::scrollBarConfig;
-
 Meatball::ScrollBar::ScrollBar(const Rectangle& rect, bool visible)
  : visible(visible), rect(rect), thumbHeight(rect.height) {}
 
@@ -31,15 +29,21 @@ void Meatball::ScrollBar::setScrollValue(float value) {
     scrollValue = value;
 }
 
-void Meatball::ScrollBar::draw() {
+void Meatball::ScrollBar::draw(
+        const Color& barColor,
+        const Color& barHoveredColor,
+        const Color& thumbColor,
+        const Color& thumbHoveredColor1,
+        const Color& thumbHoveredColor2
+) const {
     if (!visible) return;
 
-    DrawRectangle(rect.x, rect.y, rect.width, rect.height, barHovered? config->barHoveredColor : config->barColor);
+    DrawRectangle(rect.x, rect.y, rect.width, rect.height, barHovered? barHoveredColor : barColor);
 
     Color actualScrollColor;
-    if (barHovered || dragging) actualScrollColor = config->thumbHoveredColor1;
-    else actualScrollColor = config->thumbColor;
-    if (thumbHovered) actualScrollColor = config->thumbHoveredColor2;
+    if (barHovered || dragging) actualScrollColor = thumbHoveredColor1;
+    else actualScrollColor = thumbColor;
+    if (thumbHovered) actualScrollColor = thumbHoveredColor2;
 
     DrawRectangle(rect.x, rect.y+thumbY, rect.width, thumbHeight, actualScrollColor);
 }
@@ -82,7 +86,7 @@ void Meatball::ScrollBar::update(const Rectangle& parentRect) {
     scrollValue = thumbY / thumbHeight;
 }
 
-const Rectangle& Meatball::ScrollBar::getRect() {
+const Rectangle& Meatball::ScrollBar::getRect() const {
     return rect;
 }
 

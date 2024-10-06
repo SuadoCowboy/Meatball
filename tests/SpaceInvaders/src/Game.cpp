@@ -32,7 +32,7 @@ Texture2D backgroundTexture;
 bool shouldQuit = false;
 bool saveSettings = true;
 
-Font consoleGeneralFont, consoleLabelFont;
+Font consoleInputFont, consoleOutputFont, consoleLabelFont;
 
 #pragma region commands
 static void quitCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
@@ -80,9 +80,6 @@ void init(int windowWidth, int windowHeight) {
     int currentMonitorId = GetCurrentMonitor();
     SetWindowMaxSize(GetMonitorWidth(currentMonitorId), GetMonitorHeight(currentMonitorId));
 
-    Font defaultFont = GetFontDefault();
-    Defaults::init("data/init.json", defaultFont);
-
     Rectangle consoleUIRect = { 0, 0, windowWidth * 0.5f, windowHeight * 0.75f };
     consoleUIRect.x = windowWidth * 0.5f - consoleUIRect.width * 0.5f;
     consoleUIRect.y = windowHeight * 0.5f - consoleUIRect.height * 0.5f;
@@ -90,15 +87,16 @@ void init(int windowWidth, int windowHeight) {
     pConsoleUI = new ConsoleUI(Defaults::initLocalConsole(
         consoleUIRect,
         "data/console.json",
-        consoleGeneralFont,
+        consoleInputFont,
+        consoleOutputFont,
         consoleLabelFont));
 
     pConsoleUI->visible = false;
 
-    entityData[PLAYER] = {10, 90, {255, 255, 0, 255}, LoadTexture("data/images/player.png")};
-    entityData[ENEMY_WEAK] = {10, 30, {0, 0, 255, 255}, LoadTexture("data/images/enemy0.png")};
-    entityData[ENEMY_MEDIUM] = {25, 60, {255, 0, 0, 255}, LoadTexture("data/images/enemy1.png")};
-    entityData[ENEMY_STRONG] = {40, 90, {0, 255, 0, 255}, LoadTexture("data/images/enemy2.png")};
+    entityData[PLAYER] = {10, 90, {255, 255, 0, 255}, LoadTexture("data/image/player.png")};
+    entityData[ENEMY_WEAK] = {10, 30, {0, 0, 255, 255}, LoadTexture("data/image/enemy0.png")};
+    entityData[ENEMY_MEDIUM] = {25, 60, {255, 0, 0, 255}, LoadTexture("data/image/enemy1.png")};
+    entityData[ENEMY_STRONG] = {40, 90, {0, 255, 0, 255}, LoadTexture("data/image/enemy2.png")};
 
     Meatball::Json gameData{"data/game.json"};
     if (gameData.object.size() != 0) {
@@ -128,7 +126,7 @@ void init(int windowWidth, int windowHeight) {
     Input::mapKeyboardKeys();
     Input::mapMouseKeys();
 
-    backgroundTexture = LoadTexture("data/images/background.png");
+    backgroundTexture = LoadTexture("data/image/background.png");
     backgroundTexture.width = GetRenderWidth();
     backgroundTexture.height = GetRenderHeight();
 
@@ -189,7 +187,7 @@ void reloadFonts() {
     std::string path = "";
     consoleData.getString("font", path);
     if (!path.empty())
-        Defaults::loadConsoleFonts(*pConsoleUI, path, consoleGeneralFont, consoleLabelFont);
+        Defaults::loadConsoleFonts(*pConsoleUI, path, consoleInputFont, consoleOutputFont, consoleLabelFont);
 }
 
 void resize() {

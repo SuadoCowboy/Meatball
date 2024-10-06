@@ -9,56 +9,41 @@
 #include "../Utils/Utils.h"
 
 namespace Meatball {
-    namespace Config {
-        struct ScrollBox {
-            Font* font = nullptr;
-            Color color = BLACK;
-        };
-    }
-
-    namespace Defaults {
-        extern Config::ScrollBox scrollBoxConfig;
-    }
-    
     /// @brief basically, a rect being used to draw text but with scrolling
     /// @note it also have a scrollable bar when text is higher than rect.height
     /// @note if you're looking for text input see TextInputBox instead
     class ScrollBox {
     public:
         ScrollBox();
-        ScrollBox(const Rectangle& rect);
+        ScrollBox(const Rectangle& rect, unsigned short fontSize);
 
         const Rectangle& getRect() const;
         unsigned int getContentHeight() const;
-        ScrollBar &getScrollBar();
 
-        void appendText(const std::string& text, const Color& color);
+        void appendText(const std::string& text, const Font& font, const Color& color);
         void clearText();
 
         /// @brief checks the current rect size and wraps the whole text
-        void updateTextWrap();
+        void updateTextWrap(const Font& font);
         
         /// @brief removes the text at index 0
         void popFront() noexcept;
 
-        const std::deque<ColoredText> &getText() const;
+        const std::deque<ColoredText>& getText() const;
 
-        void draw();
-        void drawScrollbar();
+        void draw(const Color& color, const Font& font) const;
         void update();
 
         void setPosition(float x, float y);
         void setSize(float width, float height);
 
-        Config::ScrollBox *config = &Defaults::scrollBoxConfig;
+        ScrollBar scrollBar;
 
-        unsigned short fontSize = 0;
-
+        unsigned short fontSize = 10;
     private:
         std::deque<ColoredText> text;
         unsigned int contentHeight = 0;
         
-        ScrollBar scrollBar; // it appears when text is higher than rect.height
         Rectangle rect;
     };
 }

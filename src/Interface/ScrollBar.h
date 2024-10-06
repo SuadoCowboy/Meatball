@@ -3,22 +3,9 @@
 #include <raylib.h>
 
 #include "../Shared.h"
+#include "Theme.h"
 
 namespace Meatball {
-    namespace Config {
-        struct ScrollBar {
-            Color barColor = {15,15,15,255};
-            Color barHoveredColor = {25,25,25,255};
-            Color thumbColor = {30,30,30,255};
-            Color thumbHoveredColor1 = {60,60,60,255};
-            Color thumbHoveredColor2 = {90,90,90,255};
-        };
-    }
-
-    namespace Defaults {
-        extern Config::ScrollBar scrollBarConfig;
-    }
-
     class ScrollBar {
     public:
         ScrollBar() {}
@@ -28,7 +15,13 @@ namespace Meatball {
         /// @param parentRect to check if the mouse is between parent's boundaries to use mouse wheel 
         void update(const Rectangle& parentRect);
 
-        void draw();
+        void draw(
+            const Color& barColor,
+            const Color& barHoveredColor,
+            const Color& thumbColor,
+            const Color& thumbHoveredColor1,
+            const Color& thumbHoveredColor2
+        ) const;
 
         float getScrollValue() const;
         void setScrollValue(float value);
@@ -41,9 +34,7 @@ namespace Meatball {
         /// @warning should call updateThumbHeight and update after calling this function or else things might break
         void setSize(float width, float height);
         
-        const Rectangle& getRect();
-
-        Config::ScrollBar *config = &Defaults::scrollBarConfig;
+        const Rectangle& getRect() const;
         
         bool visible = true;
 

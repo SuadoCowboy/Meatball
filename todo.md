@@ -1,4 +1,6 @@
 # TODOS
+- Idk what to do with this Theme thing I just implemented. I still need to think about how I can make a 100% user-made UI, this means deleting ConsoleUI class and leaving only the needed functions that user can't define.
+
 - UI Stuff: Instead of them being updated on every frame, it would be easier with functions that handles events like a mousepress function which calls the current scene stuff that requires mousepress, keypress/keyrelease, mousemove, etc
 
 - config stuff can be removed and their members can be passed as parameters in the needed functions. This will make the code clearer to understand(probably). Maybe let default config stuff since it might still be useful for now

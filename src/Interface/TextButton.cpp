@@ -4,16 +4,8 @@
 #include "Utils/DrawFuncs.h"
 #include "MouseCursor.h"
 
-Meatball::Config::TextButton Meatball::Defaults::textButtonConfig;
-
-Meatball::TextButton::TextButton() {
-    fontSize = config->font->baseSize;
-}
-
-Meatball::TextButton::TextButton(const Rectangle& rect)
- : rect(rect) {
-    fontSize = config->font->baseSize;
- }
+Meatball::TextButton::TextButton(const Rectangle& rect, unsigned short fontSize)
+ : rect(rect), fontSize(fontSize) {}
 
 void Meatball::TextButton::update() {
     if (hovered)
@@ -24,6 +16,6 @@ void Meatball::TextButton::update() {
     checkHovered(hovered, rect, &onHover, &onRelease);
 }
 
-void Meatball::TextButton::drawText() {
-    Meatball::drawText(*config->font, fontSize, text.c_str(), rect.x+rect.width*0.5f-measureTextWidth(*config->font, fontSize, text.c_str())*0.5f, rect.y+rect.height*0.5f, hovered? config->hoveredTextColor : config->textColor);
+void Meatball::TextButton::drawText(const Font& font, const Color& textColor, const Color& hoveredTextColor) const {
+    Meatball::drawText(font, fontSize, text.c_str(), rect.x+rect.width*0.5f-measureTextWidth(font, fontSize, text.c_str())*0.5f, rect.y+rect.height*0.5f, hovered? hoveredTextColor : textColor);
 }

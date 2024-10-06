@@ -4,7 +4,7 @@ void Meatball::drawRect(const Rectangle& rect, const Color& color) {
     DrawRectangle(rect.x, rect.y, rect.width, rect.height, color);
 }
 
-void Meatball::drawX(Rectangle& rect, Color& color) {
+void Meatball::drawX(const Rectangle& rect, const Color& color) {
     /*
     .
      .

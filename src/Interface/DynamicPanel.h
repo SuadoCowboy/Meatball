@@ -5,33 +5,21 @@
 #include "../Shared.h"
 
 namespace Meatball {
-    namespace Config {
-        struct DynamicPanel {
-            DynamicPanel();
-
-            Color color;
-            Vector2 minSize;
-            float grabHeight;
-        };
-    }
-
-    namespace Defaults {
-        extern Config::DynamicPanel dynamicPanelConfig;
-    }
-
     /// @brief a panel that can be resized and moved
     class DynamicPanel {
     public:
-        DynamicPanel();
+        DynamicPanel() {}
         DynamicPanel(const Rectangle& rect);
 
         void update();
 
         /// @brief whether is dragging/resizing/hovered
         bool isAnyConditionActive();
+        
+        Rectangle rect = {0.0f, 0.0f, 0.0f, 0.0f};
 
-        Config::DynamicPanel *config = &Defaults::dynamicPanelConfig;
-        Rectangle rect;
+        Vector2 minSize = {8,10};
+        float grabHeight = 2.0f;
 
         // TODO: grabHeight proportional to screen size or window size
 

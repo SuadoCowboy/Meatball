@@ -18,6 +18,9 @@ namespace Meatball {
         std::string filePath = "", objectName = "";
 
         Json() {}
+
+        Json(const json& object, const std::string& filePath, const std::string& objectName="")
+         : object(object), filePath(filePath), objectName(objectName) {};
         
         Json(const Json& other, const std::string& key);
         Json(const std::string& filePath);

@@ -5,9 +5,7 @@
 #include "Utils/Utils.h"
 #include "MouseCursor.h"
 
-unsigned char Meatball::ConsoleUI::margin = 4;
-
-static void handleInputHistoryPos(Meatball::InputTextBox &inputBox, std::string *inputHistory, unsigned char inputHistorySize, unsigned char &inputHistoryPos) {
+static void handleInputHistoryPos(Meatball::InputTextBox& inputBox, std::string* inputHistory, unsigned char inputHistorySize, unsigned char inputHistoryPos) {
     if ((IsKeyPressed(KEY_UP) || IsKeyPressedRepeat(KEY_UP)) && inputHistoryPos != 0)
         --inputHistoryPos;
     
@@ -22,18 +20,13 @@ static void handleInputHistoryPos(Meatball::InputTextBox &inputBox, std::string 
 	}
 }
 
-Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const Config::ConsoleUI& _config, bool visible)
- : IScene(), config(_config), visible(visible), mainPanel(rect) {
-	mainPanel.config = &Defaults::dynamicPanelConfig;
-	outputBox.config = &Defaults::scrollBoxConfig;
-    inputBox.config = &Defaults::inputTextBoxConfig;
-	closeButton.config = &Defaults::buttonConfig;
-
+Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, bool visible)
+ : IScene(), visible(visible), mainPanel(rect) {
 	mainPanel.onMove = [&]() {
 		closeButton.rect.x = mainPanel.rect.x+mainPanel.rect.width-margin-margin*0.5;
 		closeButton.rect.y = mainPanel.rect.y+margin*0.5;
 
-		outputBox.setPosition(mainPanel.rect.x+margin, mainPanel.rect.y+config.labelFont->baseSize+margin);
+		outputBox.setPosition(mainPanel.rect.x+margin, mainPanel.rect.y+labelFont.baseSize+margin);
 
 		inputBox.rect.x = mainPanel.rect.x+margin;
 		inputBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin-inputBox.rect.height;
@@ -48,13 +41,13 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const Config::ConsoleUI& _
 			inputBox.rect.width = mainPanel.rect.width-margin*2;
 			outputBox.fontSize = inputBox.fontSize = (int)inputBox.rect.height - 2 + (int)inputBox.rect.height % 2;
 
-			outputBox.setSize(inputBox.rect.width, mainPanel.rect.height-config.labelFont->baseSize-1-margin*2-inputBox.rect.height);
+			outputBox.setSize(inputBox.rect.width, mainPanel.rect.height-labelFont.baseSize-1-margin*2-inputBox.rect.height);
 
 			mainPanel.onMove();
 	};
 
 	mainPanel.onResizeStop = [&]() {
-		outputBox.updateTextWrap();
+		outputBox.updateTextWrap(outputFont);
 	};
 
 	onResize(1, 1);
@@ -78,7 +71,7 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const Config::ConsoleUI& _
 		std::string commandName = text.substr(0, spaceIdx);
 		SweatCI::Command command;
 		if (SweatCI::Command::getCommand(commandName, command, false)) {
-			autoCompleteText.emplace_back(command.name+" "+command.usage, config.autoCompleteTextColor);
+			autoCompleteText.emplace_back(command.name+" "+command.usage, autoCompleteTextColor);
 			return;
 		}
 
@@ -88,11 +81,11 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const Config::ConsoleUI& _
 
 			std::string leftText = command.name.substr(0, idx);
 			if (leftText.size() != 0)
-				autoCompleteText.emplace_back(leftText, config.autoCompleteTextColor);
+				autoCompleteText.emplace_back(leftText, autoCompleteTextColor);
 			
-			autoCompleteText.emplace_back(command.name.substr(idx, textSize), config.autoCompleteHighlightedTextColor); // middleText
+			autoCompleteText.emplace_back(command.name.substr(idx, textSize), autoCompleteHighlightedTextColor); // middleText
 			
-			autoCompleteText.emplace_back(command.name.substr(idx+textSize)+" ", config.autoCompleteTextColor); // rightText
+			autoCompleteText.emplace_back(command.name.substr(idx+textSize)+" ", autoCompleteTextColor); // rightText
 		}
 	};
 
@@ -135,7 +128,7 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, const Config::ConsoleUI& _
 void Meatball::ConsoleUI::update() {
 	if (!visible) return;
 
-	inputBox.update();
+	inputBox.update(inputFont);
 	
 	if (inputBox.focused) {
 		if ((IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB)) && autoCompleteText.size() != 0) {
@@ -147,12 +140,12 @@ void Meatball::ConsoleUI::update() {
 				autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
 				
 				size_t idx = autoCompleteSelectedIdxEnd;
-				autoCompleteText[idx].color = config.autoCompleteSelectedTextColor;
+				autoCompleteText[idx].color = autoCompleteSelectedTextColor;
 				std::string newText = autoCompleteText[idx].text;
 				
 				--idx;
 				while (autoCompleteText[idx].text.back() != ' ') {
-					autoCompleteText[idx].color = config.autoCompleteSelectedTextColor;
+					autoCompleteText[idx].color = autoCompleteSelectedTextColor;
 					newText = autoCompleteText[idx].text+newText;
 					if (idx == 0) break;
 					--idx;
@@ -173,12 +166,12 @@ void Meatball::ConsoleUI::update() {
 				if (autoCompleteSelectedIdxEnd == 0) autoCompleteSelectedIdxBegin = 0;
 				
 				size_t idx = autoCompleteSelectedIdxBegin;
-				autoCompleteText[idx].color = config.autoCompleteSelectedTextColor;
+				autoCompleteText[idx].color = autoCompleteSelectedTextColor;
 				std::string newText = autoCompleteText[idx].text;
 				
 				while (autoCompleteText[idx].text.back() != ' ') {
 					++idx;
-					autoCompleteText[idx].color = config.autoCompleteSelectedTextColor;
+					autoCompleteText[idx].color = autoCompleteSelectedTextColor;
 					newText += autoCompleteText[idx].text;
 				}
 				
@@ -199,16 +192,21 @@ void Meatball::ConsoleUI::update() {
 	mainPanel.update();
 }
 
-void Meatball::ConsoleUI::draw() {
+void Meatball::ConsoleUI::draw() const {
 	if (!visible) return;
 
-	drawRect(mainPanel.rect, mainPanel.config->color);
+	drawRect(mainPanel.rect, backgroundColor);
 	
-	DrawRectangle(inputBox.rect.x, inputBox.rect.y, inputBox.rect.width, inputBox.rect.height, inputBox.config->color);
-	inputBox.draw();
+	DrawRectangle(inputBox.rect.x, inputBox.rect.y, inputBox.rect.width, inputBox.rect.height, inputBoxTheme.color);
+	inputBox.draw(inputFont, inputBoxTheme.textColor, inputBoxTheme.cursorColor, inputBoxTheme.selectionColor);
 
-	outputBox.draw();
-	outputBox.drawScrollbar();
+	outputBox.draw(outputBoxTheme.color, outputFont);
+	outputBox.scrollBar.draw(
+		outputScrollBarTheme.barColor,
+		outputScrollBarTheme.barHoveredColor,
+		outputScrollBarTheme.thumbColor,
+		outputScrollBarTheme.thumbHoveredColor1,
+		outputScrollBarTheme.thumbHoveredColor2);
 
 	if (autoCompleteText.size() != 0) {
 		// I can't use draw method since I'm using offsetX
@@ -218,15 +216,15 @@ void Meatball::ConsoleUI::draw() {
 			bool passedThroughSelectedText = false;
 			
 			for (auto &coloredText : autoCompleteText) {
-				if (coloredText.color == config.autoCompleteSelectedTextColor) {
-					selectedTextWidth += Meatball::measureTextWidth(*inputBox.config->font, inputBox.fontSize, coloredText.text.c_str());
+				if (coloredText.color == autoCompleteSelectedTextColor) {
+					selectedTextWidth += Meatball::measureTextWidth(inputFont, inputBox.fontSize, coloredText.text.c_str());
 					passedThroughSelectedText = true;
 					continue;
 				}
 
 				if (passedThroughSelectedText) break;
 				
-				offsetX += Meatball::measureTextWidth(*inputBox.config->font, inputBox.fontSize, coloredText.text.c_str())+1;
+				offsetX += Meatball::measureTextWidth(inputFont, inputBox.fontSize, coloredText.text.c_str())+1;
 			}
 
 			if (offsetX+selectedTextWidth < mainPanel.rect.width) offsetX = 0;
@@ -235,25 +233,25 @@ void Meatball::ConsoleUI::draw() {
 		}
 
 		float autoCompleteY = mainPanel.rect.y+mainPanel.rect.height-margin;
-		DrawRectangle(mainPanel.rect.x, autoCompleteY, mainPanel.rect.width, inputBox.rect.height, config.autoCompleteColor);
+		DrawRectangle(mainPanel.rect.x, autoCompleteY, mainPanel.rect.width, inputBox.rect.height, autoCompleteColor);
 		BeginScissorMode(mainPanel.rect.x, autoCompleteY, mainPanel.rect.width, inputBox.rect.height);
 
 		float x = mainPanel.rect.x;
 		for (auto &coloredText : autoCompleteText) {
-			drawText(*inputBox.config->font, inputBox.fontSize, coloredText.text.c_str(), x-offsetX, autoCompleteY+1, coloredText.color);
-			x += Meatball::measureTextWidth(*inputBox.config->font, inputBox.fontSize, coloredText.text.c_str())+1;
+			drawText(inputFont, inputBox.fontSize, coloredText.text.c_str(), x-offsetX, autoCompleteY+1, coloredText.color);
+			x += Meatball::measureTextWidth(inputFont, inputBox.fontSize, coloredText.text.c_str())+1;
 		}
 
 		EndScissorMode();
 	}
 
-	drawText(*config.labelFont, config.labelFont->baseSize, config.labelText, mainPanel.rect.x+margin, mainPanel.rect.y+margin, config.labelTextColor);
+	drawText(labelFont, labelFont.baseSize, labelText.c_str(), mainPanel.rect.x+margin, mainPanel.rect.y+margin, labelTextColor);
 
-	drawX(closeButton.rect, closeButton.hovered? closeButton.config->hoveredColor : closeButton.config->color);
+	drawX(closeButton.rect, closeButton.hovered? closeButtonTheme.color : closeButtonTheme.hoveredColor);
 }
 
 void Meatball::ConsoleUI::onResize(float ratioWidth, float ratioHeight) {
-	mainPanel.config->grabHeight = config.labelFont->baseSize;
+	mainPanel.grabHeight = labelFont.baseSize;
 
 	mainPanel.rect.x *= ratioWidth;
     mainPanel.rect.y *= ratioHeight;
@@ -263,11 +261,11 @@ void Meatball::ConsoleUI::onResize(float ratioWidth, float ratioHeight) {
 
 	inputBox.rect.height *= ratioHeight;
 
-	mainPanel.config->minSize = {
+	mainPanel.minSize = {
 		// scrollBarWidth + (margin left + margin right) + labelText size
-		(int)outputBox.getScrollBar().getRect().width+margin*2+Meatball::measureTextWidth(*config.labelFont, config.labelFont->baseSize, config.labelText),
+		(int)outputBox.scrollBar.getRect().width+margin*2+Meatball::measureTextWidth(labelFont, labelFont.baseSize, labelText.c_str()),
 		// outputBox minSize + inputBox minSize + (margin left + margin right)
-		(int)outputBox.fontSize+inputBox.rect.height+margin*2+config.labelFont->baseSize};
+		(int)outputBox.fontSize+inputBox.rect.height+margin*2+labelFont.baseSize};
 	
 	mainPanel.onResize();
 	mainPanel.onResizeStop();

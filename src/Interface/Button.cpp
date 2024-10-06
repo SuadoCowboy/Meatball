@@ -3,8 +3,6 @@
 #include "Utils/Utils.h"
 #include "MouseCursor.h"
 
-Meatball::Config::Button Meatball::Defaults::buttonConfig;
-
 Meatball::Button::Button(const Rectangle& rect)
  : rect(rect) {}
 

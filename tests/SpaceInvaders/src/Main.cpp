@@ -22,9 +22,10 @@ void loadSettingsAndInit() {
     Meatball::Json settingsData{SETTINGS_PATH};
 
     bool shouldRecreateFile = settingsData.object.size() == 0;
-
+    
     int windowWidth=1, windowHeight=1;
-    { // Window
+
+    if (!shouldRecreateFile) {
         Meatball::Json windowData{settingsData, "window"};
 
         bool result = windowData.getInt("height", windowHeight);
@@ -36,7 +37,7 @@ void loadSettingsAndInit() {
         Meatball::Console::printf(SweatCI::WARNING, "\"{}\" not found or corrupt. Creating a new one\n", SETTINGS_PATH);
 
         if (!settingsData.object.count("window") != 0)
-            settingsData.object["window"] = json::parse("{\"width\": 0, \"height\": 0}");
+            settingsData.object["window"] = json::parse("{\"width\": 800, \"height\": 600}");
         
         if (!settingsData.object["window"].count("width") != 0
         || !settingsData.object["window"]["width"].is_number() || settingsData.object["window"]["width"] == 0)

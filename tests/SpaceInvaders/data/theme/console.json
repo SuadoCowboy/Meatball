@@ -1,0 +1,11 @@
+{
+    "button": {
+        "color": "225,225,225",
+        "hoveredColor": "255,0,0"
+    },
+
+    "textbutton": {
+        "color": "255,255,255",
+        "hoveredColor": "50,50,50"
+    }
+}

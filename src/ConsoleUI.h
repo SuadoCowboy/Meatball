@@ -9,8 +9,10 @@
 #include "Interface/Button.h"
 #include "Interface/ScrollBox.h"
 #include "Interface/InputTextBox.h"
+#include "Interface/Theme.h"
 #include "Utils/Utils.h"
 #include "OutputColors.h"
+
 
 #ifndef CONSOLEUI_OUTPUT_MAX_LINES
 #define CONSOLEUI_OUTPUT_MAX_LINES 200
@@ -21,36 +23,21 @@
 #endif
 
 namespace Meatball {
-    namespace Config {
-        struct ConsoleUI {
-            Font* labelFont = nullptr; // used only for label
-
-            Color autoCompleteColor = BLACK; // color of the rect
-            Color autoCompleteTextColor = WHITE;
-            Color autoCompleteHighlightedTextColor = YELLOW;
-            Color autoCompleteSelectedTextColor = PURPLE;
-
-            Color labelTextColor = WHITE;
-
-            const char* labelText;
-        };
-    }
-
     class ConsoleUI : public IScene {
     public:
         /// @brief makes a empty ConsoleUI
-        ConsoleUI(const Rectangle &rect, const Config::ConsoleUI &config, bool visible = false);
+        ConsoleUI(const Rectangle& rect, bool visible = false);
 
         virtual ~ConsoleUI() {};
 
         /// @brief appends text to outputTextbox
-        void print(const SweatCI::OutputLevel &level, const std::string &text) {
+        void print(const SweatCI::OutputLevel& level, const std::string& text) {
             size_t length = text.size();
             while (text[length-1] == '\n' && length != 0)
                 --length;
             
             if (length != 0)
-                outputBox.appendText(text.substr(0, length), outputLevelToOutputColor(level));
+                outputBox.appendText(text.substr(0, length), outputFont, outputLevelToOutputColor(level));
             
             while (outputBox.getContentHeight() > CONSOLEUI_OUTPUT_MAX_LINES*(unsigned int)outputBox.fontSize) {
                 if (outputBox.getText().size() == 0) break;
@@ -58,7 +45,8 @@ namespace Meatball {
             }
         }
 
-        void draw();
+        void draw() const;
+        
         void update();
 
         /// @brief should be used when window is resized or render screen or even font size
@@ -66,20 +54,35 @@ namespace Meatball {
         /// @param ratioHeight renderHeightNow/renderHeightBefore
         void onResize(float ratioWidth, float ratioHeight);
 
-        Config::ConsoleUI config;
-
         // Only console can appear in every scene so only it needs visible boolean.
         // The rest of the scenes will be handled by a class or something that says which one should be used.
         bool visible = false;
         
+        Font outputFont, inputFont, labelFont;
+
         DynamicPanel mainPanel;
         Button closeButton;
         ScrollBox outputBox;
         InputTextBox inputBox;
-        
+
+        std::string labelText = "";
+
+        Color autoCompleteColor = BLACK;
+        Color autoCompleteTextColor = BLACK;
+        Color autoCompleteHighlightedTextColor = BLACK;
+        Color autoCompleteSelectedTextColor = BLACK;
+
+        Color labelTextColor = BLACK;
+
+        Color backgroundColor = BLACK;
+
+        ScrollBoxTheme outputBoxTheme;
+        InputTextBoxTheme inputBoxTheme;
+        ButtonTheme closeButtonTheme;
+        ScrollBarTheme outputScrollBarTheme;
 
         // margin - the space between mainPanel border and objects close to it
-        static unsigned char margin;
+        unsigned char margin = 4;
 
     private:
         std::vector<ColoredText> autoCompleteText;

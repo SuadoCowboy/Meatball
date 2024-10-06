@@ -3,14 +3,6 @@
 #include "Utils/Utils.h"
 #include "MouseCursor.h"
 
-Meatball::Config::DynamicPanel Meatball::Defaults::dynamicPanelConfig;
-
-Meatball::Config::DynamicPanel::DynamicPanel()
- : color(BLACK), minSize({8,10}), grabHeight(2) {}
-
-Meatball::DynamicPanel::DynamicPanel()
- : rect({0,0,0,0}) {}
-
 Meatball::DynamicPanel::DynamicPanel(const Rectangle& rect)
  : rect(rect) {}
 
@@ -39,7 +31,7 @@ void Meatball::DynamicPanel::update() {
 
     if (!(conditionFlags & 1) && !(conditionFlags & 2)) {
     
-    if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y+2, rect.width-4, config->grabHeight})) {
+    if (CheckCollisionPointRec(mousePos, {rect.x+2, rect.y+2, rect.width-4, grabHeight})) {
         setCursor(MOUSE_CURSOR_POINTING_HAND, MouseCursorPriorityLevel::DYNAMIC_PANEL);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             offset = {GetMouseX()-rect.x, GetMouseY()-rect.y};
@@ -159,11 +151,11 @@ void Meatball::DynamicPanel::update() {
             if (conditionFlags & 8) {
                 rect.x = mousePos.x-offset.x;
                 
-                if (rect.width-rect.x+oldX > config->minSize.x)
+                if (rect.width-rect.x+oldX > minSize.x)
                     rect.width -= rect.x-oldX;
                 else {
-                    rect.x = oldX+rect.width-config->minSize.x;
-                    rect.width = config->minSize.x;
+                    rect.x = oldX+rect.width-minSize.x;
+                    rect.width = minSize.x;
                 }
             
             } else rect.width = mousePos.x-offset.x;
@@ -173,18 +165,18 @@ void Meatball::DynamicPanel::update() {
             if (conditionFlags & 4) {
                 rect.y = mousePos.y-offset.y;
 
-                if (rect.height-rect.y+oldY > config->minSize.y)
+                if (rect.height-rect.y+oldY > minSize.y)
                     rect.height -= rect.y-oldY;
                 else {
-                    rect.y = oldY+rect.height-config->minSize.y;
-                    rect.height = config->minSize.y;
+                    rect.y = oldY+rect.height-minSize.y;
+                    rect.height = minSize.y;
                 }
             
             } else rect.height = mousePos.y-offset.y;
         }
 
-        if (rect.width < config->minSize.x) rect.width = config->minSize.x;
-        if (rect.height < config->minSize.y) rect.height = config->minSize.y;
+        if (rect.width < minSize.x) rect.width = minSize.x;
+        if (rect.height < minSize.y) rect.height = minSize.y;
 
         fitXYInRenderScreen(rect.x, rect.y, minPos, maxPos);
 

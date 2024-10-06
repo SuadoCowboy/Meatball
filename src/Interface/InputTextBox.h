@@ -8,30 +8,13 @@
 #include "../Shared.h"
 
 namespace Meatball {
-    namespace Config {
-        struct InputTextBox {
-            Font* font = nullptr;
-
-            Color color = {40,40,40,255},
-                textColor = WHITE,
-                cursorColor = WHITE,
-                selectionColor = {100,100,100,55};
-        };
-    }
-
-    namespace Defaults {
-        extern Config::InputTextBox inputTextBoxConfig;
-    }
-
     class InputTextBox {
     public:
         InputTextBox();
-        InputTextBox(const Rectangle& rect);
+        InputTextBox(const Rectangle& rect, unsigned short fontSize);
 
-        void draw();
-        void update();
-
-        Config::InputTextBox *config = &Defaults::inputTextBoxConfig;
+        void draw(const Font& font, const Color& textColor, const Color& cursorColor, const Color& selectionColor) const;
+        void update(const Font& font);
         
         // onSend by default runs when KEY_ENTER/KEY_KP_ENTER is pressed
         std::function<void(const std::string&)> onSend, onTextChange;
@@ -48,7 +31,7 @@ namespace Meatball {
         // textMaxSize range is the unsigned short range from 0 to max unsigned short MINUS ONE;
         unsigned short textMaxSize = 1000;
 
-        unsigned short fontSize = 0;
+        unsigned short fontSize = 10;
     private:
         std::string text = "";
 

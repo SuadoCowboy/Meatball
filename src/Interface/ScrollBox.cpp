@@ -3,20 +3,14 @@
 #include "Utils/Utils.h"
 #include "Utils/DrawFuncs.h"
 
-Meatball::Config::ScrollBox Meatball::Defaults::scrollBoxConfig;
-
 Meatball::ScrollBox::ScrollBox() {
     setSize(0,0);
     setPosition(0,0);
-
-    fontSize = config->font->baseSize;
 }
 
-Meatball::ScrollBox::ScrollBox(const Rectangle& rect) {
+Meatball::ScrollBox::ScrollBox(const Rectangle& rect, unsigned short fontSize) : fontSize(fontSize) {
     setSize(rect.width, rect.height);
     setPosition(rect.x, rect.y);
-
-    fontSize = config->font->baseSize;
 }
 
 static float _getContentHeight(const std::deque<Meatball::ColoredText> &text, unsigned short fontSize) {
@@ -32,14 +26,14 @@ static float _getContentHeight(const std::deque<Meatball::ColoredText> &text, un
     return lineIdx*fontSize; // contentHeight
 }
 
-static inline void handleTextWrapping(std::deque<Meatball::ColoredText> &textList, unsigned short fontSize, const std::string &text, const Color& color, Font* font, float maxWidth) {
+static inline void handleTextWrapping(std::deque<Meatball::ColoredText>& textList, unsigned short fontSize, const std::string& text, const Color& color, const Font& font, float maxWidth) {
     textList.emplace_back("", color);
     std::string newText = text;
 
-    while (Meatball::measureTextWidth(*font, fontSize, newText.c_str()) >= maxWidth) {
+    while (Meatball::measureTextWidth(font, fontSize, newText.c_str()) >= maxWidth) {
         size_t columnIdx = 1; 
         
-        while (Meatball::measureTextWidth(*font, fontSize, newText.substr(0, columnIdx).c_str()) < maxWidth)
+        while (Meatball::measureTextWidth(font, fontSize, newText.substr(0, columnIdx).c_str()) < maxWidth)
             ++columnIdx;
         
         --columnIdx;
@@ -51,7 +45,7 @@ static inline void handleTextWrapping(std::deque<Meatball::ColoredText> &textLis
     textList.back().text += newText;
 }
 
-void Meatball::ScrollBox::updateTextWrap() {
+void Meatball::ScrollBox::updateTextWrap(const Font& font) {
     for (auto &currentText : text) {
         std::string newText = "";
 
@@ -72,10 +66,10 @@ void Meatball::ScrollBox::updateTextWrap() {
         }
 
         newText.clear();
-        while (Meatball::measureTextWidth(*config->font, fontSize, currentText.text.c_str()) >= rect.width-scrollBar.getRect().width) {
+        while (Meatball::measureTextWidth(font, fontSize, currentText.text.c_str()) >= rect.width-scrollBar.getRect().width) {
             size_t columnIdx = 1;
 
-            while (Meatball::measureTextWidth(*config->font, fontSize, currentText.text.substr(0, columnIdx).c_str()) < rect.width-scrollBar.getRect().width)
+            while (Meatball::measureTextWidth(font, fontSize, currentText.text.substr(0, columnIdx).c_str()) < rect.width-scrollBar.getRect().width)
                 ++columnIdx;
             
             --columnIdx;
@@ -95,17 +89,13 @@ void Meatball::ScrollBox::updateTextWrap() {
     scrollBar.visible = contentHeight > rect.height;
 }
 
-void Meatball::ScrollBox::appendText(const std::string& newText, const Color& color) {
+void Meatball::ScrollBox::appendText(const std::string& newText, const Font& font, const Color& color) {
     if (newText.size() == 0) return;
     
-    const Font& font = *config->font;
-    float height = fontSize;
-    const char* _text = newText.c_str();
-    float width = Meatball::measureTextWidth(font, height, _text);
-    if (width < rect.width-scrollBar.getRect().width) {
+    if (Meatball::measureTextWidth(font, fontSize, newText.c_str()) < rect.width-scrollBar.getRect().width)
         text.emplace_back(newText, color);
-    } else
-        handleTextWrapping(text, fontSize, newText, color, config->font, rect.width-scrollBar.getRect().width);
+    else
+        handleTextWrapping(text, fontSize, newText, color, font, rect.width-scrollBar.getRect().width);
 
 
     contentHeight = _getContentHeight(text, fontSize);
@@ -137,12 +127,8 @@ unsigned int Meatball::ScrollBox::getContentHeight() const {
     return contentHeight;
 }
 
-const Rectangle &Meatball::ScrollBox::getRect() const {
+const Rectangle& Meatball::ScrollBox::getRect() const {
     return rect;
-}
-
-Meatball::ScrollBar &Meatball::ScrollBox::getScrollBar() {
-    return scrollBar;
 }
 
 void Meatball::ScrollBox::setPosition(float x, float y) {
@@ -159,8 +145,8 @@ void Meatball::ScrollBox::setSize(float width, float height) {
     scrollBar.setSize(width*0.02, height);
 }
 
-void Meatball::ScrollBox::draw() {
-    DrawRectangle(rect.x, rect.y, rect.width, rect.height, config->color);
+void Meatball::ScrollBox::draw(const Color& color, const Font& font) const {
+    DrawRectangle(rect.x, rect.y, rect.width, rect.height, color);
 
     BeginScissorMode(rect.x, rect.y, rect.width-scrollBar.getRect().width, rect.height);
 
@@ -178,17 +164,13 @@ void Meatball::ScrollBox::draw() {
         if (lineY > rect.height) break;
 
         if (lineY+fontSize*newLineAmount > 0)
-            drawText(*config->font, fontSize, line.text.c_str(), rect.x,
+            drawText(font, fontSize, line.text.c_str(), rect.x,
             rect.y+lineY+1/*+1 because letters get stuck 1 pixel in the top*/, line.color);
         
         lineIdx += newLineAmount;
     }
     
     EndScissorMode();
-}
-
-void Meatball::ScrollBox::drawScrollbar() {
-    scrollBar.draw();
 }
 
 void Meatball::ScrollBox::update() {
