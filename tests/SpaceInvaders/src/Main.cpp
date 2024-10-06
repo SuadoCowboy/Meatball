@@ -7,6 +7,7 @@
 
 #include <Utils/Json.h>
 #include <Console.h>
+#include <EventHandler.h>
 
 #include "Game.h"
 
@@ -23,7 +24,7 @@ void loadSettingsAndInit() {
 
     bool shouldRecreateFile = settingsData.object.size() == 0;
     
-    int windowWidth=1, windowHeight=1;
+    int windowWidth=DEFAULT_WINDOW_WIDTH, windowHeight=DEFAULT_WINDOW_HEIGHT;
 
     if (!shouldRecreateFile) {
         Meatball::Json windowData{settingsData, "window"};
@@ -67,6 +68,9 @@ int main(int, char**) {
 
     while (!shouldQuit) {
         float dt = GetFrameTime();
+        
+        Meatball::EventHandler::handle();
+
         update(dt);
         render();
     }

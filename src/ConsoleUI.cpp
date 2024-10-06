@@ -4,6 +4,7 @@
 #include "Utils/DrawFuncs.h"
 #include "Utils/Utils.h"
 #include "MouseCursor.h"
+#include "EventHandler.h"
 
 static void handleInputHistoryPos(Meatball::InputTextBox& inputBox, std::string* inputHistory, unsigned char inputHistorySize, unsigned char inputHistoryPos) {
     if ((IsKeyPressed(KEY_UP) || IsKeyPressedRepeat(KEY_UP)) && inputHistoryPos != 0)
@@ -115,6 +116,22 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, bool visible)
 		resetCursor(MouseCursorPriorityLevel::BUTTON);
 		// TODO: fading effect (maybe add a task system? Meatball::Task() or Meatball::newTask() or something)
 	};
+
+	EventHandler::onKeyboardPressFunctions.push_back([this](int key) {
+		this->onKeyPress(key);
+	});
+	
+	EventHandler::onKeyboardReleaseFunctions.push_back([this](int key) {
+		this->onKeyRelease(key);
+	});
+
+	EventHandler::onMousePressFunctions.push_back([this](int button) {
+		this->onMousePress(button);
+	});
+
+	EventHandler::onMouseReleaseFunctions.push_back([this](int button) {
+		this->onMouseRelease(button);
+	});
 
 	/*
 	TODOS:
@@ -248,6 +265,30 @@ void Meatball::ConsoleUI::draw() const {
 	drawText(labelFont, labelFont.baseSize, labelText.c_str(), mainPanel.rect.x+margin, mainPanel.rect.y+margin, labelTextColor);
 
 	drawX(closeButton.rect, closeButton.hovered? closeButtonTheme.color : closeButtonTheme.hoveredColor);
+}
+
+void Meatball::ConsoleUI::onKeyPress(int key) {
+	if (!visible) return;
+
+	Console::printf(SweatCI::ECHO, "key pressed: {}", key);
+}
+
+void Meatball::ConsoleUI::onKeyRelease(int key) {
+	if (!visible) return;
+
+	Console::printf(SweatCI::ECHO, "key released: {}", key);
+}
+
+void Meatball::ConsoleUI::onMousePress(int button) {
+	if (!visible) return;
+
+	Console::printf(SweatCI::ECHO, "button pressed: {}", button);
+}
+
+void Meatball::ConsoleUI::onMouseRelease(int button) {
+	if (!visible) return;
+
+	Console::printf(SweatCI::ECHO, "button released: {}", button);
 }
 
 void Meatball::ConsoleUI::onResize(float ratioWidth, float ratioHeight) {
