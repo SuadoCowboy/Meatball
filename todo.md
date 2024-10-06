@@ -1,4 +1,6 @@
 # TODOS
+- Add mouse movement event and keep 'eventing' console update function
+
 - Why I created Console class if it's just SweatCI?
 
 - Swap IsKeyPressed and IsKeyReleased around the project to use Meatball::EventHandler
