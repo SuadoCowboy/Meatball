@@ -49,11 +49,6 @@ namespace Meatball {
         
         void update();
 
-        void onKeyPress(int key);
-        void onKeyRelease(int key);
-        void onMousePress(int button);
-        void onMouseRelease(int button);
-
         /// @brief should be used when window is resized or render screen or even font size
         /// @param ratioWidth renderWidthNow/renderWidthBefore
         /// @param ratioHeight renderHeightNow/renderHeightBefore

@@ -2,7 +2,8 @@
 
 #include <raylib.h>
 
-std::vector<int> Meatball::EventHandler::keyboardKeysPressed;
+std::vector<int> keyboardKeysPressed;
+Vector2 mouseWheelMoveBefore = {0.0f,0.0f};
 //std::vector<int> Meatball::EventHandler::gamepadButtonsPressed;
 
 std::vector<Meatball::EventHandler::EventFunc> Meatball::EventHandler::onKeyboardPressFunctions;
@@ -10,6 +11,8 @@ std::vector<Meatball::EventHandler::EventFunc> Meatball::EventHandler::onKeyboar
 
 std::vector<Meatball::EventHandler::EventFunc> Meatball::EventHandler::onMousePressFunctions;
 std::vector<Meatball::EventHandler::EventFunc> Meatball::EventHandler::onMouseReleaseFunctions;
+
+std::vector<std::function<void(float x, float y)>> Meatball::EventHandler::onMouseWheelFunctions;
 
 //std::vector<Meatball::EventHandler::EventFunc> Meatball::EventHandler::onGamepadPressFunctions;
 //std::vector<Meatball::EventHandler::EventFunc> Meatball::EventHandler::onGamepadReleaseFunctions;
@@ -49,6 +52,14 @@ void Meatball::EventHandler::handle() {
         if (IsMouseButtonReleased(button))
             for (auto& func : onMouseReleaseFunctions)
                 func(button);
+    }
+
+    Vector2 mouseWheelMove = GetMouseWheelMoveV();
+    if (mouseWheelMove.x != mouseWheelMoveBefore.x || mouseWheelMove.y != mouseWheelMoveBefore.y) {
+        for (auto& func : onMouseWheelFunctions)
+            func(mouseWheelMove.x, mouseWheelMove.y);
+        
+        mouseWheelMoveBefore = mouseWheelMove;
     }
 
     // GetGamepadButtonPressed does not ask for a gamepad id, while IsGamepadButtonReleased asks. This is strange...

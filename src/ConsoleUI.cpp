@@ -118,19 +118,33 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, bool visible)
 	};
 
 	EventHandler::onKeyboardPressFunctions.push_back([this](int key) {
-		this->onKeyPress(key);
+		if (!this->visible) return;
+
+		Console::printf(SweatCI::ECHO, "key pressed: {}", key);
 	});
 	
 	EventHandler::onKeyboardReleaseFunctions.push_back([this](int key) {
-		this->onKeyRelease(key);
+		if (!this->visible) return;
+
+		Console::printf(SweatCI::ECHO, "key released: {}", key);
 	});
 
 	EventHandler::onMousePressFunctions.push_back([this](int button) {
-		this->onMousePress(button);
+		if (!this->visible) return;
+
+		Console::printf(SweatCI::ECHO, "mouse pressed: {}", button);
 	});
 
 	EventHandler::onMouseReleaseFunctions.push_back([this](int button) {
-		this->onMouseRelease(button);
+		if (!this->visible) return;
+
+		Console::printf(SweatCI::ECHO, "mouse released: {}", button);
+	});
+
+	EventHandler::onMouseWheelFunctions.push_back([this](float x, float y) {
+		if (!this->visible) return;
+
+		Console::printf(SweatCI::ECHO, "scroll: {}, {}", x, y);
 	});
 
 	/*
@@ -265,30 +279,6 @@ void Meatball::ConsoleUI::draw() const {
 	drawText(labelFont, labelFont.baseSize, labelText.c_str(), mainPanel.rect.x+margin, mainPanel.rect.y+margin, labelTextColor);
 
 	drawX(closeButton.rect, closeButton.hovered? closeButtonTheme.color : closeButtonTheme.hoveredColor);
-}
-
-void Meatball::ConsoleUI::onKeyPress(int key) {
-	if (!visible) return;
-
-	Console::printf(SweatCI::ECHO, "key pressed: {}", key);
-}
-
-void Meatball::ConsoleUI::onKeyRelease(int key) {
-	if (!visible) return;
-
-	Console::printf(SweatCI::ECHO, "key released: {}", key);
-}
-
-void Meatball::ConsoleUI::onMousePress(int button) {
-	if (!visible) return;
-
-	Console::printf(SweatCI::ECHO, "button pressed: {}", button);
-}
-
-void Meatball::ConsoleUI::onMouseRelease(int button) {
-	if (!visible) return;
-
-	Console::printf(SweatCI::ECHO, "button released: {}", button);
 }
 
 void Meatball::ConsoleUI::onResize(float ratioWidth, float ratioHeight) {
