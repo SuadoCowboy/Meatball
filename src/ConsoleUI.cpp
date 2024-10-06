@@ -6,11 +6,11 @@
 #include "MouseCursor.h"
 #include "EventHandler.h"
 
-static void handleInputHistoryPos(Meatball::InputTextBox& inputBox, std::string* inputHistory, unsigned char inputHistorySize, unsigned char inputHistoryPos) {
-    if ((IsKeyPressed(KEY_UP) || IsKeyPressedRepeat(KEY_UP)) && inputHistoryPos != 0)
+static void handleInputHistoryPos(int key, Meatball::InputTextBox& inputBox, std::string* inputHistory, unsigned char inputHistorySize, unsigned char inputHistoryPos) {
+    if (key == KEY_UP && inputHistoryPos != 0)
         --inputHistoryPos;
     
-    else if ((IsKeyPressed(KEY_DOWN) || IsKeyPressedRepeat(KEY_DOWN)) && inputHistoryPos != inputHistorySize-1)
+    else if (key == KEY_DOWN && inputHistoryPos != inputHistorySize-1)
         ++inputHistoryPos;
     
     else return;
@@ -120,31 +120,70 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, bool visible)
 	EventHandler::onKeyboardPressFunctions.push_back([this](int key) {
 		if (!this->visible) return;
 
-		Console::printf(SweatCI::ECHO, "key pressed: {}", key);
+		if (inputBox.focused) {
+			if (key == KEY_TAB && this->autoCompleteText.size() != 0) {
+				// -1
+				bool isLeftShiftDown = IsKeyDown(KEY_LEFT_SHIFT);
+				if (isLeftShiftDown && autoCompleteSelectedIdxBegin != 0) {
+					inputBox.onTextChange(inputBoxOriginalText);
+
+					autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
+					
+					size_t idx = autoCompleteSelectedIdxEnd;
+					autoCompleteText[idx].color = autoCompleteSelectedTextColor;
+					std::string newText = autoCompleteText[idx].text;
+					
+					--idx;
+					while (autoCompleteText[idx].text.back() != ' ') {
+						autoCompleteText[idx].color = autoCompleteSelectedTextColor;
+						newText = autoCompleteText[idx].text+newText;
+						if (idx == 0) break;
+						--idx;
+					}
+					
+					newText.pop_back();
+					if (inputBox.setText(newText)) {
+						inputBox.cursorPos = newText.size();
+						autoCompleteSelectedIdxBegin = idx == 0? 0 : idx+1;
+					}
+				}
+				
+				// +1
+				if (!isLeftShiftDown && autoCompleteSelectedIdxEnd != autoCompleteText.size()-1) {
+					inputBox.onTextChange(inputBoxOriginalText);
+					
+					autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd+1;
+					if (autoCompleteSelectedIdxEnd == 0) autoCompleteSelectedIdxBegin = 0;
+					
+					size_t idx = autoCompleteSelectedIdxBegin;
+					autoCompleteText[idx].color = autoCompleteSelectedTextColor;
+					std::string newText = autoCompleteText[idx].text;
+					
+					while (autoCompleteText[idx].text.back() != ' ') {
+						++idx;
+						autoCompleteText[idx].color = autoCompleteSelectedTextColor;
+						newText += autoCompleteText[idx].text;
+					}
+					
+					newText.pop_back();
+					if (inputBox.setText(newText)) {
+						inputBox.cursorPos = newText.size();
+						autoCompleteSelectedIdxEnd = idx;
+					}
+				}
+			}
+
+			else if (inputHistorySize != 0)
+				handleInputHistoryPos(key, this->inputBox, this->inputHistory, this->inputHistorySize, this->inputHistoryPos);
+		}
 	});
-	
-	EventHandler::onKeyboardReleaseFunctions.push_back([this](int key) {
-		if (!this->visible) return;
 
-		Console::printf(SweatCI::ECHO, "key released: {}", key);
+	EventHandler::onMousePressFunctions.push_back([this](int) {
+		if (!this->visible) return;
 	});
 
-	EventHandler::onMousePressFunctions.push_back([this](int button) {
+	EventHandler::onMouseWheelFunctions.push_back([this](float, float) {
 		if (!this->visible) return;
-
-		Console::printf(SweatCI::ECHO, "mouse pressed: {}", button);
-	});
-
-	EventHandler::onMouseReleaseFunctions.push_back([this](int button) {
-		if (!this->visible) return;
-
-		Console::printf(SweatCI::ECHO, "mouse released: {}", button);
-	});
-
-	EventHandler::onMouseWheelFunctions.push_back([this](float x, float y) {
-		if (!this->visible) return;
-
-		Console::printf(SweatCI::ECHO, "scroll: {}, {}", x, y);
 	});
 
 	/*
@@ -160,63 +199,6 @@ void Meatball::ConsoleUI::update() {
 	if (!visible) return;
 
 	inputBox.update(inputFont);
-	
-	if (inputBox.focused) {
-		if ((IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB)) && autoCompleteText.size() != 0) {
-			// -1
-			bool isLeftShiftDown = IsKeyDown(KEY_LEFT_SHIFT);
-			if (isLeftShiftDown && autoCompleteSelectedIdxBegin != 0) {
-				inputBox.onTextChange(inputBoxOriginalText);
-
-				autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
-				
-				size_t idx = autoCompleteSelectedIdxEnd;
-				autoCompleteText[idx].color = autoCompleteSelectedTextColor;
-				std::string newText = autoCompleteText[idx].text;
-				
-				--idx;
-				while (autoCompleteText[idx].text.back() != ' ') {
-					autoCompleteText[idx].color = autoCompleteSelectedTextColor;
-					newText = autoCompleteText[idx].text+newText;
-					if (idx == 0) break;
-					--idx;
-				}
-				
-				newText.pop_back();
-				if (inputBox.setText(newText)) {
-					inputBox.cursorPos = newText.size();
-					autoCompleteSelectedIdxBegin = idx == 0? 0 : idx+1;
-				}
-			}
-			
-			// +1
-			if (!isLeftShiftDown && autoCompleteSelectedIdxEnd != autoCompleteText.size()-1) {
-				inputBox.onTextChange(inputBoxOriginalText);
-				
-				autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd+1;
-				if (autoCompleteSelectedIdxEnd == 0) autoCompleteSelectedIdxBegin = 0;
-				
-				size_t idx = autoCompleteSelectedIdxBegin;
-				autoCompleteText[idx].color = autoCompleteSelectedTextColor;
-				std::string newText = autoCompleteText[idx].text;
-				
-				while (autoCompleteText[idx].text.back() != ' ') {
-					++idx;
-					autoCompleteText[idx].color = autoCompleteSelectedTextColor;
-					newText += autoCompleteText[idx].text;
-				}
-				
-				newText.pop_back();
-				if (inputBox.setText(newText)) {
-					inputBox.cursorPos = newText.size();
-					autoCompleteSelectedIdxEnd = idx;
-				}
-			}
-		}
-
-		else if (inputHistorySize != 0)
-			handleInputHistoryPos(inputBox, inputHistory, inputHistorySize, inputHistoryPos);
-	}
 
 	outputBox.update();
 	closeButton.update();
