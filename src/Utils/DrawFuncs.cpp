@@ -10,13 +10,13 @@ void Meatball::drawX(const Rectangle& rect, const Color& color) {
      .
       .
     */
-    DrawLine(rect.x,rect.y, rect.x+rect.width,rect.y+rect.height, color);
+    DrawLine(rect.x,rect.y, rect.x+rect.width-1,rect.y+rect.height-1, color);
     /*
       .
      .
     .
     */
-    DrawLine(rect.x,rect.y+rect.height, rect.x+rect.width,rect.y, color);
+    DrawLine(rect.x,rect.y+rect.height-1, rect.x+rect.width-1,rect.y, color);
 }
 
 void Meatball::drawText(const Font& font, float height, const char* text, float x, float y, const Color& color) {

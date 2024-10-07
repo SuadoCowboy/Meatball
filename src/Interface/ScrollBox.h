@@ -32,7 +32,6 @@ namespace Meatball {
         const std::deque<ColoredText>& getText() const;
 
         void draw(const Color& color, const Font& font) const;
-        void update();
 
         void setPosition(float x, float y);
         void setSize(float width, float height);

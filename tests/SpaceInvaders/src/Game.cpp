@@ -65,8 +65,11 @@ static void reloadFontsCommand(void*, SweatCI::Command&, const std::vector<std::
 
 static void toggleLocalConsoleCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
     pConsoleUI->visible = not pConsoleUI->visible;
-    if (!pConsoleUI->visible)
+    if (!pConsoleUI->visible) {
         resetCursor(currentMouseCursorPriorityLevel);
+        Input::setUiAllowedCommandsOnly(false);
+    } else
+        Input::setUiAllowedCommandsOnly(true);
 }
 
 #pragma endregion
@@ -90,8 +93,6 @@ void init(int windowWidth, int windowHeight) {
         consoleInputFont,
         consoleOutputFont,
         consoleLabelFont));
-
-    pConsoleUI->visible = false;
 
     entityData[PLAYER] = {10, 90, {255, 255, 0, 255}, LoadTexture("data/image/player.png")};
     entityData[ENEMY_WEAK] = {10, 30, {0, 0, 255, 255}, LoadTexture("data/image/enemy0.png")};
@@ -221,10 +222,8 @@ void resize() {
 }
 
 void update(float dt) {
-    pConsoleUI->update();
-    Input::update(pConsoleUI->visible);
-
     if (WindowShouldClose()) shouldQuit = true;
+    
     if (IsWindowResized())
         resize();
 

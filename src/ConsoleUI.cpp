@@ -22,45 +22,47 @@ static void handleInputHistoryPos(int key, Meatball::InputTextBox& inputBox, std
 }
 
 Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, bool visible)
- : IScene(), visible(visible), mainPanel(rect) {
-	mainPanel.onMove = [&]() {
-		closeButton.rect.x = mainPanel.rect.x+mainPanel.rect.width-margin-margin*0.5;
-		closeButton.rect.y = mainPanel.rect.y+margin*0.5;
+ : visible(visible), mainPanel(rect) {
+	mainPanel.onMove = [this]() {
+		this->closeButton.rect.x = this->mainPanel.rect.x+this->mainPanel.rect.width-this->closeButton.rect.width;
+		this->closeButton.rect.y = this->mainPanel.rect.y+this->closeButton.rect.height;
 
-		outputBox.setPosition(mainPanel.rect.x+margin, mainPanel.rect.y+labelFont.baseSize+margin);
+		this->outputBox.setPosition(
+			this->mainPanel.rect.x+this->margin,
+			this->mainPanel.rect.y+this->labelFont.baseSize+this->margin);
 
-		inputBox.rect.x = mainPanel.rect.x+margin;
-		inputBox.rect.y = mainPanel.rect.y+mainPanel.rect.height-margin-inputBox.rect.height;
+		this->inputBox.rect.x = this->mainPanel.rect.x+this->margin;
+		this->inputBox.rect.y = this->mainPanel.rect.y+this->mainPanel.rect.height-this->margin-this->inputBox.rect.height;
 	};
 
 	inputBox.rect.height = mainPanel.rect.height*0.04;
 
-	mainPanel.onResize = [&]() {
-			closeButton.rect.width = margin; // it's inside the margin
-			closeButton.rect.height = margin;
+	mainPanel.onResize = [this]() {
+			this->closeButton.rect.width = this->margin; // it's inside the margin
+			this->closeButton.rect.height = this->margin;
 
-			inputBox.rect.width = mainPanel.rect.width-margin*2;
-			outputBox.fontSize = inputBox.fontSize = (int)inputBox.rect.height - 2 + (int)inputBox.rect.height % 2;
+			this->inputBox.rect.width = this->mainPanel.rect.width-margin*2;
+			this->outputBox.fontSize = this->inputBox.fontSize = (int)this->inputBox.rect.height - 2 + (int)this->inputBox.rect.height % 2;
 
-			outputBox.setSize(inputBox.rect.width, mainPanel.rect.height-labelFont.baseSize-1-margin*2-inputBox.rect.height);
+			this->outputBox.setSize(this->inputBox.rect.width, this->mainPanel.rect.height-this->labelFont.baseSize-1-this->margin*2-this->inputBox.rect.height);
 
-			mainPanel.onMove();
+			this->mainPanel.onMove();
 	};
 
-	mainPanel.onResizeStop = [&]() {
-		outputBox.updateTextWrap(outputFont);
+	mainPanel.onResizeStop = [this]() {
+		this->outputBox.updateTextWrap(this->outputFont);
 	};
 
 	onResize(1, 1);
 
 	// add auto completion
-	inputBox.onTextChange = [&](const std::string& text) {
-		autoCompleteText.clear();
+	inputBox.onTextChange = [this](const std::string& text) {
+		this->autoCompleteText.clear();
 
-		if (inputBoxOriginalText != text) {
-			autoCompleteSelectedIdxBegin = 0;
-			autoCompleteSelectedIdxEnd = 0;
-			inputBoxOriginalText = text;
+		if (this->inputBoxOriginalText != text) {
+			this->autoCompleteSelectedIdxBegin = 0;
+			this->autoCompleteSelectedIdxEnd = 0;
+			this->inputBoxOriginalText = text;
 		}
 		
 		size_t textSize = text.size();
@@ -72,7 +74,7 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, bool visible)
 		std::string commandName = text.substr(0, spaceIdx);
 		SweatCI::Command command;
 		if (SweatCI::Command::getCommand(commandName, command, false)) {
-			autoCompleteText.emplace_back(command.name+" "+command.usage, autoCompleteTextColor);
+			this->autoCompleteText.emplace_back(command.name+" "+command.usage, this->autoCompleteTextColor);
 			return;
 		}
 
@@ -82,20 +84,20 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, bool visible)
 
 			std::string leftText = command.name.substr(0, idx);
 			if (leftText.size() != 0)
-				autoCompleteText.emplace_back(leftText, autoCompleteTextColor);
+				this->autoCompleteText.emplace_back(leftText, this->autoCompleteTextColor);
 			
-			autoCompleteText.emplace_back(command.name.substr(idx, textSize), autoCompleteHighlightedTextColor); // middleText
+			this->autoCompleteText.emplace_back(command.name.substr(idx, textSize), this->autoCompleteHighlightedTextColor); // middleText
 			
-			autoCompleteText.emplace_back(command.name.substr(idx+textSize)+" ", autoCompleteTextColor); // rightText
+			this->autoCompleteText.emplace_back(command.name.substr(idx+textSize)+" ", this->autoCompleteTextColor); // rightText
 		}
 	};
 
-	inputBox.onSend = [&](const std::string& text) {
-		autoCompleteText.clear();
-		autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd = 0;
-		print(SweatCI::OutputLevel::DEFAULT, text);
+	inputBox.onSend = [this](const std::string& text) {
+		this->autoCompleteText.clear();
+		this->autoCompleteSelectedIdxBegin = this->autoCompleteSelectedIdxEnd = 0;
+		this->print(SweatCI::OutputLevel::DEFAULT, text);
 		Console::run(text);
-		addToInputHistory(text);
+		this->addToInputHistory(text);
 	};
 
 	/*
@@ -111,80 +113,11 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, bool visible)
 	---------------------
 	*/
 
-	closeButton.onRelease = [&]() {
+	closeButton.onMouseRelease = [this]() {
 		this->visible = false;
 		resetCursor(MouseCursorPriorityLevel::BUTTON);
 		// TODO: fading effect (maybe add a task system? Meatball::Task() or Meatball::newTask() or something)
 	};
-
-	EventHandler::onKeyboardPressFunctions.push_back([this](int key) {
-		if (!this->visible) return;
-
-		if (inputBox.focused) {
-			if (key == KEY_TAB && this->autoCompleteText.size() != 0) {
-				// -1
-				bool isLeftShiftDown = IsKeyDown(KEY_LEFT_SHIFT);
-				if (isLeftShiftDown && autoCompleteSelectedIdxBegin != 0) {
-					inputBox.onTextChange(inputBoxOriginalText);
-
-					autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
-					
-					size_t idx = autoCompleteSelectedIdxEnd;
-					autoCompleteText[idx].color = autoCompleteSelectedTextColor;
-					std::string newText = autoCompleteText[idx].text;
-					
-					--idx;
-					while (autoCompleteText[idx].text.back() != ' ') {
-						autoCompleteText[idx].color = autoCompleteSelectedTextColor;
-						newText = autoCompleteText[idx].text+newText;
-						if (idx == 0) break;
-						--idx;
-					}
-					
-					newText.pop_back();
-					if (inputBox.setText(newText)) {
-						inputBox.cursorPos = newText.size();
-						autoCompleteSelectedIdxBegin = idx == 0? 0 : idx+1;
-					}
-				}
-				
-				// +1
-				if (!isLeftShiftDown && autoCompleteSelectedIdxEnd != autoCompleteText.size()-1) {
-					inputBox.onTextChange(inputBoxOriginalText);
-					
-					autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd+1;
-					if (autoCompleteSelectedIdxEnd == 0) autoCompleteSelectedIdxBegin = 0;
-					
-					size_t idx = autoCompleteSelectedIdxBegin;
-					autoCompleteText[idx].color = autoCompleteSelectedTextColor;
-					std::string newText = autoCompleteText[idx].text;
-					
-					while (autoCompleteText[idx].text.back() != ' ') {
-						++idx;
-						autoCompleteText[idx].color = autoCompleteSelectedTextColor;
-						newText += autoCompleteText[idx].text;
-					}
-					
-					newText.pop_back();
-					if (inputBox.setText(newText)) {
-						inputBox.cursorPos = newText.size();
-						autoCompleteSelectedIdxEnd = idx;
-					}
-				}
-			}
-
-			else if (inputHistorySize != 0)
-				handleInputHistoryPos(key, this->inputBox, this->inputHistory, this->inputHistorySize, this->inputHistoryPos);
-		}
-	});
-
-	EventHandler::onMousePressFunctions.push_back([this](int) {
-		if (!this->visible) return;
-	});
-
-	EventHandler::onMouseWheelFunctions.push_back([this](float, float) {
-		if (!this->visible) return;
-	});
 
 	/*
 	TODOS:
@@ -193,16 +126,6 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, bool visible)
 	F1 key as default to toggle the local console
 	buildVersion on the top right OF THE SCREEN, NOT ON THE PANEL
 	*/
-}
-
-void Meatball::ConsoleUI::update() {
-	if (!visible) return;
-
-	inputBox.update(inputFont);
-
-	outputBox.update();
-	closeButton.update();
-	mainPanel.update();
 }
 
 void Meatball::ConsoleUI::draw() const {
@@ -282,4 +205,104 @@ void Meatball::ConsoleUI::onResize(float ratioWidth, float ratioHeight) {
 	
 	mainPanel.onResize();
 	mainPanel.onResizeStop();
+}
+
+void Meatball::ConsoleUI::onCharPress(int codepoint) {
+	if (!visible) return;
+
+	inputBox.onCharPress(codepoint);
+}
+
+void Meatball::ConsoleUI::onKeyboardPress(int key) {
+	if (!visible) return;
+	
+	inputBox.onKeyboardPress(key, inputFont);
+
+	if (!inputBox.focused) return;
+	if (key != KEY_TAB || this->autoCompleteText.size() == 0) {
+		if (inputHistorySize != 0)
+			handleInputHistoryPos(key, inputBox, inputHistory, inputHistorySize, inputHistoryPos);
+		return;
+	}
+
+	// -1
+	bool isLeftShiftDown = IsKeyDown(KEY_LEFT_SHIFT);
+	if (isLeftShiftDown && autoCompleteSelectedIdxBegin != 0) {
+		inputBox.onTextChange(inputBoxOriginalText);
+
+		autoCompleteSelectedIdxEnd = autoCompleteSelectedIdxBegin-1;
+		
+		size_t idx = autoCompleteSelectedIdxEnd;
+		autoCompleteText[idx].color = autoCompleteSelectedTextColor;
+		std::string newText = autoCompleteText[idx].text;
+		
+		--idx;
+		while (autoCompleteText[idx].text.back() != ' ') {
+			autoCompleteText[idx].color = autoCompleteSelectedTextColor;
+			newText = autoCompleteText[idx].text+newText;
+			if (idx == 0) break;
+			--idx;
+		}
+		
+		newText.pop_back();
+		if (inputBox.setText(newText)) {
+			inputBox.cursorPos = newText.size();
+			autoCompleteSelectedIdxBegin = idx == 0? 0 : idx+1;
+		}
+	}
+	
+	// +1
+	if (!isLeftShiftDown && autoCompleteSelectedIdxEnd != autoCompleteText.size()-1) {
+		inputBox.onTextChange(inputBoxOriginalText);
+		
+		autoCompleteSelectedIdxBegin = autoCompleteSelectedIdxEnd+1;
+		if (autoCompleteSelectedIdxEnd == 0) autoCompleteSelectedIdxBegin = 0;
+		
+		size_t idx = autoCompleteSelectedIdxBegin;
+		autoCompleteText[idx].color = autoCompleteSelectedTextColor;
+		std::string newText = autoCompleteText[idx].text;
+		
+		while (autoCompleteText[idx].text.back() != ' ') {
+			++idx;
+			autoCompleteText[idx].color = autoCompleteSelectedTextColor;
+			newText += autoCompleteText[idx].text;
+		}
+		
+		newText.pop_back();
+		if (inputBox.setText(newText)) {
+			inputBox.cursorPos = newText.size();
+			autoCompleteSelectedIdxEnd = idx;
+		}
+	}
+}
+
+void Meatball::ConsoleUI::onMousePress(int button) {
+	if (!visible) return;
+
+	inputBox.onMousePress(button, inputFont);
+
+	mainPanel.onMousePress(button);
+}
+
+void Meatball::ConsoleUI::onMouseRelease(int button) {
+	if (!visible) return;
+
+	if (button == MOUSE_BUTTON_LEFT && closeButton.hovered)
+		closeButton.onMouseRelease();
+	
+	inputBox.onMouseRelease(button);
+	
+	mainPanel.onMouseRelease(button);
+}
+
+void Meatball::ConsoleUI::onMouseMove(const Vector2& mousePosition) {
+	if (!visible) return;
+
+	closeButton.onMouseMove(mousePosition);
+	
+	outputBox.scrollBar.onMouseMove(outputBox.getRect(), mousePosition);
+	
+	inputBox.onMouseMove(mousePosition);
+	
+	mainPanel.onMouseMove(mousePosition);
 }

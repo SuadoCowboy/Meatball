@@ -4,7 +4,6 @@
 
 #include <SweatCI.h>
 
-#include "IScene.h"
 #include "Interface/DynamicPanel.h"
 #include "Interface/Button.h"
 #include "Interface/ScrollBox.h"
@@ -23,7 +22,7 @@
 #endif
 
 namespace Meatball {
-    class ConsoleUI : public IScene {
+    class ConsoleUI {
     public:
         /// @brief makes a empty ConsoleUI
         ConsoleUI(const Rectangle& rect, bool visible = false);
@@ -46,13 +45,17 @@ namespace Meatball {
         }
 
         void draw() const;
-        
-        void update();
 
         /// @brief should be used when window is resized or render screen or even font size
         /// @param ratioWidth renderWidthNow/renderWidthBefore
         /// @param ratioHeight renderHeightNow/renderHeightBefore
         void onResize(float ratioWidth, float ratioHeight);
+
+        void onCharPress(int codepoint);
+        void onKeyboardPress(int key);
+        void onMousePress(int button);
+        void onMouseRelease(int button);
+        void onMouseMove(const Vector2& mousePosition);
 
         // Only console can appear in every scene so only it needs visible boolean.
         // The rest of the scenes will be handled by a class or something that says which one should be used.

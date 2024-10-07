@@ -8,8 +8,8 @@
 
 std::vector<std::string> Meatball::Input::allowedUiCommands;
 
-std::unordered_map<std::string, Meatball::InputData> Meatball::Input::keyState;
-std::unordered_map<std::string, Meatball::InputData> Meatball::Input::mouseState;
+std::unordered_map<unsigned short, Meatball::InputData> Meatball::Input::keysData;
+std::unordered_map<unsigned short, Meatball::InputData> Meatball::Input::mouseButtonsData;
 
 std::string Meatball::Input::mouseWheelUpCallback;
 std::string Meatball::Input::mouseWheelUpOffCallback;
@@ -17,37 +17,27 @@ std::string Meatball::Input::mouseWheelUpOffCallback;
 std::string Meatball::Input::mouseWheelDownCallback;
 std::string Meatball::Input::mouseWheelDownOffCallback;
 
-unsigned char Meatball::Input::mouseWheelRolled;
+unsigned char Meatball::Input::flags;
 
-void Meatball::Input::bind(std::string keyName, const std::string& callback) {
-	std::transform(keyName.begin(), keyName.end(), keyName.begin(),
+static void errorUnknownKey(const std::string& key) {
+	Meatball::Console::printf(SweatCI::ERROR, "Unknown key: {}", key);
+}
+
+static bool beginsWithMouse(const std::string& str) {
+	return str.size() >= 5 && str.substr(0, 5) == "mouse";
+}
+
+void Meatball::Input::bind(std::string key, const std::string& callback) {
+	std::transform(key.begin(), key.end(), key.begin(),
     [](unsigned char c){ return std::tolower(c); });
 
-	bool isMouseButton = mouseState.count(keyName) != 0;
-	bool isMouseWheelUp = keyName == "mwheelup";
-	bool isMouseWheelDown = keyName == "mwheeldown";
-
-	if (isMouseWheelUp)
-		mouseWheelUpCallback = callback;
-	else if (isMouseWheelDown)
-		mouseWheelDownCallback = callback;
-	else if (keyState.count(keyName) == 0 && !isMouseButton) {
-		Console::printf(SweatCI::ERROR, "unknown key \"{}\"", keyName);
-		return;
-	}
-	
-	if (!isMouseButton) keyState[keyName].callback = callback;
-	else mouseState[keyName].callback = callback;
-	
+	bool uiAllowed = true;
 	std::stringstream stream;
 	SweatCI::Lexer lexer{callback};
 	SweatCI::Token token = lexer.nextToken();
 	while (token.getType() != SweatCI::TokenType::_EOF) {
 		if (token.getType() == SweatCI::TokenType::COMMAND && std::find(allowedUiCommands.begin(), allowedUiCommands.end(), token.getValue()) == allowedUiCommands.end()) {
-			if (isMouseButton)
-				mouseState[keyName].uiAllowed = false;
-			else if (!isMouseWheelDown && !isMouseWheelUp)
-				keyState[keyName].uiAllowed = false;
+			uiAllowed = false;
 		}
 
 		if (token.getValue()[0] == '+') {
@@ -68,89 +58,124 @@ void Meatball::Input::bind(std::string keyName, const std::string& callback) {
 	std::string offCallback = stream.str();
 	offCallback = offCallback.substr(0, offCallback.size()-1);
 
-	if (offCallback.size() == 0) return;
+	for (auto& button : mouseButtonsData)
+		if (button.second.key == key) {
+			button.second.callback = callback;
+			button.second.offCallback = offCallback;
+			button.second.uiAllowed = uiAllowed;
+			return;
+		}
 
-	if (isMouseWheelUp) // mouse wheel up
+	if (key == "mwheelup") {
+		mouseWheelUpCallback = callback;
 		mouseWheelUpOffCallback = offCallback;
+		return;
 	
-	else if (isMouseWheelDown) // mouse wheel down
+	} else if (key == "mwheeldown") {
+		mouseWheelDownCallback = callback;
 		mouseWheelDownOffCallback = offCallback;
+		return;
 	
-	else if (isMouseButton) // mouse buttons
-		mouseState[keyName].offCallback = offCallback;
-	else // keyboard
-		keyState[keyName].offCallback = offCallback;
+	} else for (auto& keyData: keysData)
+		if (keyData.second.key == key) {
+			keyData.second.callback = callback;
+			keyData.second.offCallback = offCallback;
+			keyData.second.uiAllowed = uiAllowed;
+			return;
+		}
+	
+	errorUnknownKey(key);
 }
 
-void Meatball::Input::unbind(const std::string& keyName) {
-	if (keyState.count(keyName) != 0) {
-		keyState[keyName].callback = "";
-		keyState[keyName].offCallback = "";
-		keyState[keyName].uiAllowed = true;
-	
-	} else if (mouseState.count(keyName) != 0) {
-		mouseState[keyName].callback = "";
-		mouseState[keyName].offCallback = "";
-		keyState[keyName].uiAllowed = true;
-	
-	} else if (keyName == "mwheelup")
+void Meatball::Input::unbind(const std::string& key) {
+	if (key == "mwheelup") {
 		mouseWheelUpCallback = "";
-	
-	else if (keyName == "mwheeldown")
+		mouseWheelUpOffCallback = "";
+		return;
+	} else if (key == "mwheeldown") {
 		mouseWheelDownCallback = "";
+		mouseWheelDownOffCallback = "";
+		return;
+	}
+
+	if (beginsWithMouse(key)) {
+		for (auto& button : mouseButtonsData)
+			if (key == button.second.key) {
+				button.second.callback = "";
+				button.second.offCallback = "";
+				button.second.uiAllowed = true;
+				return;
+			}
+	} else for (auto& keyData : keysData)
+		if (keyData.second.key == key) {
+			keyData.second.callback = "";
+			keyData.second.offCallback = "";
+			keyData.second.uiAllowed = true;
+			return;
+		}
+	
+	errorUnknownKey(key);
 }
 
-void Meatball::Input::setKey(const std::string& name, unsigned short code) {
-	if (name.size() > 5 && name.substr(0, 5) == "mouse")
-		mouseState[name] = {code, "", "", true};
+void Meatball::Input::setKey(const std::string& key, unsigned short code) {
+	if (beginsWithMouse(key))
+		mouseButtonsData[code] = {key, "", "", true};
 	else
-		keyState[name] = {code, "", "", true};
+		keysData[code] = {key, "", "", true};
 }
 
-void Meatball::Input::removeKey(const std::string& name) {
-	keyState.erase(name);
+void Meatball::Input::removeKey(const std::string& key) {
+	for (auto& keyData : keysData)
+		if (keyData.second.key == key) {
+			keysData.erase(keyData.first);
+			return;
+		}
 }
 
-void Meatball::Input::update(bool uiAllowedCommandsOnly) {
-	for (auto& key : keyState) {
-		if (!key.second.uiAllowed && uiAllowedCommandsOnly) continue;
+void Meatball::Input::onMousePress(int buttonId) {
+	if (mouseButtonsData.count(buttonId) == 0 || (!mouseButtonsData[buttonId].uiAllowed && (flags & 4))) return;
 
-		if (IsKeyPressed(key.second.code))
-			Console::run(key.second.callback);
-		else if (IsKeyReleased(key.second.code))
-			Console::run(key.second.offCallback);
-	}
+	Console::run(keysData[buttonId].callback);
+}
 
-	for (auto& button : mouseState) {
-		if (!button.second.uiAllowed && uiAllowedCommandsOnly) continue;
+void Meatball::Input::onMouseRelease(int buttonId) {
+	if (mouseButtonsData.count(buttonId) == 0 || (!mouseButtonsData[buttonId].uiAllowed && (flags & 4))) return;
 
-		if (IsMouseButtonPressed(button.second.code))
-			Console::run(button.second.callback);
-		
-		else if (IsMouseButtonReleased(button.second.code)) 
-			Console::run(button.second.offCallback);
-	}
+	Console::run(keysData[buttonId].offCallback);
+}
 
-	if (uiAllowedCommandsOnly) return;
+void Meatball::Input::onKeyboardPress(int keyId) { 
+	if (keysData.count(keyId) == 0 || (!keysData[keyId].uiAllowed && (flags & 4))) return;
 
-	float wheel = GetMouseWheelMove();
-	if (wheel == 1.0f) {
+	Console::run(keysData[keyId].callback);
+}
+
+void Meatball::Input::onKeyboardRelease(int keyId) {
+	if (keysData.count(keyId) == 0 || (!keysData[keyId].uiAllowed && (flags & 4))) return;
+
+	Console::run(keysData[keyId].offCallback);
+}
+
+void Meatball::Input::onMouseWheel(const Vector2& dir) {
+	if (flags & 4) return; // if (uiAllowedCommandsOnly) return;
+
+	if (dir.y == 1.0f) {
 		Console::run(mouseWheelUpCallback);
-		mouseWheelRolled |= 1;
+		flags |= 1;
 	}
 	
-	else if (wheel == -1.0f) {
+	else if (dir.y == -1.0f) {
 		Console::run(mouseWheelDownCallback);
-		mouseWheelRolled |= 2;
+		flags |= 2;
 	}
 
 	else {
-		if (mouseWheelRolled & 1) {
+		if (flags & 1) {
 			Console::run(mouseWheelUpOffCallback);
-			mouseWheelRolled &= ~1;
-		} else if (mouseWheelRolled & 2) {
+			flags &= ~1;
+		} else if (flags & 2) {
 			Console::run(mouseWheelDownOffCallback);
-			mouseWheelRolled &= ~2;
+			flags &= ~2;
 		}
 	}
 }
@@ -163,19 +188,24 @@ void Meatball::Input::bindCommand(void*, SweatCI::Command&, const std::vector<st
 
 	// get
 	std::string callback;
-	if (keyState.count(args[0]) != 0)
-		callback = keyState[args[0]].callback;
+	if (beginsWithMouse(args[0])) {
+		for (auto& button : mouseButtonsData)
+			if (button.second.key == args[0]) {
+				callback = button.second.callback;
+				break;
+			}
 	
-	else if (mouseState.count(args[0]) != 0)
-		callback = keyState[args[0]].callback;
-	
-	else if (args[0] == "mwheelup")
+	} else if (args[0] == "mwheelup")
 		callback = mouseWheelUpCallback;
-	
 	else if (args[0] == "mwheeldown")
 		callback = mouseWheelDownCallback;
+	else for (auto& keyData : keysData)
+		if (keyData.second.key == args[0]) {
+			callback = keyData.second.callback;
+			break;
+		}
 	else {
-		Console::printf(SweatCI::ERROR, "unknown key {}\n", args[0]);
+		errorUnknownKey(args[0]);
 		return;
 	}
 
@@ -187,12 +217,12 @@ void Meatball::Input::unBindCommand(void*, SweatCI::Command&, const std::vector<
 }
 
 void Meatball::Input::unBindAllCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
-	for (auto& key : keyState) {
+	for (auto& key : keysData) {
 		key.second.callback = "";
 		key.second.offCallback = "";
 	}
 
-	for (auto& button : mouseState) {
+	for (auto& button : mouseButtonsData) {
 		button.second.callback = "";
 		button.second.offCallback = "";
 	}
@@ -296,4 +326,15 @@ void Meatball::Input::mapKeyboardKeys() {
 void Meatball::Input::mapMouseKeys() {
 	for (unsigned short i = MOUSE_BUTTON_LEFT; i < MOUSE_BUTTON_BACK; ++i)
 		setKey("mouse"+std::to_string(i+1), i);
+}
+
+void Meatball::Input::setUiAllowedCommandsOnly(bool value) {
+	if (value)
+		flags |= 4;
+	else
+		flags &= ~4;
+}
+
+bool Meatball::Input::isUiAllowedCommandsOnly() {
+	return flags & 4;
 }

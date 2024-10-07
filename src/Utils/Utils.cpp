@@ -4,35 +4,17 @@ float Meatball::textSpacing = 1.0f;
 
 Meatball::ColoredText::ColoredText(const std::string& text, const Color& color) : text(text), color(color) {}
 
-void Meatball::checkHovered(bool& hovered, const Rectangle& rect, VoidFunc* onHover, VoidFunc* onRelease) {
+bool Meatball::handleRectHover(bool hovered, const Vector2& mousePosition, const Rectangle& rect, const VoidFunc& onHover, const VoidFunc& onUnhover) {
     bool wasHovered = hovered;
-    hovered = CheckCollisionPointRec(GetMousePosition(), rect);
+    hovered = CheckCollisionPointRec(mousePosition, rect);
     
-    if (!wasHovered && hovered && onHover && *onHover)
-        (*onHover)();
+    if (!wasHovered && hovered && onHover)
+        (onHover)();
     
-    if (hovered && onRelease && *onRelease && IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
-        (*onRelease)();
-}
+    if (hovered && onUnhover)
+        (onUnhover)();
 
-Vector2 Meatball::getRectCenter(const Rectangle& rect) {
-    return {rect.x+rect.width*0.5f, rect.y+rect.height*0.5f};
-}
-
-float Meatball::getRectCenterX(const Rectangle& rect) {
-    return rect.x+rect.width*0.5;
-}
-
-float Meatball::getRectCenterY(const Rectangle& rect) {
-    return rect.y+rect.height*0.5;
-}
-
-void Meatball::fitXYInRenderScreen(float& x, float& y, const Vector2& minPos, const Vector2& maxPos) {
-    if (x < minPos.x) x = minPos.x;
-    else if (x > GetRenderWidth()-maxPos.x) x = GetRenderWidth()-maxPos.x;
-    
-    if (y < minPos.y) y = minPos.y;
-    else if (y > GetRenderHeight()-maxPos.y) y = GetRenderHeight()-maxPos.y;
+    return hovered;
 }
 
 bool Meatball::loadFont(const std::filesystem::path& path, int size, int* codepoints, int codepointCount, Font& outputFont) {

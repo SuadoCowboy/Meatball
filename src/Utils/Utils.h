@@ -18,15 +18,8 @@ namespace Meatball {
     };
 
     /// @brief since alot of classes might do hover check, this function exists to facilitate the process of implementing it
-    void checkHovered(bool& hovered, const Rectangle& rect, VoidFunc* onHover, VoidFunc* onRelease);
-    
-    Vector2 getRectCenter(const Rectangle& rect);
-    float getRectCenterX(const Rectangle& rect);
-    float getRectCenterY(const Rectangle& rect);
-
-    /// @brief modifies the rect position to fit in the render screen
-    /// @param maxPos the max pos is already counted with render position so you don't need to sum it yourself
-    void fitXYInRenderScreen(float& x, float& y, const Vector2& minPos, const Vector2& maxPos);
+    /// @return hovered
+    bool handleRectHover(bool hovered, const Vector2& mousePosition, const Rectangle& rect, const VoidFunc& onHover, const VoidFunc& onUnhover);
 
     /// @note it sets font texture filter to bilinear
     /// @return false if path does not exist or is directory

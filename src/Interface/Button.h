@@ -12,10 +12,10 @@ namespace Meatball {
     public:
         Button() {}
         Button(const Rectangle& rect);
+
+        void onMouseMove(const Vector2& mousePosition);
         
-        void update();
-        
-        VoidFunc onRelease, onHover;
+        VoidFunc onMouseRelease, onHover, onUnhover;
         Rectangle rect = {0.0f, 0.0f, 0.0f, 0.0f};
 
         bool hovered = false;

@@ -11,7 +11,9 @@ namespace Meatball {
         DynamicPanel() {}
         DynamicPanel(const Rectangle& rect);
 
-        void update();
+        void onMousePress(int button);
+        void onMouseRelease(int button);
+        void onMouseMove(const Vector2& mousePosition);
 
         /// @brief whether is dragging/resizing/hovered
         bool isAnyConditionActive();

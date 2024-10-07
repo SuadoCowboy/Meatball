@@ -14,12 +14,17 @@ namespace Meatball {
         InputTextBox(const Rectangle& rect, unsigned short fontSize);
 
         void draw(const Font& font, const Color& textColor, const Color& cursorColor, const Color& selectionColor) const;
-        void update(const Font& font);
+        
+        void onKeyboardPress(int key, const Font& font);
+        void onCharPress(int codePoint);
+        void onMousePress(int button, const Font& font);
+        void onMouseRelease(int button);
+        void onMouseMove(const Vector2& mousePosition);
         
         // onSend by default runs when KEY_ENTER/KEY_KP_ENTER is pressed
         std::function<void(const std::string&)> onSend, onTextChange;
         
-        bool focused = false;
+        bool focused = false, hovered = false;
         size_t cursorPos = 0;
 
         Rectangle rect = {0.0f,0.0f,0.0f,0.0f};

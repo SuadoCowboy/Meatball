@@ -1,23 +1,38 @@
 #include "EventHandler.h"
 
-#include <raylib.h>
+#include <vector>
 
 std::vector<int> keyboardKeysPressed;
-Vector2 mouseWheelMoveBefore = {0.0f,0.0f};
 //std::vector<int> Meatball::EventHandler::gamepadButtonsPressed;
 
-std::vector<Meatball::EventHandler::EventFunc> Meatball::EventHandler::onKeyboardPressFunctions;
-std::vector<Meatball::EventHandler::EventFunc> Meatball::EventHandler::onKeyboardReleaseFunctions;
+Meatball::EventHandler::EventFunc Meatball::EventHandler::onCharPress = [](int){};
 
-std::vector<Meatball::EventHandler::EventFunc> Meatball::EventHandler::onMousePressFunctions;
-std::vector<Meatball::EventHandler::EventFunc> Meatball::EventHandler::onMouseReleaseFunctions;
+Meatball::EventHandler::EventFunc Meatball::EventHandler::onKeyboardPress = Meatball::EventHandler::onCharPress;
+Meatball::EventHandler::EventFunc Meatball::EventHandler::onKeyboardRelease = Meatball::EventHandler::onCharPress;
 
-std::vector<std::function<void(float x, float y)>> Meatball::EventHandler::onMouseWheelFunctions;
+Meatball::EventHandler::EventFunc Meatball::EventHandler::onMousePress = Meatball::EventHandler::onCharPress;
+Meatball::EventHandler::EventFunc Meatball::EventHandler::onMouseRelease = Meatball::EventHandler::onCharPress;
 
-//std::vector<Meatball::EventHandler::EventFunc> Meatball::EventHandler::onGamepadPressFunctions;
-//std::vector<Meatball::EventHandler::EventFunc> Meatball::EventHandler::onGamepadReleaseFunctions;
+std::function<void(const Vector2&)> Meatball::EventHandler::onMouseWheel = [](const Vector2&){};
+
+std::function<void(const Vector2&, const Vector2&)> Meatball::EventHandler::onMouseMove = [](const Vector2&,const Vector2&){};
+
+//Meatball::EventHandler::EventFunc> Meatball::EventHandler::onGamepadPress;
+//Meatball::EventHandler::EventFunc> Meatball::EventHandler::onGamepadRelease;
+
+Vector2 mouseWheelDirectionBefore = {0.0f,0.0f};
 
 void Meatball::EventHandler::handle() {
+    { // ASCII char
+        int codepoint = GetCharPressed();
+
+        while (codepoint != 0) {
+            onCharPress(codepoint);
+
+            codepoint = GetCharPressed();
+        }
+    }
+
     { // Keyboard Press
         int key = GetKeyPressed();
         
@@ -25,8 +40,7 @@ void Meatball::EventHandler::handle() {
             // TODO: TEST IF THIS CAN GET A KEY PRESSED MORE THAN ONCE(do this by pressing on 2 keyboards and not releasing)
             keyboardKeysPressed.emplace_back(key);
 
-            for (auto& func : onKeyboardPressFunctions)
-                func(key);
+            onKeyboardPress(key);
             
             key = GetKeyPressed();
         }
@@ -35,9 +49,7 @@ void Meatball::EventHandler::handle() {
     // Keyboard Release
     for (auto it = keyboardKeysPressed.begin(); it != keyboardKeysPressed.end(); ++it) {
         if (IsKeyUp(*it)) {
-            for (auto& func : onKeyboardReleaseFunctions)
-                func(*it);
-            
+            onKeyboardRelease(*it);
             keyboardKeysPressed.erase(it);
             --it;
         }
@@ -46,20 +58,28 @@ void Meatball::EventHandler::handle() {
     // Mouse Press + Mouse Release
     for (int button = 0; button != 6; ++button) {
         if (IsMouseButtonPressed(button))
-            for (auto& func : onMousePressFunctions)
-                func(button);
+            onMousePress(button);
         
-        if (IsMouseButtonReleased(button))
-            for (auto& func : onMouseReleaseFunctions)
-                func(button);
+        else if (IsMouseButtonReleased(button))
+            onMouseRelease(button);
     }
 
-    Vector2 mouseWheelMove = GetMouseWheelMoveV();
-    if (mouseWheelMove.x != mouseWheelMoveBefore.x || mouseWheelMove.y != mouseWheelMoveBefore.y) {
-        for (auto& func : onMouseWheelFunctions)
-            func(mouseWheelMove.x, mouseWheelMove.y);
+    { // Mouse Wheel
+        Vector2 mouseWheelDirection = GetMouseWheelMoveV();
         
-        mouseWheelMoveBefore = mouseWheelMove;
+        if (mouseWheelDirection.x != mouseWheelDirectionBefore.x || mouseWheelDirection.y != mouseWheelDirectionBefore.y) {
+            onMouseWheel(mouseWheelDirection);
+            
+            mouseWheelDirectionBefore = mouseWheelDirection;
+        }
+    }
+
+    { // Mouse Move
+        Vector2 mouseDelta = GetMouseDelta();
+
+        if (mouseDelta.x != 0 || mouseDelta.y != 0) {
+            onMouseMove(mouseDelta, GetMousePosition());
+        }
     }
 
     // GetGamepadButtonPressed does not ask for a gamepad id, while IsGamepadButtonReleased asks. This is strange...
@@ -70,7 +90,7 @@ void Meatball::EventHandler::handle() {
             // TODO: TEST IF THIS CAN GET A BUTTON PRESSED MORE THAN ONCE(do this by pressing on 2 gamepads and not releasing)
             gamepadButtonsPressed.emplace_back(button);
 
-            for (auto& func : onGamepadPressFunctions)
+            for (auto& func : onGamepadPress)
                 func(button);
             
             button = GetGamepadButtonPressed();

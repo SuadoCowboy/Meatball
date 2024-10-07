@@ -85,7 +85,7 @@ void Meatball::ScrollBox::updateTextWrap(const Font& font) {
 
     contentHeight = _getContentHeight(text, fontSize);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
-    scrollBar.update(rect);
+    scrollBar.onMouseMove(rect, GetMousePosition());
     scrollBar.visible = contentHeight > rect.height;
 }
 
@@ -110,7 +110,7 @@ void Meatball::ScrollBox::clearText() {
     // to fix view
     contentHeight = _getContentHeight(text, fontSize);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
-    scrollBar.update(rect);
+    scrollBar.onMouseMove(rect, GetMousePosition());
 }
 
 void Meatball::ScrollBox::popFront() noexcept {
@@ -171,8 +171,4 @@ void Meatball::ScrollBox::draw(const Color& color, const Font& font) const {
     }
     
     EndScissorMode();
-}
-
-void Meatball::ScrollBox::update() {
-    if (scrollBar.visible) scrollBar.update(rect);
 }

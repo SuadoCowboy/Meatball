@@ -15,7 +15,7 @@
 #include "OutputColors.h"
 #include "Utils/Utils.h"
 
-static void defaultConsoleUiPrint(void *pData, const SweatCI::OutputLevel &level, const std::string &text) {
+static void defaultConsoleUiPrint(void* pData, const SweatCI::OutputLevel& level, const std::string& text) {
     size_t spaceIdxBefore = 0;
     size_t currentSpaceIdx = text.find('\n');
     

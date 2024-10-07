@@ -1,21 +1,26 @@
 #pragma once
 
-#include <vector>
 #include <functional>
+
+#include <raylib.h>
 
 namespace Meatball::EventHandler {
     typedef std::function<void(int key)> EventFunc;
 
-    extern std::vector<EventFunc> onKeyboardPressFunctions;
-    extern std::vector<EventFunc> onKeyboardReleaseFunctions;
+    extern EventFunc onCharPress;
 
-    extern std::vector<EventFunc> onMousePressFunctions;
-    extern std::vector<EventFunc> onMouseReleaseFunctions;
+    extern EventFunc onKeyboardPress;
+    extern EventFunc onKeyboardRelease;
+
+    extern EventFunc onMousePress;
+    extern EventFunc onMouseRelease;
     
-    extern std::vector<std::function<void(float x, float y)>> onMouseWheelFunctions;
+    extern std::function<void(const Vector2& dir)> onMouseWheel;
 
-    //extern std::vector<EventFunc> onGamepadPressFunctions;
-    //extern std::vector<EventFunc> onGamepadReleaseFunctions;
+    extern std::function<void(const Vector2& delta, const Vector2& position)> onMouseMove;
+
+    //extern EventFunc> onGamepadPress;
+    //extern EventFunc> onGamepadRelease;
 
     void handle();
 }

@@ -57,56 +57,10 @@ const std::string& Meatball::InputTextBox::getText() const {
     return text;
 }
 
-void Meatball::InputTextBox::update(const Font& font) {
-    unsigned short textSize = text.size();
-    
-    bool hovered = CheckCollisionPointRec(GetMousePosition(), rect);
-    if (hovered)
-        setCursor(MOUSE_CURSOR_IBEAM, MouseCursorPriorityLevel::INPUT_TEXT_BOX);
-    else
-        resetCursor(MouseCursorPriorityLevel::INPUT_TEXT_BOX);
-
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        bool wasFocusedBefore = focused;
-        focused = hovered;
-        
-        if (wasFocusedBefore && focused && textSize != 0) {
-            unsigned int newCursorPos = 0;
-            float textWidth = 0;
-            
-            while (newCursorPos < textSize && textWidth < GetMouseX()-rect.x+offsetX) {
-                textWidth += Meatball::measureTextWidth(font, fontSize, text.substr(newCursorPos, 1).c_str())+1;
-                ++newCursorPos;
-            }
-            
-            cursorPos = newCursorPos;
-            selectedTextStartIdx = selectedTextFinalIdx = textMaxSize+1;
-            mousePressed = true;
-        }
-    }
-
-    if (mousePressed) {
-        if (textSize != 0 && IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            if (selectedTextStartIdx == textMaxSize+1)
-                selectedTextStartIdx = cursorPos;
-            
-            float newCursorPos = 0;
-            float textWidth = 0;
-            
-            while (newCursorPos < textSize && textWidth < GetMouseX()-rect.x+offsetX) {
-                textWidth += Meatball::measureTextWidth(font, fontSize, text.substr(newCursorPos, 1).c_str())+1;
-                ++newCursorPos;
-            }
-            
-            cursorPos = newCursorPos;
-            selectedTextFinalIdx = cursorPos;
-        }
-
-        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
-            mousePressed = false;
-    }
-
+void Meatball::InputTextBox::onKeyboardPress(int key, const Font& font) {
     if (!focused) return;
+
+    size_t textSize = text.size();
 
     bool selectMode = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
     bool moveMode = IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL);
@@ -249,39 +203,13 @@ void Meatball::InputTextBox::update(const Font& font) {
         
         if (onTextChange) onTextChange(text);
     }
-    
-    int codePoint = 0;
-    if (codePoint = GetCharPressed(), codePoint) {
-        if (selectedTextFinalIdx != textMaxSize+1) {
-            cursorPos = selectedTextFinalIdx > selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx;
-            unsigned short delta = selectedTextFinalIdx > selectedTextStartIdx? selectedTextFinalIdx-selectedTextStartIdx
-             : selectedTextStartIdx-selectedTextFinalIdx;
-            
-            for (unsigned short i = 0; i < delta; ++i)
-                text.erase(text.begin()+cursorPos);
-            
-            textSize = text.size();
-        }
 
-        if (textSize < textMaxSize) {
-            text.insert(text.begin()+cursorPos, (char)codePoint);
-            if (onTextChange) onTextChange(text);
-            
-            textSize = text.size();
-            ++cursorPos;
-            
-            selectedTextStartIdx = selectedTextFinalIdx = textMaxSize+1;
-        }
-
-    }
-
-    if (onSend && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER)) && textSize != 0) {
+    if (onSend && (key == KEY_ENTER || key == KEY_KP_ENTER) && textSize != 0) {
         onSend(text);
         text.clear();
-        cursorPos = textSize = 0;
-        offsetX = 0;
+        cursorPos = textSize = offsetX = 0;
         selectedTextStartIdx = selectedTextFinalIdx = textMaxSize+1;
-    
+
     } else {
         float x = getRealCursorPos(cursorPos, font, fontSize, text);
         if (x-offsetX > rect.width || x-offsetX < 0) {
@@ -289,4 +217,79 @@ void Meatball::InputTextBox::update(const Font& font) {
             if (offsetX < 0) offsetX = 0;
         }
     }
+}
+
+void Meatball::InputTextBox::onCharPress(int codePoint) {
+    if (!focused) return;
+    
+    if (selectedTextFinalIdx != textMaxSize+1) {
+        cursorPos = selectedTextFinalIdx > selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx;
+        unsigned short delta = selectedTextFinalIdx > selectedTextStartIdx? selectedTextFinalIdx-selectedTextStartIdx
+            : selectedTextStartIdx-selectedTextFinalIdx;
+        
+        for (unsigned short i = 0; i < delta; ++i)
+            text.erase(text.begin()+cursorPos);
+    }
+
+    if (text.size() < textMaxSize) {
+        text.insert(text.begin()+cursorPos, (char)codePoint);
+        if (onTextChange) onTextChange(text);
+
+        ++cursorPos;
+        
+        selectedTextStartIdx = selectedTextFinalIdx = textMaxSize+1;
+    }
+}
+
+void Meatball::InputTextBox::onMousePress(int button, const Font& font) {
+    size_t textSize = text.size();
+    
+    if (button == MOUSE_BUTTON_LEFT) {
+        bool wasFocusedBefore = focused;
+        focused = hovered;
+        
+        if (wasFocusedBefore && focused && textSize != 0) {
+            unsigned int newCursorPos = 0;
+            float textWidth = 0;
+            
+            while (newCursorPos < textSize && textWidth < GetMouseX()-rect.x+offsetX) {
+                textWidth += Meatball::measureTextWidth(font, fontSize, text.substr(newCursorPos, 1).c_str())+1;
+                ++newCursorPos;
+            }
+            
+            cursorPos = newCursorPos;
+            selectedTextStartIdx = selectedTextFinalIdx = textMaxSize+1;
+            mousePressed = true;
+        }
+    }
+
+    if (mousePressed && textSize != 0) {
+        if (selectedTextStartIdx == textMaxSize+1)
+            selectedTextStartIdx = cursorPos;
+        
+        float newCursorPos = 0;
+        float textWidth = 0;
+        
+        while (newCursorPos < textSize && textWidth < GetMouseX()-rect.x+offsetX) {
+            textWidth += Meatball::measureTextWidth(font, fontSize, text.substr(newCursorPos, 1).c_str())+1;
+            ++newCursorPos;
+        }
+        
+        cursorPos = newCursorPos;
+        selectedTextFinalIdx = cursorPos;
+    }
+}
+
+void Meatball::InputTextBox::onMouseRelease(int button) {
+    if (button == MOUSE_BUTTON_LEFT)
+        mousePressed = false;
+}
+
+void Meatball::InputTextBox::onMouseMove(const Vector2& mousePosition) {
+    hovered = CheckCollisionPointRec(mousePosition, rect);
+    
+    if (hovered)
+        setCursor(MOUSE_CURSOR_IBEAM, MouseCursorPriorityLevel::INPUT_TEXT_BOX);
+    else
+        resetCursor(MouseCursorPriorityLevel::INPUT_TEXT_BOX);
 }

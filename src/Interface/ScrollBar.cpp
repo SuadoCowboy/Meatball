@@ -48,10 +48,9 @@ void Meatball::ScrollBar::draw(
     DrawRectangle(rect.x, rect.y+thumbY, rect.width, thumbHeight, actualScrollColor);
 }
 
-void Meatball::ScrollBar::update(const Rectangle& parentRect) {
-    Vector2 mousePosition = GetMousePosition();
-    
+void Meatball::ScrollBar::onMouseMove(const Rectangle& parentRect, const Vector2& mousePosition) {
     barHovered = CheckCollisionPointRec(mousePosition, rect);
+
     if (barHovered)
         setCursor(MOUSE_CURSOR_POINTING_HAND, MouseCursorPriorityLevel::SCROLL_BAR);
     else

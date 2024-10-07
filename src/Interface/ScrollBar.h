@@ -13,7 +13,7 @@ namespace Meatball {
         ScrollBar(const Rectangle& rect, bool visible = true);
         
         /// @param parentRect to check if the mouse is between parent's boundaries to use mouse wheel 
-        void update(const Rectangle& parentRect);
+        void onMouseMove(const Rectangle& parentRect, const Vector2& mousePosition);
 
         void draw(
             const Color& barColor,

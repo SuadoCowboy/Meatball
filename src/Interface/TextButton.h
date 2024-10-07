@@ -12,12 +12,12 @@ namespace Meatball {
         TextButton() {}
         TextButton(const Rectangle& rect, unsigned short fontSize);
 
-        void update();
+        void onMouseMove(const Vector2& mousePosition);
 
         /// @brief draws text centered on the button
         void drawText(const Font& font, const Color& textColor, const Color& hoveredTextColor) const;
 
-        VoidFunc onRelease, onHover;
+        VoidFunc onMouseRelease, onHover, onUnhover;
         Rectangle rect = {0.0f,0.0f,0.0f,0.0f};
 
         std::string text;

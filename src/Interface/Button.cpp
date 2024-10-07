@@ -6,11 +6,11 @@
 Meatball::Button::Button(const Rectangle& rect)
  : rect(rect) {}
 
-void Meatball::Button::update() {
+void Meatball::Button::onMouseMove(const Vector2& mousePosition) {
+    hovered = handleRectHover(hovered, mousePosition, rect, onHover, onUnhover);
+
     if (hovered)
         setCursor(MOUSE_CURSOR_POINTING_HAND, MouseCursorPriorityLevel::BUTTON);
     else
         resetCursor(MouseCursorPriorityLevel::BUTTON);
-    
-    checkHovered(hovered, rect, &onHover, &onRelease);
 }
