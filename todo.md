@@ -1,6 +1,7 @@
 # TODOS
 - Add mouse movement event and keep 'eventing' console update function
 - How can KeyRepeat still work after making input as a event?
+- Change DynamicPanel onMouseMove to use mouse delta instead of offset variable
 
 - Why I created Console class if it's just SweatCI?
 
