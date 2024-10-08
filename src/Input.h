@@ -10,10 +10,10 @@
 
 namespace Meatball {
 	struct InputData {
-		std::string key;
-		std::string callback;
-		std::string offCallback; // to turn off all the toggle types that might be in the callback
-		bool uiAllowed;
+		std::string key = "";
+		std::string callback = "";
+		std::string offCallback = ""; // to turn off all the toggle types that might be in the callback
+		bool uiAllowed = true;
 	};
 
 	class Input {
@@ -63,11 +63,11 @@ namespace Meatball {
 		static std::string mouseWheelDownOffCallback;
 
 	private:
-		static unsigned char flags;
 		/*
 		1 = mouse wheel up
 		2 = mouse wheel down
 		4 = ui commands only - this is used when an interface is active, so that only ui allowed commands can run
 		*/
+		static unsigned char flags;
 	};
 }

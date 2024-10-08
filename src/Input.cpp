@@ -118,10 +118,13 @@ void Meatball::Input::unbind(const std::string& key) {
 }
 
 void Meatball::Input::setKey(const std::string& key, unsigned short code) {
-	if (beginsWithMouse(key))
-		mouseButtonsData[code] = {key, "", "", true};
-	else
-		keysData[code] = {key, "", "", true};
+	if (beginsWithMouse(key)) {
+		mouseButtonsData[code] = {};
+		mouseButtonsData[code].key = key;
+	} else {
+		keysData[code] = {};
+		keysData[code].key = key;
+	}
 }
 
 void Meatball::Input::removeKey(const std::string& key) {
@@ -135,13 +138,13 @@ void Meatball::Input::removeKey(const std::string& key) {
 void Meatball::Input::onMousePress(int buttonId) {
 	if (mouseButtonsData.count(buttonId) == 0 || (!mouseButtonsData[buttonId].uiAllowed && (flags & 4))) return;
 
-	Console::run(keysData[buttonId].callback);
+	Console::run(mouseButtonsData[buttonId].callback);
 }
 
 void Meatball::Input::onMouseRelease(int buttonId) {
 	if (mouseButtonsData.count(buttonId) == 0 || (!mouseButtonsData[buttonId].uiAllowed && (flags & 4))) return;
 
-	Console::run(keysData[buttonId].offCallback);
+	Console::run(mouseButtonsData[buttonId].offCallback);
 }
 
 void Meatball::Input::onKeyboardPress(int keyId) { 
@@ -324,8 +327,8 @@ void Meatball::Input::mapKeyboardKeys() {
 }
 
 void Meatball::Input::mapMouseKeys() {
-	for (unsigned short i = MOUSE_BUTTON_LEFT; i < MOUSE_BUTTON_BACK; ++i)
-		setKey("mouse"+std::to_string(i+1), i);
+	for (unsigned short code = MOUSE_BUTTON_LEFT; code < MOUSE_BUTTON_BACK; ++code)
+		setKey("mouse"+std::to_string(code+1), code);
 }
 
 void Meatball::Input::setUiAllowedCommandsOnly(bool value) {
