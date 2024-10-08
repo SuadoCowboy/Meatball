@@ -1,8 +1,6 @@
 # TODOS
 - Change DynamicPanel onMouseMove to use mouse delta instead of offset variable(if possible and better)
 
-- Why I created Console class if it's just SweatCI?
-
 - "Defaults" namespace does not make sense with its current functions. Maybe it should be deleted but because console ui will already change in the (hopefully)near future, there is no need to update this for now
 
 - Idk what to do with this Theme thing I just implemented. I still need to think about how I can make a 100% user-made UI, this means deleting ConsoleUI class and leaving only the needed functions that user can't define

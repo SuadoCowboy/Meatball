@@ -35,7 +35,7 @@ Meatball::ConsoleUI::ConsoleUI(const Rectangle& rect, bool visible)
 		this->inputBox.rect.y = this->mainPanel.rect.y+this->mainPanel.rect.height-this->margin-this->inputBox.rect.height;
 	};
 
-	inputBox.rect.height = mainPanel.rect.height*0.04;
+	inputBox.rect.height = mainPanel.rect.height*0.04f;
 
 	mainPanel.onResize = [this]() {
 			this->closeButton.rect.width = this->margin; // it's inside the margin
