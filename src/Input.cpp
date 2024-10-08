@@ -20,7 +20,7 @@ std::string Meatball::Input::mouseWheelDownOffCallback;
 unsigned char Meatball::Input::flags;
 
 static void errorUnknownKey(const std::string& key) {
-	Meatball::Console::printf(SweatCI::ERROR, "Unknown key: {}", key);
+	Meatball::Console::printf(SweatCI::ERROR, "Unknown key: \"{}\"\n", key);
 }
 
 static bool beginsWithMouse(const std::string& str) {
@@ -190,24 +190,32 @@ void Meatball::Input::bindCommand(void*, SweatCI::Command&, const std::vector<st
 	}
 
 	// get
+	bool isUnknownKey = true;
 	std::string callback;
 	if (beginsWithMouse(args[0])) {
 		for (auto& button : mouseButtonsData)
 			if (button.second.key == args[0]) {
 				callback = button.second.callback;
+				isUnknownKey = false;
 				break;
 			}
 	
-	} else if (args[0] == "mwheelup")
+	} else if (args[0] == "mwheelup") {
 		callback = mouseWheelUpCallback;
-	else if (args[0] == "mwheeldown")
+		isUnknownKey = false;
+	
+	} else if (args[0] == "mwheeldown") {
 		callback = mouseWheelDownCallback;
-	else for (auto& keyData : keysData)
+		isUnknownKey = false;
+	
+	} else for (auto& keyData : keysData)
 		if (keyData.second.key == args[0]) {
 			callback = keyData.second.callback;
+			isUnknownKey = false;
 			break;
 		}
-	else {
+	
+	if (isUnknownKey) {
 		errorUnknownKey(args[0]);
 		return;
 	}
