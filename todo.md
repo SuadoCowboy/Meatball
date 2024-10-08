@@ -1,6 +1,8 @@
 # TODOS
 - replace "Defaults" namespace after succesfully creating a working ui system
 
+- sometimes console's outputbox does not appear after running the executable. Find out why and fix it!
+
 - idk what to do with this Theme thing I just implemented. I still need to think about how I can make a 100% user-made UI, this means deleting ConsoleUI class and leaving only the needed functions that user can't define
 
 - after making ui system, console ui will not be needed to be found anymore. For commands that are specific for it, like 'toggle_local_console', will search it by its name in the beginning of the program. It should begin as a unordered_map (std::string, UIObject) and later replaced to a vector (UIObject). THIS VECTOR IS JUST LOADED DATA! IT DOESN'T MEAN IT SHOULD BE UPDATED EVERY FRAME AND IT DOESN'T MEAN THE DATA IS BEING USED! ALSO, DO NOT WASTE MEMORY LOADING UI THAT IS NOT BEING USED, ONLY IF IT'S HEAVY TO PROCESS LATER.
