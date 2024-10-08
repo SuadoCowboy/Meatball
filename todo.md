@@ -1,11 +1,9 @@
 # TODOS
-- Change DynamicPanel onMouseMove to use mouse delta instead of offset variable(if possible and better)
+- replace "Defaults" namespace after succesfully creating a working ui system
 
-- "Defaults" namespace does not make sense with its current functions. Maybe it should be deleted but because console ui will already change in the (hopefully)near future, there is no need to update this for now
+- idk what to do with this Theme thing I just implemented. I still need to think about how I can make a 100% user-made UI, this means deleting ConsoleUI class and leaving only the needed functions that user can't define
 
-- Idk what to do with this Theme thing I just implemented. I still need to think about how I can make a 100% user-made UI, this means deleting ConsoleUI class and leaving only the needed functions that user can't define
-
-- I could try making ConsoleUI working without it being a pointer but it's going to be deleted anyways in the future so it doesn't need to change at the moment
+- after making ui system, console ui will not be needed to be found anymore. For commands that are specific for it, like 'toggle_local_console', will search it by its name in the beginning of the program. It should begin as a unordered_map (std::string, UIObject) and later replaced to a vector (UIObject). THIS VECTOR IS JUST LOADED DATA! IT DOESN'T MEAN IT SHOULD BE UPDATED EVERY FRAME AND IT DOESN'T MEAN THE DATA IS BEING USED! ALSO, DO NOT WASTE MEMORY LOADING UI THAT IS NOT BEING USED, ONLY IF IT'S HEAVY TO PROCESS LATER.
 
 - make custom folder work for every current and future projects so that if a file with a recognized name is placed in a folder called "custom", it will replace the default data with that custom data without modifying the original default file
 
