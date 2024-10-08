@@ -20,13 +20,6 @@ using namespace Meatball;
 
 Meatball::ConsoleUI* pConsoleUI;
 
-struct ConsoleFonts {
-    Font label;
-    Font inputBox;
-    Font outputBox;
-};
-ConsoleFonts consoleFonts;
-
 Texture2D backgroundTexture;
 
 bool shouldQuit = false;
@@ -233,6 +226,7 @@ void update(float dt) {
 
     Rectangle playerRect = { player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height };
 
+    // TODO: those 2 for loops can be removed and be replaced with the event system
     for (size_t i = 0; i < enemies.size(); ++i) {
         if (CheckCollisionRecs(playerRect, { enemies[i].position.x, enemies[i].position.y, (float)entityData[enemies[i].type].texture.width, (float)entityData[enemies[i].type].texture.height })) {
             player.health -= enemies[i].health;
@@ -282,9 +276,9 @@ void save(const std::string& path) {
 }
 
 void cleanup() {
-    UnloadFont(consoleFonts.label);
-    UnloadFont(consoleFonts.inputBox);
-    UnloadFont(consoleFonts.outputBox);
+    UnloadFont(pConsoleUI->labelFont);
+    UnloadFont(pConsoleUI->inputFont);
+    UnloadFont(pConsoleUI->outputFont);
     CloseWindow();
 
     delete pConsoleUI;
