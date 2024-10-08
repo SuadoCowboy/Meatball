@@ -12,8 +12,14 @@ namespace Meatball {
         /// @param rect the bar rect
         ScrollBar(const Rectangle& rect, bool visible = true);
         
+        /// @brief should be used when resizing or moving rect
+        void fitThumb();
+
+        void onMousePress(int button);
+        void onMouseRelease(int button);
+        void onMouseWheel(const Vector2& dir, const Rectangle& parentRect);
         /// @param parentRect to check if the mouse is between parent's boundaries to use mouse wheel 
-        void onMouseMove(const Rectangle& parentRect, const Vector2& mousePosition);
+        void onMouseMove(const Vector2& mousePosition);
 
         void draw(
             const Color& barColor,

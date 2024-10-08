@@ -48,7 +48,39 @@ void Meatball::ScrollBar::draw(
     DrawRectangle(rect.x, rect.y+thumbY, rect.width, thumbHeight, actualScrollColor);
 }
 
-void Meatball::ScrollBar::onMouseMove(const Rectangle& parentRect, const Vector2& mousePosition) {
+void Meatball::ScrollBar::onMousePress(int button) {
+    if (button == MOUSE_BUTTON_LEFT) {
+        if (thumbHovered) {
+            dragging = true;
+            dragOffsetY = thumbY - GetMouseY();
+        } else if (barHovered)
+            thumbY = GetMouseY() - thumbHeight/2 - rect.y;
+        
+    }
+}
+
+void Meatball::ScrollBar::onMouseRelease(int button) {
+    if (button == MOUSE_BUTTON_LEFT)
+        dragging = false;
+}
+
+void Meatball::ScrollBar::onMouseWheel(const Vector2& dir, const Rectangle& parentRect) {
+    if (dir.y != 0 && CheckCollisionPointRec(GetMousePosition(), parentRect))
+        thumbY -= dir.y * scrollSpeed * (thumbHeight/rect.height);
+    
+    fitThumb();
+}
+
+void Meatball::ScrollBar::fitThumb() {
+    // if up limit
+    if (thumbY < 0) thumbY = 0;
+    // if down limit
+    if (thumbY+thumbHeight > rect.height) thumbY = rect.height-thumbHeight;
+    
+    scrollValue = thumbY / thumbHeight;
+}
+
+void Meatball::ScrollBar::onMouseMove(const Vector2& mousePosition) {
     barHovered = CheckCollisionPointRec(mousePosition, rect);
 
     if (barHovered)
@@ -58,31 +90,11 @@ void Meatball::ScrollBar::onMouseMove(const Rectangle& parentRect, const Vector2
     
     thumbHovered = CheckCollisionPointRec(mousePosition,
         {rect.x, rect.y+thumbY, rect.width, thumbHeight});
-
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        if (thumbHovered) {
-            dragging = true;
-            dragOffsetY = thumbY - mousePosition.y;
-        } else if (barHovered)
-            thumbY = mousePosition.y - thumbHeight/2 - rect.y;
-        
-    } else if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) dragging = false;
     
-    float mouseWheelMove = GetMouseWheelMove();
-    if (mouseWheelMove != 0 && CheckCollisionPointRec(GetMousePosition(), parentRect)) {
-        thumbY -= mouseWheelMove * scrollSpeed * (thumbHeight/rect.height);
-    }
-    
-    if (dragging) {
+    if (dragging)
         thumbY = mousePosition.y+dragOffsetY;
-    }
     
-    // if up limit
-    if (thumbY < 0) thumbY = 0;
-    // if down limit
-    if (thumbY+thumbHeight > rect.height) thumbY = rect.height-thumbHeight;
-    
-    scrollValue = thumbY / thumbHeight;
+    fitThumb();
 }
 
 const Rectangle& Meatball::ScrollBar::getRect() const {
