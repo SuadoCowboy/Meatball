@@ -85,7 +85,7 @@ void Meatball::ScrollBox::updateTextWrap(const Font& font) {
 
     contentHeight = _getContentHeight(text, fontSize);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
-    scrollBar.onMouseMove(rect, GetMousePosition());
+    scrollBar.fitThumb();
     scrollBar.visible = contentHeight > rect.height;
 }
 
@@ -110,7 +110,7 @@ void Meatball::ScrollBox::clearText() {
     // to fix view
     contentHeight = _getContentHeight(text, fontSize);
     scrollBar.updateThumbHeight(rect.height, contentHeight);
-    scrollBar.onMouseMove(rect, GetMousePosition());
+    scrollBar.fitThumb();
 }
 
 void Meatball::ScrollBox::popFront() noexcept {
