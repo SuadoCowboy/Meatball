@@ -53,6 +53,8 @@ namespace Meatball {
 
         void onCharPress(int codepoint);
         void onKeyboardPress(int key, bool isRepeat);
+        
+        void onMouseWheel(const Vector2& dir);
         void onMousePress(int button);
         void onMouseRelease(int button);
         void onMouseMove(const Vector2& mousePosition);

@@ -96,6 +96,7 @@ int main(int, char**) {
 
     Meatball::EventHandler::onMouseWheel = [](const Vector2& dir) {
         Meatball::Input::onMouseWheel(dir);
+        pConsoleUI->onMouseWheel(dir);
     };
 
     while (!shouldQuit) {

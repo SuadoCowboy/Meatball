@@ -276,10 +276,16 @@ void Meatball::ConsoleUI::onKeyboardPress(int key, bool isRepeat) {
 	}
 }
 
+void Meatball::ConsoleUI::onMouseWheel(const Vector2& dir) {
+	outputBox.scrollBar.onMouseWheel(dir, outputBox.getRect());
+}
+
 void Meatball::ConsoleUI::onMousePress(int button) {
 	if (!visible) return;
 
 	inputBox.onMousePress(button, inputFont);
+
+	outputBox.scrollBar.onMousePress(button);
 
 	mainPanel.onMousePress(button);
 }
@@ -291,6 +297,8 @@ void Meatball::ConsoleUI::onMouseRelease(int button) {
 		closeButton.onMouseRelease();
 	
 	inputBox.onMouseRelease(button);
+
+	outputBox.scrollBar.onMouseRelease(button);
 	
 	mainPanel.onMouseRelease(button);
 }
@@ -300,7 +308,7 @@ void Meatball::ConsoleUI::onMouseMove(const Vector2& mousePosition) {
 
 	closeButton.onMouseMove(mousePosition);
 	
-	outputBox.scrollBar.onMouseMove(outputBox.getRect(), mousePosition);
+	outputBox.scrollBar.onMouseMove(mousePosition);
 	
 	inputBox.onMouseMove(mousePosition);
 	
