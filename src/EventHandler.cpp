@@ -46,12 +46,15 @@ void Meatball::EventHandler::handle() {
         }
     }
 
-    // Keyboard Release
+    // Keyboard Release + Keyboard Repeat
     for (auto it = keyboardKeysPressed.begin(); it != keyboardKeysPressed.end(); ++it) {
         if (IsKeyUp(*it)) {
             onKeyboardRelease(*it);
             keyboardKeysPressed.erase(it);
             --it;
+        
+        } else if (IsKeyPressedRepeat(*it)) {
+            onKeyboardPress(*it);
         }
     }
 
