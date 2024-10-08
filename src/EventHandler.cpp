@@ -37,7 +37,6 @@ void Meatball::EventHandler::handle() {
         int key = GetKeyPressed();
         
         while (key != 0) {
-            // TODO: TEST IF THIS CAN GET A KEY PRESSED MORE THAN ONCE(do this by pressing on 2 keyboards and not releasing)
             keyboardKeysPressed.emplace_back(key);
 
             onKeyboardPress(key, false);
@@ -90,7 +89,6 @@ void Meatball::EventHandler::handle() {
         int button = GetGamepadButtonPressed();
 
         while (button != 0) {
-            // TODO: TEST IF THIS CAN GET A BUTTON PRESSED MORE THAN ONCE(do this by pressing on 2 gamepads and not releasing)
             gamepadButtonsPressed.emplace_back(button);
 
             for (auto& func : onGamepadPress)
