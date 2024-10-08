@@ -7,7 +7,6 @@
 
 #include <Utils/Json.h>
 #include <Console.h>
-#include <EventHandler.h>
 #include <Input.h>
 
 #include "Game.h"
@@ -67,45 +66,9 @@ void loadSettingsAndInit() {
 int main(int, char**) {
     loadSettingsAndInit();
 
-    Meatball::EventHandler::onCharPress = [](int codepoint) {
-        pConsoleUI->onCharPress(codepoint);
-    };
-
-    Meatball::EventHandler::onKeyboardPress = [](int key, bool isRepeat) {
-        Meatball::Input::onKeyboardPress(key, isRepeat);
-        pConsoleUI->onKeyboardPress(key, isRepeat);
-    };
-
-    Meatball::EventHandler::onKeyboardRelease = [](int key) {
-        Meatball::Input::onKeyboardRelease(key);
-    };
-
-    Meatball::EventHandler::onMousePress = [](int button) {
-        Meatball::Input::onMousePress(button);
-        pConsoleUI->onMousePress(button);
-    };
-
-    Meatball::EventHandler::onMouseRelease = [](int button) {
-        Meatball::Input::onMouseRelease(button);
-        pConsoleUI->onMouseRelease(button);
-    };
-
-    Meatball::EventHandler::onMouseMove = [](const Vector2&, const Vector2& mousePosition) {
-        pConsoleUI->onMouseMove(mousePosition);
-    };
-
-    Meatball::EventHandler::onMouseWheel = [](const Vector2& dir) {
-        Meatball::Input::onMouseWheel(dir);
-        pConsoleUI->onMouseWheel(dir);
-    };
-
     while (!shouldQuit) {
         float dt = GetFrameTime();
-        
-        Meatball::EventHandler::handle();
-
-        update(dt);
-        render();
+        render(dt);
     }
 
     save(SETTINGS_PATH);

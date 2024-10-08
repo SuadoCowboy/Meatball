@@ -6,10 +6,11 @@
 #include <fstream>
 
 #include <Utils/Json.h>
-#include <Console.h>
 #include <Utils/Defaults.h>
+#include <Console.h>
 #include <MouseCursor.h>
 #include <Input.h>
+#include <EventHandler.h>
 
 #include "Entity.h"
 #include "Player.h"
@@ -49,7 +50,7 @@ static void moveRightCommand(void*, SweatCI::Command&, const std::vector<std::st
 }
 
 static void fireCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
-    bullets.push_back({ PLAYER, { player.position.x + entityData[PLAYER].texture.width * 0.5f - bulletSize.x * 0.5f, player.position.y + bulletSize.y * 0.25f } });
+    bullets.push_back({ PLAYER, { player.rect.x + entityData[PLAYER].texture.width * 0.5f - bulletSize.x * 0.5f, player.rect.y + bulletSize.y * 0.25f } });
 }
 
 static void reloadFontsCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
@@ -124,12 +125,12 @@ void init(int windowWidth, int windowHeight) {
     backgroundTexture.width = GetRenderWidth();
     backgroundTexture.height = GetRenderHeight();
 
-    player = {{.0f, .0f}, {0.6f, 0.8f}};
     entityData[PLAYER].texture.width = backgroundTexture.width * 0.05f;
     entityData[PLAYER].texture.height = backgroundTexture.width * 0.05f;
+    player = {{.0f, .0f}, {0.6f, 0.8f}};
 
-    player.position.x = backgroundTexture.width * 0.5f - entityData[PLAYER].texture.width * 0.5f;
-    player.position.y = backgroundTexture.height * 0.9f - entityData[PLAYER].texture.height;
+    player.rect.x = backgroundTexture.width * 0.5f - entityData[PLAYER].texture.width * 0.5f;
+    player.rect.y = backgroundTexture.height * 0.9f - entityData[PLAYER].texture.height;
 
     bulletSpeed = 0.8f;
 
@@ -162,6 +163,38 @@ void init(int windowWidth, int windowHeight) {
         SweatCI::CVARUtils::getBoolean,
         "if should save the changed settings in a file");
 
+    Meatball::EventHandler::onCharPress = [](int codepoint) {
+        pConsoleUI->onCharPress(codepoint);
+    };
+
+    Meatball::EventHandler::onKeyboardPress = [](int key, bool isRepeat) {
+        Meatball::Input::onKeyboardPress(key, isRepeat);
+        pConsoleUI->onKeyboardPress(key, isRepeat);
+    };
+
+    Meatball::EventHandler::onKeyboardRelease = [](int key) {
+        Meatball::Input::onKeyboardRelease(key);
+    };
+
+    Meatball::EventHandler::onMousePress = [](int button) {
+        Meatball::Input::onMousePress(button);
+        pConsoleUI->onMousePress(button);
+    };
+
+    Meatball::EventHandler::onMouseRelease = [](int button) {
+        Meatball::Input::onMouseRelease(button);
+        pConsoleUI->onMouseRelease(button);
+    };
+
+    Meatball::EventHandler::onMouseMove = [](const Vector2&, const Vector2& mousePosition) {
+        pConsoleUI->onMouseMove(mousePosition);
+    };
+
+    Meatball::EventHandler::onMouseWheel = [](const Vector2& dir) {
+        Meatball::Input::onMouseWheel(dir);
+        pConsoleUI->onMouseWheel(dir);
+    };
+
     SweatCI::execConfigFile("data/cfg/autoexec.cfg", Console::variables);
     SweatCI::execConfigFile("data/cfg/config.cfg", Console::variables);
 
@@ -193,8 +226,8 @@ void resize() {
     backgroundTexture.width = newScreenWidth;
     backgroundTexture.height = newScreenHeight;
 
-    player.position.x *= ratio.x;
-    player.position.y *= ratio.y;
+    player.rect.x *= ratio.x;
+    player.rect.y *= ratio.y;
     entityData[PLAYER].texture.width *= ratio.x;
     entityData[PLAYER].texture.height *= ratio.y;
 
@@ -214,42 +247,30 @@ void resize() {
     }
 }
 
-void update(float dt) {
+void render(float dt) {
     if (WindowShouldClose()) shouldQuit = true;
     
     if (IsWindowResized())
         resize();
 
+    Meatball::EventHandler::handle();
+
     SweatCI::handleLoopAliasesRunning(Console::variables);
 
-    player.update(backgroundTexture.width, backgroundTexture.height, dt);
-
-    Rectangle playerRect = { player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height };
-
-    // TODO: those 2 for loops can be removed and be replaced with the event system
-    for (size_t i = 0; i < enemies.size(); ++i) {
-        if (CheckCollisionRecs(playerRect, { enemies[i].position.x, enemies[i].position.y, (float)entityData[enemies[i].type].texture.width, (float)entityData[enemies[i].type].texture.height })) {
-            player.health -= enemies[i].health;
-            enemies.erase(enemies.begin() + i);
-            --i;
-            continue;
-        }
-    }
-
-    for (size_t bulletIdx = 0; bulletIdx < bullets.size();)
-        if (handleBullet(bulletIdx, dt))
-            ++bulletIdx;
-}
-
-void render() {
     BeginDrawing();
     DrawTexture(backgroundTexture, 0, 0, WHITE);
 
-    for (auto& bullet : bullets)
-        DrawRectangle(bullet.position.x, bullet.position.y, bulletSize.x, bulletSize.y, entityData[bullet.ownerType].color);
+    player.update(backgroundTexture.width, backgroundTexture.height, dt);
+    for (size_t bulletIdx = 0; bulletIdx < bullets.size();) {
+        DrawRectangle(bullets[bulletIdx].position.x, bullets[bulletIdx].position.y, bulletSize.x, bulletSize.y, entityData[bullets[bulletIdx].ownerType].color);
+        if (handleBullet(bulletIdx, dt))
+            ++bulletIdx;
+    }
 
-    for (auto& enemy : enemies)
+    for (auto& enemy : enemies) {
+        enemy.update(player, dt);
         enemy.draw();
+    }
 
     player.draw();
     
@@ -346,7 +367,7 @@ bool handleBullet(size_t& bulletIdx, float dt) {
             }
         }
         else {
-            if (CheckCollisionRecs(rect, { player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height })) {
+            if (CheckCollisionRecs(rect, { player.rect.x, player.rect.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height })) {
                 player.health -= entityData[bullets[bulletIdx].ownerType].damage;
                 bullets.erase(bullets.begin() + bulletIdx);
                 return false;

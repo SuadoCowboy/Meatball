@@ -9,8 +9,7 @@ void init(int windowWidth, int windowHeight);
 void reloadFonts();
 void resize();
 /// @brief also updates
-void update(float dt);
-void render();
+void render(float dt);
 void save(const std::string& path);
 void cleanup();
 
