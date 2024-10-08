@@ -238,7 +238,7 @@ void Meatball::Input::unBindAllCommand(void*, SweatCI::Command&, const std::vect
 		button.second.offCallback = "";
 	}
 
-	mouseWheelUpCallback = mouseWheelDownCallback = "";
+	mouseWheelUpCallback = mouseWheelUpOffCallback = mouseWheelDownCallback = mouseWheelDownOffCallback = "";
 }
 
 void Meatball::Input::registerCommands() {
