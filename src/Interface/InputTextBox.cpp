@@ -106,7 +106,7 @@ void Meatball::InputTextBox::onKeyboardPress(int key, const Font& font) {
         }
     }
     
-    if (IsKeyPressed(KEY_LEFT) || IsKeyPressedRepeat(KEY_LEFT)) {
+    if (key == KEY_LEFT) {
         if (selectMode && selectedTextStartIdx == textMaxSize+1)
             selectedTextStartIdx = cursorPos;
 
@@ -123,7 +123,7 @@ void Meatball::InputTextBox::onKeyboardPress(int key, const Font& font) {
         else
             selectedTextStartIdx = selectedTextFinalIdx = textMaxSize+1;
     
-    } else if (IsKeyPressed(KEY_RIGHT) || IsKeyPressedRepeat(KEY_RIGHT)) {
+    } else if (key == KEY_RIGHT) {
         if (selectMode && selectedTextStartIdx == textMaxSize+1)
             selectedTextStartIdx = cursorPos;
         
@@ -141,7 +141,7 @@ void Meatball::InputTextBox::onKeyboardPress(int key, const Font& font) {
             selectedTextStartIdx = selectedTextFinalIdx = textMaxSize+1;
         }
     
-    } else if ((IsKeyPressed(KEY_BACKSPACE) || IsKeyPressedRepeat(KEY_BACKSPACE)) && cursorPos != 0) {
+    } else if (key == KEY_BACKSPACE && (cursorPos != 0 || selectedTextFinalIdx == 0)) {
         if (selectedTextFinalIdx != textMaxSize+1) {
             cursorPos = selectedTextFinalIdx > selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx;
             unsigned short delta = selectedTextFinalIdx > selectedTextStartIdx? selectedTextFinalIdx-selectedTextStartIdx
