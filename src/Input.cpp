@@ -147,8 +147,8 @@ void Meatball::Input::onMouseRelease(int buttonId) {
 	Console::run(mouseButtonsData[buttonId].offCallback);
 }
 
-void Meatball::Input::onKeyboardPress(int keyId) { 
-	if (keysData.count(keyId) == 0 || (!keysData[keyId].uiAllowed && (flags & 4))) return;
+void Meatball::Input::onKeyboardPress(int keyId, bool isRepeat) { 
+	if (isRepeat || keysData.count(keyId) == 0 || (!keysData[keyId].uiAllowed && (flags & 4))) return;
 
 	Console::run(keysData[keyId].callback);
 }

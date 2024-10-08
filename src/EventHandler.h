@@ -9,7 +9,7 @@ namespace Meatball::EventHandler {
 
     extern EventFunc onCharPress;
 
-    extern EventFunc onKeyboardPress;
+    extern std::function<void(int key, bool isRepeat)> onKeyboardPress;
     extern EventFunc onKeyboardRelease;
 
     extern EventFunc onMousePress;

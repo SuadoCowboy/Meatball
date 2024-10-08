@@ -71,9 +71,9 @@ int main(int, char**) {
         pConsoleUI->onCharPress(codepoint);
     };
 
-    Meatball::EventHandler::onKeyboardPress = [](int key) {
-        Meatball::Input::onKeyboardPress(key);
-        pConsoleUI->onKeyboardPress(key);
+    Meatball::EventHandler::onKeyboardPress = [](int key, bool isRepeat) {
+        Meatball::Input::onKeyboardPress(key, isRepeat);
+        pConsoleUI->onKeyboardPress(key, isRepeat);
     };
 
     Meatball::EventHandler::onKeyboardRelease = [](int key) {

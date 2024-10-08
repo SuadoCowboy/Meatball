@@ -52,7 +52,7 @@ namespace Meatball {
         void onResize(float ratioWidth, float ratioHeight);
 
         void onCharPress(int codepoint);
-        void onKeyboardPress(int key);
+        void onKeyboardPress(int key, bool isRepeat);
         void onMousePress(int button);
         void onMouseRelease(int button);
         void onMouseMove(const Vector2& mousePosition);

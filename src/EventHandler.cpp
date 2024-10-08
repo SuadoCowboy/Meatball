@@ -7,7 +7,7 @@ std::vector<int> keyboardKeysPressed;
 
 Meatball::EventHandler::EventFunc Meatball::EventHandler::onCharPress = [](int){};
 
-Meatball::EventHandler::EventFunc Meatball::EventHandler::onKeyboardPress = Meatball::EventHandler::onCharPress;
+std::function<void(int key, bool isRepeat)> Meatball::EventHandler::onKeyboardPress = [](int,bool){};
 Meatball::EventHandler::EventFunc Meatball::EventHandler::onKeyboardRelease = Meatball::EventHandler::onCharPress;
 
 Meatball::EventHandler::EventFunc Meatball::EventHandler::onMousePress = Meatball::EventHandler::onCharPress;
@@ -40,7 +40,7 @@ void Meatball::EventHandler::handle() {
             // TODO: TEST IF THIS CAN GET A KEY PRESSED MORE THAN ONCE(do this by pressing on 2 keyboards and not releasing)
             keyboardKeysPressed.emplace_back(key);
 
-            onKeyboardPress(key);
+            onKeyboardPress(key, false);
             
             key = GetKeyPressed();
         }
@@ -54,7 +54,7 @@ void Meatball::EventHandler::handle() {
             --it;
         
         } else if (IsKeyPressedRepeat(*it)) {
-            onKeyboardPress(*it);
+            onKeyboardPress(*it, true);
         }
     }
 

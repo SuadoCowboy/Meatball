@@ -57,7 +57,7 @@ const std::string& Meatball::InputTextBox::getText() const {
     return text;
 }
 
-void Meatball::InputTextBox::onKeyboardPress(int key, const Font& font) {
+void Meatball::InputTextBox::onKeyboardPress(int key, bool isRepeat, const Font& font) {
     if (!focused) return;
 
     size_t textSize = text.size();
@@ -66,17 +66,17 @@ void Meatball::InputTextBox::onKeyboardPress(int key, const Font& font) {
     bool moveMode = IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL);
 
     if (moveMode) {
-        if (IsKeyPressed(KEY_A) && textSize != 0) {
+        if (key == KEY_A && !isRepeat && textSize != 0) {
             selectedTextStartIdx = 0;
             cursorPos = textSize;
             selectedTextFinalIdx = cursorPos;
         }
 
-        if (IsKeyPressed(KEY_C) && selectedTextFinalIdx != textMaxSize+1)
+        if (key == KEY_C && !isRepeat && selectedTextFinalIdx != textMaxSize+1)
             SetClipboardText(text.substr(selectedTextFinalIdx > selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx, selectedTextFinalIdx > selectedTextStartIdx? selectedTextFinalIdx-selectedTextStartIdx
              : selectedTextStartIdx-selectedTextFinalIdx).c_str());
         
-        else if ((IsKeyPressed(KEY_V) || IsKeyPressedRepeat(KEY_V))) {
+        else if ((key == KEY_V)) {
             if (selectedTextFinalIdx <= textSize) {
                 // cursorPos = left idx
                 cursorPos = selectedTextFinalIdx > selectedTextStartIdx? selectedTextStartIdx : selectedTextFinalIdx;
@@ -179,7 +179,7 @@ void Meatball::InputTextBox::onKeyboardPress(int key, const Font& font) {
         
         if (onTextChange) onTextChange(text);
     
-    } else if ((IsKeyPressed(KEY_DELETE) || IsKeyPressedRepeat(KEY_DELETE)) && cursorPos != textSize) {
+    } else if (key == KEY_BACKSPACE && cursorPos != textSize) {
         if (selectedTextFinalIdx != textMaxSize+1)
             selectedTextStartIdx = selectedTextFinalIdx = textMaxSize+1;
         
@@ -204,7 +204,7 @@ void Meatball::InputTextBox::onKeyboardPress(int key, const Font& font) {
         if (onTextChange) onTextChange(text);
     }
 
-    if (onSend && (key == KEY_ENTER || key == KEY_KP_ENTER) && textSize != 0) {
+    if (onSend && (key == KEY_ENTER || key == KEY_KP_ENTER) && !isRepeat && textSize != 0) {
         onSend(text);
         text.clear();
         cursorPos = textSize = offsetX = 0;

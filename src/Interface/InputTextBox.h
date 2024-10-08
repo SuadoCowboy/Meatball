@@ -15,7 +15,7 @@ namespace Meatball {
 
         void draw(const Font& font, const Color& textColor, const Color& cursorColor, const Color& selectionColor) const;
         
-        void onKeyboardPress(int key, const Font& font);
+        void onKeyboardPress(int key, bool isRepeat, const Font& font);
         void onCharPress(int codePoint);
         void onMousePress(int button, const Font& font);
         void onMouseRelease(int button);

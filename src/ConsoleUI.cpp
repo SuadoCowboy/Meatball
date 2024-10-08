@@ -213,10 +213,10 @@ void Meatball::ConsoleUI::onCharPress(int codepoint) {
 	inputBox.onCharPress(codepoint);
 }
 
-void Meatball::ConsoleUI::onKeyboardPress(int key) {
+void Meatball::ConsoleUI::onKeyboardPress(int key, bool isRepeat) {
 	if (!visible) return;
 	
-	inputBox.onKeyboardPress(key, inputFont);
+	inputBox.onKeyboardPress(key, isRepeat, inputFont);
 
 	if (!inputBox.focused) return;
 	if (key != KEY_TAB || this->autoCompleteText.size() == 0) {

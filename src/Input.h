@@ -31,7 +31,7 @@ namespace Meatball {
 		static void onMousePress(int button);
 		static void onMouseRelease(int button);
 
-		static void onKeyboardPress(int key);
+		static void onKeyboardPress(int key, bool isRepeat);
 		static void onKeyboardRelease(int key);
 
 		static void onMouseWheel(const Vector2& dir);
