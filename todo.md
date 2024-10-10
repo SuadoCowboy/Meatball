@@ -15,6 +15,7 @@
 
 # FUTURE TODOS:
 - use threads with locks, atomic and mutex (maybe not needed or worse)
+- make something like the ddnet engine, but without their mixed naming conventions and unecessary pointers
 - optimize code and use the right data structures
 
 # IMPORTANT:
