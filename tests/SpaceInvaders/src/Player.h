@@ -14,8 +14,9 @@ public:
 
     Vector2uc direction = {1,1};
     Vector2 speed = {0.0f,0.0f};
+    Vector2 position = {0.0f,0.0f};
+
     short health = 100;
-    Rectangle rect = {0.0f,0.0f,0.0f,0.0f};
 };
 
 extern Player player;

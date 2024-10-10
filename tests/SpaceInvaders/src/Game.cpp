@@ -50,7 +50,7 @@ static void moveRightCommand(void*, SweatCI::Command&, const std::vector<std::st
 }
 
 static void fireCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
-    bullets.push_back({ PLAYER, { player.rect.x + entityData[PLAYER].texture.width * 0.5f - bulletSize.x * 0.5f, player.rect.y + bulletSize.y * 0.25f } });
+    bullets.push_back({ PLAYER, { player.position.x + entityData[PLAYER].texture.width * 0.5f - bulletSize.x * 0.5f, player.position.y + bulletSize.y * 0.25f } });
 }
 
 static void reloadFontsCommand(void*, SweatCI::Command&, const std::vector<std::string>&) {
@@ -129,8 +129,8 @@ void init(int windowWidth, int windowHeight) {
     entityData[PLAYER].texture.height = backgroundTexture.width * 0.05f;
     player = {{.0f, .0f}, {0.6f, 0.8f}};
 
-    player.rect.x = backgroundTexture.width * 0.5f - entityData[PLAYER].texture.width * 0.5f;
-    player.rect.y = backgroundTexture.height * 0.9f - entityData[PLAYER].texture.height;
+    player.position.x = backgroundTexture.width * 0.5f - entityData[PLAYER].texture.width * 0.5f;
+    player.position.y = backgroundTexture.height * 0.9f - entityData[PLAYER].texture.height;
 
     bulletSpeed = 0.8f;
 
@@ -226,8 +226,8 @@ void resize() {
     backgroundTexture.width = newScreenWidth;
     backgroundTexture.height = newScreenHeight;
 
-    player.rect.x *= ratio.x;
-    player.rect.y *= ratio.y;
+    player.position.x *= ratio.x;
+    player.position.y *= ratio.y;
     entityData[PLAYER].texture.width *= ratio.x;
     entityData[PLAYER].texture.height *= ratio.y;
 
@@ -260,16 +260,23 @@ void render(float dt) {
     BeginDrawing();
     DrawTexture(backgroundTexture, 0, 0, WHITE);
 
+
+    Rectangle playerRect = {player.position.x, player.position.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height};
+    
     player.update(backgroundTexture.width, backgroundTexture.height, dt);
     for (size_t bulletIdx = 0; bulletIdx < bullets.size();) {
         DrawRectangle(bullets[bulletIdx].position.x, bullets[bulletIdx].position.y, bulletSize.x, bulletSize.y, entityData[bullets[bulletIdx].ownerType].color);
-        if (handleBullet(bulletIdx, dt))
+        if (handleBullet(bulletIdx, playerRect, dt))
             ++bulletIdx;
     }
 
-    for (auto& enemy : enemies) {
-        enemy.update(player, dt);
-        enemy.draw();
+    for (auto it = enemies.begin(); it != enemies.end(); ++it) {
+        if (it->update(player, playerRect, dt)) {
+            enemies.erase(it);
+            --it;
+            continue;
+        }
+        it->draw();
     }
 
     player.draw();
@@ -330,10 +337,10 @@ void loadCommands() {
     Input::allowedUiCommands.push_back("quit");
 }
 
-bool handleBullet(size_t& bulletIdx, float dt) {
+bool handleBullet(size_t bulletIdx, const Rectangle& playerRect, float dt) {
     Rectangle rect = { bullets[bulletIdx].position.x, bullets[bulletIdx].position.y, bulletSize.x, bulletSize.y };
     float movement = bulletSpeed * backgroundTexture.height * dt;
-    
+
     unsigned int substeps = std::ceil(movement / bulletSize.y);
     float substepMovement = movement / substeps;
     for (unsigned int i = 0; i < substeps; ++i) {
@@ -367,7 +374,7 @@ bool handleBullet(size_t& bulletIdx, float dt) {
             }
         }
         else {
-            if (CheckCollisionRecs(rect, { player.rect.x, player.rect.y, (float)entityData[PLAYER].texture.width, (float)entityData[PLAYER].texture.height })) {
+            if (CheckCollisionRecs(rect, playerRect)) {
                 player.health -= entityData[bullets[bulletIdx].ownerType].damage;
                 bullets.erase(bullets.begin() + bulletIdx);
                 return false;

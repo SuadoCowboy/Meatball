@@ -14,7 +14,7 @@ void save(const std::string& path);
 void cleanup();
 
 void loadCommands();
-bool handleBullet(size_t& bulletIdx, float dt);
+bool handleBullet(size_t bulletIdx, const Rectangle& playerRect, float dt);
 
 extern Meatball::ConsoleUI* pConsoleUI;
 extern Texture2D backgroundTexture;
